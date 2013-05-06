@@ -2,7 +2,6 @@ package mgl;
 import flash.display.BitmapData;
 import flash.display.ColorCorrection;
 import flash.geom.Rectangle;
-import flash.Lib;
 using Math;
 class D { // DotShape
 	public var i(getNewInstance, null):D;
@@ -22,16 +21,21 @@ class D { // DotShape
 	public function p(pos:V):D { return setPos(pos); }
 	public function r(angle:Float):D { return rotate(angle); }
 	public function sz(dotSize:Int):D { return setDotSize(dotSize); }
+	public function sc(x:Float = 1, y:Float = 0):D { return setScale(x, y); }
+	public var ed(enableDotScale, null):D;
+	public var dd(disableDotScale, null):D;
 	public function dc(color:C = null):D { return setDrawColor(color); }
 	public var d(draw, null):D;
 
 	static inline var BASE_DOT_SIZE = 3;
 	static var bd:BitmapData;
+	static var screenSize:V;
 	static var rect:Rectangle;
 	static var rPos:V;
 	static var colorInstance:C;
 	public static function initialize(game:G) {
 		bd = game.bd;
+		screenSize = game.screenSize;
 		rect = new Rectangle();
 		rPos = new V();
 		colorInstance = new C();
@@ -145,8 +149,8 @@ class D { // DotShape
 		var doy = dotSize * scaleY;
 		var rox = Std.int(rect.width / 2);
 		var roy = Std.int(rect.height / 2);
-		var x = pos.x * Lib.current.width;
-		var y = pos.y * Lib.current.height;
+		var x = pos.x * screenSize.x;
+		var y = pos.y * screenSize.y;
 		for (d in dots) {
 			rPos.x = d.offset.x * dox;
 			rPos.y = d.offset.y * doy;
