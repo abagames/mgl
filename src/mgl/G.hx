@@ -25,7 +25,7 @@ class G { // Game
 	public var t:T;
 	public var u:U;
 	public var v:V;
-	public function tt(title:String):G { return setTitle(title); }
+	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
 	public var dm(setDebuggingMode, null):G;
 	public function pl(platform:Dynamic):G { return setPlatform(platform); }
 	public function bc(backgroundColor:C):G { return setBackgroundColor(backgroundColor); }
@@ -41,9 +41,12 @@ class G { // Game
 	public var eg(endGame, null):Bool;
 	
 	public var bd:BitmapData;
+	public var screenSize:V;
+	public var baseSprite:Sprite;
 	var current:MovieClip;
 	var main:Dynamic;
 	var title = "";
+	var title2 = "";
 	var isDebugging = false;
 	var platform:Dynamic;
 	var score = 0;
@@ -54,10 +57,7 @@ class G { // Game
 	var wasClicked = false;
 	var wasReleased = false;
 	var titleTicks = 0;
-	var screenWidth:Int;
-	var screenHeight:Int;
 	var blurBd:BitmapData;
-	var baseSprite:Sprite;
 	var fRect:Rectangle;
 	var fadeFilter:ColorMatrixFilter;
 	var blurFilter10:BlurFilter;
@@ -74,6 +74,7 @@ class G { // Game
 		C.initialize();
 		D.initialize(this);
 		L.initialize(this);
+		M.initialize(this);
 		P.initialize(this);
 		S.initialize(this);
 		T.initialize();
@@ -82,7 +83,7 @@ class G { // Game
 		d = new D();
 		k = new K();
 		l = new L();
-		m = new M(baseSprite);
+		m = new M();
 		p = new P();
 		r = new R();
 		t = new T();
@@ -91,8 +92,9 @@ class G { // Game
 		v = new V();
 		setBackgroundColor(c.di);
 	}
-	function setTitle(title:String):G {
+	function setTitle(title:String, title2:String):G {
 		this.title = title;
+		this.title2 = title2;
 		return this;
 	}
 	function setDebuggingMode():G {
@@ -105,7 +107,7 @@ class G { // Game
 	}
 	function setBackgroundColor(backgroundColor:C):G {
 		baseSprite.graphics.beginFill(backgroundColor.i);
-		baseSprite.graphics.drawRect(0, 0, screenWidth, screenHeight);
+		baseSprite.graphics.drawRect(0, 0, screenSize.xi, screenSize.yi);
 		baseSprite.graphics.endFill();
 		return this;
 	}
@@ -138,10 +140,10 @@ class G { // Game
 		return this;
 	}
 	function fillRect(x:Float, y:Float, width:Float, height:Float, color:C):G {
-		var w = width * screenWidth;
-		var h = height * screenHeight;
-		fRect.x = Std.int(x * screenWidth) - Std.int(w / 2);
-		fRect.y = Std.int(y * screenHeight) - Std.int(h / 2);
+		var w = width * screenSize.x;
+		var h = height * screenSize.y;
+		fRect.x = Std.int(x * screenSize.x) - Std.int(w / 2);
+		fRect.y = Std.int(y * screenSize.y) - Std.int(h / 2);
 		fRect.width = w;
 		fRect.height = h;
 		bd.fillRect(fRect, color.i);
@@ -170,10 +172,10 @@ class G { // Game
 		blurFilter10 = new BlurFilter(10, 10);
 		blurFilter20 = new BlurFilter(20, 20);
 		zeroPoint = new Point();
-		screenWidth = Lib.current.stage.stageWidth;
-		screenHeight = Lib.current.stage.stageHeight;
-		bd = new BitmapData(screenWidth, screenHeight, true, 0);
-		blurBd = new BitmapData(screenWidth, screenHeight, true, 0);
+		screenSize = new V();
+		screenSize.xy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
+		bd = new BitmapData(screenSize.xi, screenSize.yi, true, 0);
+		blurBd = new BitmapData(screenSize.xi, screenSize.yi, true, 0);
 		var blurBitmap = new Bitmap(blurBd);
 		baseSprite = new Sprite();
 		baseSprite.addChild(blurBitmap);
@@ -232,7 +234,12 @@ class G { // Game
 	}
 	function handleTitleScreen():Void {
 		var tx = platform.titleX;
-		l.t(title).xy(tx, 0.4).d;
+		if (title2.length <= 0) {
+			l.t(title).xy(tx, 0.4).d;
+		} else {
+			l.t(title).xy(tx, 0.38).d;
+			l.t(title2).xy(tx, 0.41).d;
+		}
 		l.t(platform.clickStr).xy(tx, 0.54).d;
 		l.t("TO").xy(tx, 0.57).d;
 		l.t("START").xy(tx, 0.6).d;
