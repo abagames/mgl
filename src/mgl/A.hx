@@ -51,12 +51,12 @@ class A { // Actor
 				(p.y - a.p.y).abs() <= (hitRect.y + a.hitRect.y) / 2);
 		});
 	}
-	function isHit(actors:Array<Dynamic>, hitInstance:A, hitTest:A -> Bool):Bool {
+	function isHit(actors:Array<Dynamic>, hitInstance:Dynamic, hitTest:A -> Bool):Bool {
 		var hf:Bool = false;
 		for (a in actors) {
 			if (this == a.a) continue;
 			if (hitTest(a.a)) {
-				if (hitInstance != null) a.hit(hitInstance);
+				if (hitInstance != null) hitInstance.hit(a);
 				hf = true;
 			}
 		}

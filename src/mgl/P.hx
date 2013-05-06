@@ -1,7 +1,6 @@
 package mgl;
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
-import flash.Lib;
 class P { // Particle
 	public var i(newInstance, null):P;
 	public function p(pos:V):P { return setPos(pos); }
@@ -15,6 +14,7 @@ class P { // Particle
 
 	public static var ps:Array<P>;
 	static var bd:BitmapData;
+	static var screenSize:V;
 	static var random:R;
 	static var rect:Rectangle;
 	static var colorInstance:C;
@@ -22,12 +22,11 @@ class P { // Particle
 	static var screenHeight:Float;
 	public static function initialize(game:G):Void {
 		bd = game.bd;
+		screenSize = game.screenSize;
 		ps = new Array<P>();
 		random = new R();
 		rect = new Rectangle();
 		colorInstance = new C();
-		screenWidth = Lib.current.width;
-		screenHeight = Lib.current.height;
 	}
 	var actor:A;
 	var ticks = 60;
@@ -102,9 +101,9 @@ class P { // Particle
 		} else {
 			size *= 0.95;
 		}
-		var s = size * screenWidth;
-		rect.x = Std.int(actor.p.x * screenWidth) - Std.int(s / 2);
-		rect.y = Std.int(actor.p.y * screenHeight) - Std.int(s / 2);
+		var s = size * screenSize.x;
+		rect.x = Std.int(actor.p.x * screenSize.x) - Std.int(s / 2);
+		rect.y = Std.int(actor.p.y * screenSize.y) - Std.int(s / 2);
 		rect.width = rect.height = Std.int(s);
 		bd.fillRect(rect, color.gbl.i);
 		return --ticks > 0;

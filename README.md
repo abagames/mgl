@@ -2,7 +2,7 @@ mgl (Mini Game programming Library)
 ======================
 Mgl is a flash mini game programming library for my own use. Mgi is useful for creating a mini game with a terrible unreadable code.
 
-[Sample game](http://wonderfl.net/c/cUIn "WASD THRUST")
+[Sample game](http://wonderfl.net/c/d8Rm "TOSSED HUMANS SPLIT OVER")
 
 Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 

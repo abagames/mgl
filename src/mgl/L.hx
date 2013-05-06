@@ -2,7 +2,6 @@ package mgl;
 import flash.display.BitmapData;
 import flash.display.ColorCorrection;
 import flash.geom.Rectangle;
-import flash.Lib;
 class L { // Letter
 	public var i(newInstance, null):L;
 	public function t(text:String):L { return setText(text); }
@@ -18,12 +17,14 @@ class L { // Letter
 	static inline var BASE_DOT_SIZE = 2;
 	static inline var COUNT = 64;
 	static var bd:BitmapData;
+	static var screenSize:V;
 	static var dotPatterns:Array<Array<V>>;
 	static var charToIndex:Array<Int>;
 	static var rect:Rectangle;
 	static var colorInstance:C;
 	public static function initialize(game:G):Void {
 		bd = game.bd;
+		screenSize = game.screenSize;
 		dotPatterns = new Array<Array<V>>();
 		charToIndex = new Array<Int>();
 		rect = new Rectangle();
@@ -123,7 +124,7 @@ class L { // Letter
 		return this;
 	}
 	function draw():L {
-		var tx = Std.int(pos.x * Lib.current.width), ty = Std.int(pos.y * Lib.current.height);
+		var tx = Std.int(pos.x * screenSize.x), ty = Std.int(pos.y * screenSize.y);
 		var ci = color.i;
 		var lw = dotSize * 5;
 		switch (align) {

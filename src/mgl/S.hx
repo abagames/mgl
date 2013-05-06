@@ -8,7 +8,7 @@ class S { // SoundEffect
 	public function bmn(l:Int = 64, v:Int = 16):S { return beginMinor(l, v); }
 	public function bn(l:Int = 64, v:Int = 16):S { return beginNoise(l, v); }
 	public function bns(l:Int = 64, v:Int = 16):S { return beginNoiseScale(l, v); }
-	public function w(width:Float, interval:Float = 0):S { return setWave(width, interval); }
+	public function w(width:Float = 0, interval:Float = 0):S { return setWave(width, interval); }
 	public function t(from:Float, time:Int = 1, to:Float = 0):S { 
 		return addTone(from, time, to);
 	}
