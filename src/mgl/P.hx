@@ -9,7 +9,7 @@ class P { // Particle
 	public function sz(size:Float):P { return setSize(size); }
 	public function s(speed:Float):P { return setSpeed(speed); }
 	public function t(ticks:Float):P { return setTicks(ticks); }
-	public function ag(angle:Float, angleWidth:Float):P { return setAngle(angle, angleWidth); }
+	public function an(angle:Float, angleWidth:Float):P { return setAngle(angle, angleWidth); }
 	public var a(add, null):P;
 
 	public static var ps:Array<P>;

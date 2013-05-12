@@ -4,10 +4,10 @@ import org.si.sion.SiONData;
 using Math;
 class S { // SoundEffect
 	public var i(newInstance, null):S;
-	public function bmj(l:Int = 64, v:Int = 16):S { return beginMarjor(l, v); }
-	public function bmn(l:Int = 64, v:Int = 16):S { return beginMinor(l, v); }
-	public function bn(l:Int = 64, v:Int = 16):S { return beginNoise(l, v); }
-	public function bns(l:Int = 64, v:Int = 16):S { return beginNoiseScale(l, v); }
+	public function m(l:Int = 64, v:Int = 16):S { return beginMajor(l, v); }
+	public function mn(l:Int = 64, v:Int = 16):S { return beginMinor(l, v); }
+	public function n(l:Int = 64, v:Int = 16):S { return beginNoise(l, v); }
+	public function ns(l:Int = 64, v:Int = 16):S { return beginNoiseScale(l, v); }
 	public function w(width:Float = 0, interval:Float = 0):S { return setWave(width, interval); }
 	public function t(from:Float, time:Int = 1, to:Float = 0):S { 
 		return addTone(from, time, to);
@@ -49,7 +49,7 @@ class S { // SoundEffect
 	function newInstance():S {
 		return new S();
 	}
-	function beginMarjor(l:Int = 64, v:Int = 16):S {
+	function beginMajor(l:Int = 64, v:Int = 16):S {
 		type = Major;
 		begin(l, v);
 		return this;

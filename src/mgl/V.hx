@@ -7,7 +7,8 @@ class V {
 	public function xy(x:Float = 0, y:Float = 0):V { return setXy(x, y); }
 	public function n(n:Float = 0):V { return setNumber(n); }
 	public function v(v:V):V { return setValue(v); }
-	public var ga(getAngle, null):Float;
+	public var l(getLength, null):Float;
+	public var an(getAngle, null):Float;
 	public var xi(getXInt, null):Int;
 	public var yi(getYInt, null):Int;
 	public function dt(pos:V):Float { return distanceTo(pos); }
@@ -41,8 +42,11 @@ class V {
 		y = v.y;
 		return this;
 	}
+	function getLength():Float {
+		return (x * x + y * y).sqrt();
+	}
 	function getAngle():Float {
-		return Math.atan2(x, y);
+		return y.atan2(x);
 	}
 	function getXInt():Int {
 		return Std.int(x);
@@ -53,10 +57,10 @@ class V {
 	function distanceTo(pos:V):Float {
 		var ox = pos.x - x;
 		var oy = pos.y - y;
-		return Math.sqrt(ox * ox + oy * oy);
+		return (ox * ox + oy * oy).sqrt();
 	}
 	function wayTo(pos:V):Float {
-		return (pos.x - x).atan2(pos.y - y);
+		return (pos.y - y).atan2(pos.x - x);
 	}
 	function add(v:V):V {
 		x += v.x;
@@ -79,13 +83,13 @@ class V {
 		return this;
 	}
 	function addAngle(angle:Float, speed:Float):V {
-		x += angle.sin() * speed;
-		y += angle.cos() * speed;
+		x += angle.cos() * speed;
+		y += angle.sin() * speed;
 		return this;
 	}
 	function rotate(angle:Float):V {
 		var px = x;
-		x = -x * angle.cos() + y * angle.sin();
+		x = x * angle.cos() - y * angle.sin();
 		y = px * angle.sin() + y * angle.cos();
 		return this;
 	}
