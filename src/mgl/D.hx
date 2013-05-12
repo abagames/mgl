@@ -5,6 +5,7 @@ import flash.geom.Rectangle;
 using Math;
 class D { // DotShape
 	public var i(getNewInstance, null):D;
+	public function sz(dotSize:Int):D { return setDotSize(dotSize); }
 	public function c(color:C):D { return setColor(color); }
 	public function cs(color:C):D { return setColorSpot(color); }
 	public function cb(color:C):D { return setColorBottom(color); }
@@ -14,13 +15,20 @@ class D { // DotShape
 	}
 	public function st(threshold:Float):D { return setSpotThreshold(threshold); }
 	public function o(x:Float = 0, y:Float = 0):D { return setOffset(x, y); }
-	public function fr(width:Int, height:Int):D { return fillRect(width, height); }
-	public function lr(width:Int, height:Int):D { return lineRect(width, height); }
-	public function fc(radius:Int):D { return fillCircle(radius); }
-	public function lc(radius:Int):D { return lineCircle(radius); }
+	public function fr(width:Float, height:Float, edgeWidth:Int = 0):D {
+		return fillRect(width, height, edgeWidth);
+	}
+	public function lr(width:Float, height:Float, edgeWidth:Int = 1):D {
+		return lineRect(width, height, edgeWidth);
+	}
+	public function fc(radius:Float, edgeWidth:Int = 0):D {
+		return fillCircle(radius, edgeWidth);
+	}
+	public function lc(radius:Float, edgeWidth:Int = 1):D {
+		return lineCircle(radius, edgeWidth);
+	}
 	public function p(pos:V):D { return setPos(pos); }
 	public function r(angle:Float):D { return rotate(angle); }
-	public function sz(dotSize:Int):D { return setDotSize(dotSize); }
 	public function sc(x:Float = 1, y:Float = 0):D { return setScale(x, y); }
 	public var ed(enableDotScale, null):D;
 	public var dd(disableDotScale, null):D;
@@ -41,6 +49,7 @@ class D { // DotShape
 		colorInstance = new C();
 	}
 	var dots:Array<OffsetColor>;
+	var dotSize = BASE_DOT_SIZE;
 	var color:C;
 	var colorSpot:C;
 	var colorBottom:C;
@@ -52,7 +61,6 @@ class D { // DotShape
 	var offset:V;
 	var pos:V;
 	var angle = 0.0;
-	var dotSize = BASE_DOT_SIZE;
 	var scaleX = 1.0;
 	var scaleY = 1.0;
 	var isDotScale = true;
@@ -66,6 +74,10 @@ class D { // DotShape
 	}
 	function getNewInstance():D  {
 		return new D();
+	}
+	function setDotSize(dotSize:Int = BASE_DOT_SIZE):D {
+		this.dotSize = dotSize;
+		return this;
 	}
 	function setColor(color:C):D {
 		this.color = color;
@@ -94,20 +106,21 @@ class D { // DotShape
 		return this;
 	}
 	function setOffset(x:Float, y:Float):D {
-		offset.x = x; offset.y = y;
+		offset.x = Std.int(x * screenSize.x / dotSize);
+		offset.y = Std.int(y * screenSize.y / dotSize);
 		return this;
 	}
-	function fillRect(width:Int, height:Int):D {
-		return setRect(width, height, false);
+	function fillRect(width:Float, height:Float, edgeWidth:Int):D {
+		return setRect(width, height, edgeWidth, false);
 	}
-	function lineRect(width:Int, height:Int):D {
-		return setRect(width, height, true);
+	function lineRect(width:Float, height:Float, edgeWidth:Int):D {
+		return setRect(width, height, edgeWidth, true);
 	}
-	function fillCircle(radius:Int):D {
-		return setCircle(radius, false);
+	function fillCircle(radius:Float, edgeWidth:Int):D {
+		return setCircle(radius, edgeWidth, false);
 	}
-	function lineCircle(radius:Int):D {
-		return setCircle(radius, true);
+	function lineCircle(radius:Float, edgeWidth:Int):D {
+		return setCircle(radius, edgeWidth, true);
 	}
 	function setPos(pos:V):D {
 		this.pos.v(pos);
@@ -115,10 +128,6 @@ class D { // DotShape
 	}
 	function rotate(angle:Float):D {
 		this.angle = angle;
-		return this;
-	}
-	function setDotSize(dotSize:Int = BASE_DOT_SIZE):D {
-		this.dotSize = dotSize;
 		return this;
 	}
 	function setScale(x:Float, y:Float):D {
@@ -163,22 +172,35 @@ class D { // DotShape
 		return this;
 	}
 
-	function setRect(width:Int, height:Int, isDrawingEdge:Bool = false):D {
-		var ox = Std.int(-width / 2), oy = -Std.int(height / 2);
-		for (y in 0...height) {
-			for (x in 0...width) {
-				if (!isDrawingEdge ||
-				x == 0 || x == width - 1 || y == 0 || y == height - 1) {
-					setDot(x + ox, y + oy, y / height);
+	function setRect(width:Float, height:Float, edgeWidth:Int, isDrawingEdge:Bool = false):D {
+		var w = Std.int(screenSize.x * width / dotSize);
+		var h = Std.int(screenSize.y * height / dotSize);
+		var ox = Std.int(-w / 2), oy = -Std.int(h / 2);
+		for (y in 0...h) {
+			for (x in 0...w) {
+				if (x < edgeWidth || x >= w - edgeWidth ||
+					y < edgeWidth || y >= h - edgeWidth) {
+					if (isDrawingEdge) setDot(x + ox, y + oy, y / h);
+				} else {
+					if (!isDrawingEdge) setDot(x + ox, y + oy, y / h);
 				}
 			}
 		}
 		return this;
 	}
-	function setCircle(radius:Int, isDrawingEdge:Bool):D {
+	function setCircle(radius:Float, edgeWidth:Int, isDrawingEdge:Bool):D {
+		var r = Std.int(screenSize.x * radius / dotSize);
+		if (isDrawingEdge) {
+			for (er in r - edgeWidth + 1...r + 1) setOneCircle(er, true);
+		} else {
+			setOneCircle(r - edgeWidth, false);
+		}
+		return this;
+	}
+	function setOneCircle(radius:Int, isDrawingEdge:Bool):Void {
 		var d = 3 - radius * 2;
 		var y = radius;
-		for (x in 0...y + 1) {
+		for (x in 0...Std.int(y * 0.7) + 2) {
 			if (isDrawingEdge) {
 				setCircleDotsEdge(x, y, radius);
 				setCircleDotsEdge(y, x, radius);
@@ -193,7 +215,6 @@ class D { // DotShape
 				y--;
 			}
 		}
-		return this;
 	}
 	function setCircleDots(x:Int, y:Int, r:Int):Void {
 		setXLine(-x, x, y, r);
