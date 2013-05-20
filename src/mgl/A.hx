@@ -8,7 +8,7 @@ class A { // Actor
 	public var s = 0.0; // speed
 	public var u(update, null):A;
 	public function c(radius:Float):A { return setHitCircle(radius); }
-	public function r(width:Float, height:Float):A { return setHitRect(width, height); }
+	public function r(width:Float, height:Float = -1):A { return setHitRect(width, height); }
 	public function ic(actors:Array<Dynamic>, hitInstance:Dynamic = null):Bool {
 		return isHitCircle(actors, hitInstance);
 	}
@@ -37,7 +37,7 @@ class A { // Actor
 	}
 	function setHitRect(width:Float, height:Float):A {
 		hitRect.x = width;
-		hitRect.y = height;
+		hitRect.y = (height >= 0 ? height : width);
 		return this;
 	}
 	function isHitCircle(actors:Array<Dynamic>, hitInstance:Dynamic):Bool {

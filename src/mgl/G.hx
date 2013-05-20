@@ -28,17 +28,20 @@ class G { // Game
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
 	public var dm(setDebuggingMode, null):G;
 	public function pl(platform:Dynamic):G { return setPlatform(platform); }
-	public function bc(backgroundColor:C):G { return setBackgroundColor(backgroundColor); }
 	public var b(begin, null):G;
 	public var ig(getIsInGame, null):Bool;
 	public var tc(getTicks, null):Int;
 	public function ua(actors:Array<Dynamic>):G { return updateActors(actors); }
 	public var dp(drawParticles, null):G;
 	public function fr(x:Float, y:Float, width:Float, height:Float, color:C):G {
-		return fillRect(x, y, width, height, color);
+		return fillRect(bd, x, y, width, height, color);
+	}
+	public function cb(color:C):G { return clearBackground(color); }
+	public function frb(x:Float, y:Float, width:Float, height:Float, color:C):G {
+		return fillRect(baseBd, x, y, width, height, color);
 	}
 	public function sc(score:Int):G { return addScore(score); }
-	public var eg(endGame, null):Bool;
+	public var e(endGame, null):Bool;
 	
 	public var bd:BitmapData;
 	public var screenSize:V;
@@ -58,6 +61,8 @@ class G { // Game
 	var wasReleased = false;
 	var titleTicks = 0;
 	var blurBd:BitmapData;
+	var baseBd:BitmapData;
+	var sRect:Rectangle;
 	var fRect:Rectangle;
 	var fadeFilter:ColorMatrixFilter;
 	var blurFilter10:BlurFilter;
@@ -90,7 +95,6 @@ class G { // Game
 		s = new S();
 		u = new U();
 		v = new V();
-		setBackgroundColor(c.di);
 	}
 	function setTitle(title:String, title2:String):G {
 		this.title = title;
@@ -103,12 +107,6 @@ class G { // Game
 	}
 	function setPlatform(platform:Dynamic):G {
 		this.platform = platform;
-		return this;
-	}
-	function setBackgroundColor(backgroundColor:C):G {
-		baseSprite.graphics.beginFill(backgroundColor.i);
-		baseSprite.graphics.drawRect(0, 0, screenSize.xi, screenSize.yi);
-		baseSprite.graphics.endFill();
 		return this;
 	}
 	function begin():G {
@@ -130,7 +128,7 @@ class G { // Game
 	function updateActors(actors:Array<Dynamic>):G {
 		var i = 0;
 		while (i < actors.length) {
-			if (actors[i].update()) i++;
+			if (actors[i].u()) i++;
 			else actors.splice(i, 1);
 		}
 		return this;
@@ -139,14 +137,18 @@ class G { // Game
 		updateActors(P.ps);
 		return this;
 	}
-	function fillRect(x:Float, y:Float, width:Float, height:Float, color:C):G {
+	function fillRect(fbd:BitmapData, x:Float, y:Float, width:Float, height:Float, color:C):G {
 		var w = width * screenSize.x;
 		var h = height * screenSize.y;
 		fRect.x = Std.int(x * screenSize.x) - Std.int(w / 2);
 		fRect.y = Std.int(y * screenSize.y) - Std.int(h / 2);
 		fRect.width = w;
 		fRect.height = h;
-		bd.fillRect(fRect, color.i);
+		fbd.fillRect(fRect, color.i);
+		return this;
+	}
+	function clearBackground(color:C):G {
+		baseBd.fillRect(sRect, color.i);
 		return this;
 	}
 	function addScore(score:Int):G {
@@ -155,6 +157,7 @@ class G { // Game
 	}
 	function endGame():Bool {
 		if (!isInGame) return false;
+		s.fo();
 		platform.recordHighScore(score);
 		platform.showHighScore();
 		isInGame = false;
@@ -176,13 +179,18 @@ class G { // Game
 		screenSize.xy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		bd = new BitmapData(screenSize.xi, screenSize.yi, true, 0);
 		blurBd = new BitmapData(screenSize.xi, screenSize.yi, true, 0);
-		var blurBitmap = new Bitmap(blurBd);
+		baseBd = new BitmapData(screenSize.xi, screenSize.yi, false, 0);
 		baseSprite = new Sprite();
+		var baseBitmap = new Bitmap(baseBd);
+		baseSprite.addChild(baseBitmap);
+		var blurBitmap = new Bitmap(blurBd);
 		baseSprite.addChild(blurBitmap);
 		Lib.current.addChild(baseSprite);
+		sRect = new Rectangle(0, 0, screenSize.x, screenSize.y);
 		fRect = new Rectangle();
 	}
 	function beginGame():Void {
+		s.s;
 		isInGame = true;
 		score = 0;
 		ticks = 0;
@@ -203,7 +211,7 @@ class G { // Game
 			if (isDebugging) {
 				l.ar.t("FPS: " + Std.string(Std.int(fps))).xy(1, 0.03).d.ac;
 			}
-			S.updateAll();
+			updateActors(S.ss);
 			ticks++;
 		} else {
 			l.t("PAUSED").xy(0.5, 0.45).d;

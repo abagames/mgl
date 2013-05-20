@@ -29,7 +29,7 @@ class D { // DotShape
 	}
 	public function p(pos:V):D { return setPos(pos); }
 	public function r(angle:Float):D { return rotate(angle); }
-	public function sc(x:Float = 1, y:Float = 0):D { return setScale(x, y); }
+	public function s(x:Float = 1, y:Float = -1):D { return setScale(x, y); }
 	public var ed(enableDotScale, null):D;
 	public var dd(disableDotScale, null):D;
 	public function dc(color:C = null):D { return setDrawColor(color); }
@@ -132,7 +132,7 @@ class D { // DotShape
 	}
 	function setScale(x:Float, y:Float):D {
 		scaleX = x;
-		scaleY = (y > 0 ? y : x);
+		scaleY = (y >= 0 ? y : x);
 		return this;
 	}
 	function enableDotScale():D {

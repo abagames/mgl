@@ -4,11 +4,13 @@ Mgl is a flash mini game programming library for my own use. Mgi is useful for c
 
 Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
-###Sample game
+####Sample game
+
+[LOCK ON TO ALL OF THEM](http://wonderfl.net/c/rqvL)
+
+####Sample game (using the older version mgl)
 
 [DUAL PISTOLS RG](http://wonderfl.net/c/ilHX)
-
-#### using the older version mgl
 
 [TOSSED HUMANS SPLIT OVER](http://wonderfl.net/c/d8Rm)
 

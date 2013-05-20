@@ -5,7 +5,7 @@ class R { // Random
 	public function i(v:Int, s:Int = 0):Int { return Std.int(n(v, s)); }
 	public function p():Int { return i(2) * 2 - 1; }
 	public function pn(v:Float = 1):Float { return n(v) * p(); }
-	public function s(v:Int = -0x7fffffff):Void { setSeed(v); }
+	public function s(v:Int = -0x7fffffff):R { return setSeed(v); }
 
 	var x = 0;
 	var y = 0;
@@ -17,7 +17,7 @@ class R { // Random
 	function newInstance(v:Int = -0x7fffffff):R {
 		return new R(v);
 	}
-	function setSeed(v:Int = -0x7fffffff):Void {
+	function setSeed(v:Int = -0x7fffffff):R {
 		var sv:Int;
 		if (v == -0x7fffffff) sv = Std.int(Math.random() * 0x7fffffff);
 		else sv = v;
@@ -25,6 +25,7 @@ class R { // Random
 		y = sv = 1812433253 * (sv ^ (sv >> 30)) + 1;
 		z = sv = 1812433253 * (sv ^ (sv >> 30)) + 2;
 		w = sv = 1812433253 * (sv ^ (sv >> 30)) + 3;
+		return this;
 	}
 
 	function get():Float {

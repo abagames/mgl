@@ -60,7 +60,7 @@ class T { // Text
 		return add();
 	}
 
-	public function update():Bool {
+	public function u():Bool {
 		if (isFirstTicks) {
 			actor.v.d(ticks);
 			isFirstTicks = false;

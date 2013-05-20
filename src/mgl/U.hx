@@ -25,7 +25,7 @@ class U {
 		else r = targetAngle;
 		return na(r);
 	}
-	public inline function cr(v:Float, max:Float, min:Float = 0):Float { // circleRange
+	public inline function cr(v:Float, min:Float, max:Float):Float { // circleRange
 		var w = max - min;
 		v -= min;
 		var r:Float;

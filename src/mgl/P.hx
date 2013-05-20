@@ -92,7 +92,7 @@ class P { // Particle
 		return this;
 	}
 
-	public function update():Bool {
+	public function u():Bool {
 		actor.p.a(actor.v);
 		actor.v.m(0.98);
 		if (isExpand) {
