@@ -56,7 +56,7 @@ class A { // Actor
 		for (a in actors) {
 			if (this == a.a) continue;
 			if (hitTest(a.a)) {
-				if (hitInstance != null) hitInstance.hit(a);
+				if (hitInstance != null) hitInstance.h(a);
 				hf = true;
 			}
 		}
