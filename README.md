@@ -6,9 +6,11 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
-[LOCK ON TO ALL OF THEM](http://wonderfl.net/c/rqvL)
+[LASER WINDER](http://wonderfl.net/c/pYeI)
 
 ####Sample game (using the older version mgl)
+
+[LOCK ON TO ALL OF THEM](http://wonderfl.net/c/rqvL)
 
 [DUAL PISTOLS RG](http://wonderfl.net/c/ilHX)
 

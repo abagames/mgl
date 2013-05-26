@@ -153,8 +153,8 @@ class S { // SoundEffect
 		isStarting = false;
 		driver.stop();
 		driver.volume = 0;
+		fadeIn(0.1);
 		driver.play();
-		fadeIn(0);
 		return this;
 	}
 

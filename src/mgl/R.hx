@@ -2,7 +2,7 @@ package mgl;
 class R { // Random
 	public function ni(v:Int):R { return newInstance(v); }
 	public function n(v:Float = 1, s:Float = 0):Float { return get() * v + s; }
-	public function i(v:Int, s:Int = 0):Int { return Std.int(n(v, s)); }
+	public function i(v:Int, s:Int = 0):Int { return Std.int(n(v)) + s; }
 	public function p():Int { return i(2) * 2 - 1; }
 	public function pn(v:Float = 1):Float { return n(v) * p(); }
 	public function s(v:Int = -0x7fffffff):R { return setSeed(v); }
