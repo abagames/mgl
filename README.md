@@ -107,7 +107,7 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 ####K // Key
 
 ##### Variables
-* s:Array<Bool>;
+* s:Array<Bool> // pressed keys
 
 ##### Methods
 * iu:Bool // is up pressed
@@ -138,7 +138,7 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ##### Variables
 * p:V // pos
-* ip = false // is pressing
+* ip:Bool // is pressing
 
 ####P // Particle
 
@@ -211,8 +211,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 ####V // Vector
 
 ##### Variables
-* x = 0.0;
-* y = 0.0;
+* x:Float // x
+* y:Float // y
 
 ##### Methods
 * i:V // instance
