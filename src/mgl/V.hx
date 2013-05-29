@@ -1,16 +1,16 @@
 package mgl;
 using Math;
-class V {
-	public var i(newInstance, null):V;
+class V { // Vector
+	public var i(get, null):V; // instance
 	public var x = 0.0;
 	public var y = 0.0;
 	public function xy(x:Float = 0, y:Float = 0):V { return setXy(x, y); }
 	public function n(n:Float = 0):V { return setNumber(n); }
 	public function v(v:V):V { return setValue(v); }
-	public var l(getLength, null):Float;
-	public var an(getAngle, null):Float;
-	public var xi(getXInt, null):Int;
-	public var yi(getYInt, null):Int;
+	public var l(get, null):Float; // length
+	public var an(get, null):Float; // angle
+	public var xi(get, null):Int; // x int
+	public var yi(get, null):Int; // y int
 	public function dt(pos:V):Float { return distanceTo(pos); }
 	public function wt(pos:V):Float { return wayTo(pos); }
 	public function a(v:V):V { return add(v); }
@@ -25,7 +25,7 @@ class V {
 	}
 
 	public function new() {	}
-	function newInstance():V {
+	function get_i():V {
 		return new V();
 	}
 	function setXy(x:Float, y:Float):V {
@@ -42,16 +42,16 @@ class V {
 		y = v.y;
 		return this;
 	}
-	function getLength():Float {
+	function get_l():Float {
 		return (x * x + y * y).sqrt();
 	}
-	function getAngle():Float {
+	function get_an():Float {
 		return y.atan2(x);
 	}
-	function getXInt():Int {
+	function get_xi():Int {
 		return Std.int(x);
 	}
-	function getYInt():Int {
+	function get_yi():Int {
 		return Std.int(y);
 	}
 	function distanceTo(pos:V):Float {

@@ -1,12 +1,12 @@
 package mgl;
 using Math;
 class A { // Actor
-	public var i(newInstance, null):A;
+	public var i(get, null):A; // instance
 	public var p:V; // position
 	public var v:V; // velocity
 	public var a = 0.0; // angle
 	public var s = 0.0; // speed
-	public var u(update, null):A;
+	public var u(get, null):A; // update
 	public function c(radius:Float):A { return setHitCircle(radius); }
 	public function r(width:Float, height:Float = -1):A { return setHitRect(width, height); }
 	public function ic(actors:Array<Dynamic>, hitInstance:Dynamic = null):Bool {
@@ -23,10 +23,10 @@ class A { // Actor
 		v = new V();
 		hitRect = new V();
 	}
-	function newInstance():A {
+	function get_i():A {
 		return new A();
 	}
-	function update():A {
+	function get_u():A {
 		p.a(v);
 		p.aa(a, s);
 		return this;

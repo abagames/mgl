@@ -3,15 +3,15 @@ import flash.events.KeyboardEvent;
 import flash.Lib;
 class K { // Key
 	public var s:Array<Bool>;
-	public var iu(isUpPressed, null):Bool;
-	public var id(isDownPressed, null):Bool;
-	public var ir(isRightPressed, null):Bool;
-	public var il(isLeftPressed, null):Bool;
-	public var ib(isButtonPressed, null):Bool;
-	public var ib1(isButton1Pressed, null):Bool;
-	public var ib2(isButton2Pressed, null):Bool;
-	public var st(getStick, null):V;
-	public var r(reset, null):K;
+	public var iu(get, null):Bool; // isUpPressed
+	public var id(get, null):Bool; // isDownPressed
+	public var ir(get, null):Bool; // isRightPressed
+	public var il(get, null):Bool; // isLeftPressed
+	public var ib(get, null):Bool; // isButtonPressed
+	public var ib1(get, null):Bool; // isButton1Pressed
+	public var ib2(get, null):Bool; // isButton2Pressed
+	public var st(get, null):V; // stick
+	public var r(get, null):K; // reset
 
 	var stick:V;
 	public function new() {
@@ -21,37 +21,37 @@ class K { // Key
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onPressed);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onReleased);
 	}
-	function isUpPressed():Bool {
+	function get_iu():Bool {
 		return s[0x26] || s[0x57];
 	}
-	function isDownPressed():Bool {
+	function get_id():Bool {
 		return s[0x28] || s[0x53];
 	}
-	function isRightPressed():Bool {
+	function get_ir():Bool {
 		return s[0x27] || s[0x44];
 	}
-	function isLeftPressed():Bool {
+	function get_il():Bool {
 		return s[0x25] || s[0x41];
 	}
-	function isButtonPressed():Bool {
-		return isButton1Pressed() || isButton2Pressed();
+	function get_ib():Bool {
+		return get_ib1() || get_ib2();
 	}
-	function isButton1Pressed():Bool {
+	function get_ib1():Bool {
 		return s[0x5a] || s[0xbe] || s[0x20];
 	}
-	function isButton2Pressed():Bool {
+	function get_ib2():Bool {
 		return s[0x58] || s[0xbf];
 	}	
-	function getStick():V {
+	function get_st():V {
 		stick.n(0);
-		if (isUpPressed()) stick.y -= 1;
-		if (isDownPressed()) stick.y += 1;
-		if (isRightPressed()) stick.x += 1;
-		if (isLeftPressed()) stick.x -= 1;
+		if (get_iu()) stick.y -= 1;
+		if (get_id()) stick.y += 1;
+		if (get_ir()) stick.x += 1;
+		if (get_il()) stick.x -= 1;
 		if (stick.x != 0 && stick.y != 0) stick.m(0.7);
 		return stick;
 	}
-	function reset():K {
+	function get_r():K {
 		for (i in 0...256) s[i] = false;
 		return this;
 	}

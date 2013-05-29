@@ -2,12 +2,12 @@ package mgl;
 import org.si.sion.SiONDriver;
 import org.si.sion.SiONData;
 using Math;
-class S { // SoundEffect
-	public var i(newInstance, null):S;
-	public var mj(beginMajor, null):S;
-	public var mn(beginMinor, null):S;
-	public var n(beginNoise, null):S;
-	public var ns(beginNoiseScale, null):S;
+class S { // Sound
+	public var i(get, null):S; // instance
+	public var mj(get, null):S; // major
+	public var mn(get, null):S; // minor
+	public var n(get, null):S; // noise
+	public var ns(get, null):S; // noise scale
 	public function t(from:Float, time:Int = 1, to:Float = 0):S {
 		return addTone(from, time, to);
 	}
@@ -21,12 +21,12 @@ class S { // SoundEffect
 	public function rr(v:Int = 0):S { return setRepeatRest(v); }
 	public function l(v:Int = 64):S { return setLength(v); }
 	public function v(v:Int = 16):S { return setVolume(v); }
-	public var lp(setLoopStart, null):S;
-	public var e(end, null):S;
-	public var p(play, null):S;
+	public var lp(get, null):S; // loop
+	public var e(get, null):S; // end
+	public var p(get, null):S; // play
 	public function fi(second:Float = 1):S { return fadeIn(second); }
 	public function fo(second:Float = 1):S { return fadeOut(second); }
-	public var s(stopAll, null):S;
+	public var s(get, null):S; // stop
 
 	public static var ss:Array<S>;
 	static var g:G;
@@ -62,22 +62,22 @@ class S { // SoundEffect
 	var toneIndex = 0;
 	var lastPlayTicks = 0;
 	public function new() { }
-	function newInstance():S {
+	function get_i():S {
 		return new S();
 	}
-	function beginMajor():S {
+	function get_mj():S {
 		begin(Major);
 		return this;
 	}
-	function beginMinor():S {
+	function get_mn():S {
 		begin(Minor);
 		return this;
 	}
-	function beginNoise():S {
+	function get_n():S {
 		begin(Noise);
 		return this;
 	}
-	function beginNoiseScale():S {
+	function get_ns():S {
 		begin(NoiseScale);
 		return this;
 	}
@@ -124,11 +124,11 @@ class S { // SoundEffect
 		mml += "v" + v;
 		return this;
 	}
-	function setLoopStart():S {
+	function get_lp():S {
 		mml += "$";
 		return this;
 	}
-	function end():S {
+	function get_e():S {
 		isStarting = false;
 		data = driver.compile(mml);
 		driver.volume = 0;
@@ -136,7 +136,7 @@ class S { // SoundEffect
 		ss.push(this);
 		return this;
 	}
-	function play():S {
+	function get_p():S {
 		if (!g.ig || lastPlayTicks > 0) return this;
 		isPlaying = true;
 		return this;
@@ -149,7 +149,7 @@ class S { // SoundEffect
 		driver.fadeOut(second);
 		return this;
 	}
-	function stopAll():S {
+	function get_s():S {
 		isStarting = false;
 		driver.stop();
 		driver.volume = 0;

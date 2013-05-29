@@ -26,13 +26,13 @@ class G { // Game
 	public var u:U;
 	public var v:V;
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
-	public var dm(setDebuggingMode, null):G;
+	public var dm(get, null):G; // debugging mode
 	public function pl(platform:Dynamic):G { return setPlatform(platform); }
-	public var b(begin, null):G;
-	public var ig(getIsInGame, null):Bool;
-	public var tc(getTicks, null):Int;
+	public var b(get, null):G; // begin
+	public var ig(get, null):Bool; // is in game
+	public var tc(get, null):Int; // ticks
 	public function ua(actors:Array<Dynamic>):G { return updateActors(actors); }
-	public var dp(drawParticles, null):G;
+	public var dp(get, null):G; // draw particles
 	public function fr(x:Float, y:Float, width:Float, height:Float, color:C):G {
 		return fillRect(bd, x, y, width, height, color);
 	}
@@ -41,7 +41,7 @@ class G { // Game
 		return fillRect(baseBd, x, y, width, height, color);
 	}
 	public function sc(score:Int):G { return addScore(score); }
-	public var e(endGame, null):Bool;
+	public var e(get, null):Bool; // end
 	
 	public var bd:BitmapData;
 	public var screenSize:V;
@@ -101,7 +101,7 @@ class G { // Game
 		this.title2 = title2;
 		return this;
 	}
-	function setDebuggingMode():G {
+	function get_dm():G {
 		isDebugging = true;
 		return this;
 	}
@@ -109,7 +109,7 @@ class G { // Game
 		this.platform = platform;
 		return this;
 	}
-	function begin():G {
+	function get_b():G {
 		initializeGame();
 		if (isDebugging) beginGame();
 		else platform.showHighScore();
@@ -119,10 +119,10 @@ class G { // Game
 		Lib.current.addEventListener(Event.ENTER_FRAME, updateFrame);
 		return this;
 	}
-	function getIsInGame():Bool {
+	function get_ig():Bool {
 		return isInGame;
 	}
-	function getTicks():Int {
+	function get_tc():Int {
 		return ticks;
 	}
 	function updateActors(actors:Array<Dynamic>):G {
@@ -133,7 +133,7 @@ class G { // Game
 		}
 		return this;
 	}
-	function drawParticles():G {
+	function get_dp():G {
 		updateActors(P.ps);
 		return this;
 	}
@@ -155,7 +155,7 @@ class G { // Game
 		this.score += score;
 		return this;
 	}
-	function endGame():Bool {
+	function get_e():Bool {
 		if (!isInGame) return false;
 		s.fo();
 		platform.recordHighScore(score);

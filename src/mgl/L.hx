@@ -3,16 +3,16 @@ import flash.display.BitmapData;
 import flash.display.ColorCorrection;
 import flash.geom.Rectangle;
 class L { // Letter
-	public var i(newInstance, null):L;
+	public var i(get, null):L; // instance
 	public function t(text:String):L { return setText(text); }
 	public function p(pos:V):L { return setPos(pos); }
 	public function xy(x:Float, y:Float):L { return setXy(x, y); }
-	public var al(alignLeft, null):L;
-	public var ar(alignRight, null):L;
-	public var ac(alignCenter, null):L;
+	public var al(get, null):L; // align left
+	public var ar(get, null):L; // align right
+	public var ac(get, null):L; // align center
 	public function s(dotSize:Int):L { return setDotSize(dotSize); }
 	public function c(color:C):L { return setColor(color); }
-	public var d(draw, null):L;
+	public var d(get, null):L; // draw
 
 	static inline var BASE_DOT_SIZE = 2;
 	static inline var COUNT = 64;
@@ -87,7 +87,7 @@ class L { // Letter
 		color = colorInstance.wi;
 		pos = new V();
 	}
-	function newInstance():L {
+	function get_i():L {
 		return new L();
 	}
 	function setText(text:String):L {
@@ -103,15 +103,15 @@ class L { // Letter
 		pos.y = y;
 		return this;
 	}
-	function alignLeft():L {
+	function get_al():L {
 		align = Left;
 		return this;
 	}
-	function alignRight():L {
+	function get_ar():L {
 		align = Right;
 		return this;
 	}
-	function alignCenter():L {
+	function get_ac():L {
 		align = Center;
 		return this;
 	}
@@ -123,7 +123,7 @@ class L { // Letter
 		this.color = color;
 		return this;
 	}
-	function draw():L {
+	function get_d():L {
 		var tx = Std.int(pos.x * screenSize.x), ty = Std.int(pos.y * screenSize.y);
 		var ci = color.i;
 		var lw = dotSize * 5;

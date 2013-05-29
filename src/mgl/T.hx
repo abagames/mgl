@@ -1,13 +1,13 @@
 package mgl;
 class T { // Text
-	public var i(newInstance, null):T;
+	public var i(get, null):T; // instance
 	public function p(pos:V):T { return setPos(pos); }
 	public function xy(x:Float, y:Float):T { return setXy(x, y); }
 	public function t(text:String):T { return setText(text); }
 	public function v(vel:V):T { return setVel(vel); }
 	public function tc(ticks:Int):T { return setTicks(ticks); }
-	public var a(add, null):T;
-	public var ao(addOnce, null):T;
+	public var a(get, null):T; // add
+	public var ao(get, null):T; // add once
 	
 	public static var s:Array<T>;
 	static var shownMessages:Array<String>;
@@ -24,7 +24,7 @@ class T { // Text
 		letter = new L();
 		actor = new A();
 	}
-	function newInstance():T {
+	function get_i():T {
 		return new T();
 	}
 	function setPos(pos:V):T {
@@ -50,14 +50,14 @@ class T { // Text
 		this.ticks = ticks;
 		return this;
 	}
-	function add():T {
+	function get_a():T {
 		s.push(this);
 		return this;
 	}
-	function addOnce():T {
+	function get_ao():T {
 		for (m in shownMessages) if (m == text) return null;
 		shownMessages.push(text);
-		return add();
+		return get_a();
 	}
 
 	public function u():Bool {

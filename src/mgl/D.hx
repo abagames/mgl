@@ -4,7 +4,7 @@ import flash.display.ColorCorrection;
 import flash.geom.Rectangle;
 using Math;
 class D { // DotShape
-	public var i(getNewInstance, null):D;
+	public var i(get, null):D; // instance
 	public function sz(dotSize:Int):D { return setDotSize(dotSize); }
 	public function c(color:C):D { return setColor(color); }
 	public function cs(color:C):D { return setColorSpot(color); }
@@ -30,10 +30,10 @@ class D { // DotShape
 	public function p(pos:V):D { return setPos(pos); }
 	public function r(angle:Float):D { return rotate(angle); }
 	public function s(x:Float = 1, y:Float = -1):D { return setScale(x, y); }
-	public var ed(enableDotScale, null):D;
-	public var dd(disableDotScale, null):D;
+	public var ed(get, null):D; // enable dot scale
+	public var dd(get, null):D; // disable dot scale
 	public function dc(color:C = null):D { return setDrawColor(color); }
-	public var d(draw, null):D;
+	public var d(get, null):D; // draw
 
 	static inline var BASE_DOT_SIZE = 3;
 	static var bd:BitmapData;
@@ -72,7 +72,7 @@ class D { // DotShape
 		offset = new V();
 		pos = new V();
 	}
-	function getNewInstance():D  {
+	function get_i():D  {
 		return new D();
 	}
 	function setDotSize(dotSize:Int = BASE_DOT_SIZE):D {
@@ -135,11 +135,11 @@ class D { // DotShape
 		scaleY = (y >= 0 ? y : x);
 		return this;
 	}
-	function enableDotScale():D {
+	function get_ed():D {
 		isDotScale = true;
 		return this;
 	}
-	function disableDotScale():D {
+	function get_dd():D {
 		isDotScale = false;
 		return this;
 	}
@@ -147,7 +147,7 @@ class D { // DotShape
 		drawColor = color;
 		return this;
 	}
-	function draw():D {
+	function get_d():D {
 		if (isDotScale) {
 			rect.width = dotSize * scaleX.abs();
 			rect.height = dotSize * scaleY.abs();

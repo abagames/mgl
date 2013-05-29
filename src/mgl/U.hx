@@ -1,5 +1,5 @@
 package mgl;
-class U {
+class U { // Utility
 	public function new() { }
 	public inline function c(v:Float, min:Float, max:Float):Float { // clamp
 		if (v > max) v = max;

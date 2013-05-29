@@ -2,7 +2,7 @@ package mgl;
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
 class P { // Particle
-	public var i(newInstance, null):P;
+	public var i(get, null):P; // instance
 	public function p(pos:V):P { return setPos(pos); }
 	public function c(color:C):P { return setColor(color); }
 	public function cn(count:Int):P { return setCount(count); }
@@ -10,7 +10,7 @@ class P { // Particle
 	public function s(speed:Float):P { return setSpeed(speed); }
 	public function t(ticks:Float):P { return setTicks(ticks); }
 	public function an(angle:Float, angleWidth:Float):P { return setAngle(angle, angleWidth); }
-	public var a(add, null):P;
+	public var a(get, null):P; // add
 
 	public static var ps:Array<P>;
 	static var bd:BitmapData;
@@ -47,7 +47,7 @@ class P { // Particle
 		aPos = new V();
 		aColor = colorInstance.wi;
 	}
-	function newInstance():P {
+	function get_i():P {
 		return new P();
 	}
 	function setPos(pos:V):P {
@@ -79,7 +79,7 @@ class P { // Particle
 		aAngleWidth = angleWidth;
 		return this;
 	}
-	function add():P {
+	function get_a():P {
 		for (i in 0...aCount) {
 			var p = new P();
 			p.color = aColor;
@@ -105,7 +105,7 @@ class P { // Particle
 		rect.x = Std.int(actor.p.x * screenSize.x) - Std.int(s / 2);
 		rect.y = Std.int(actor.p.y * screenSize.y) - Std.int(s / 2);
 		rect.width = rect.height = Std.int(s);
-		bd.fillRect(rect, color.gbl.i);
+		bd.fillRect(rect, color.getBlinkColor().i);
 		return --ticks > 0;
 	}
 }
