@@ -184,10 +184,10 @@ class Ball extends A {
 * hr(ratio:Float):A // set hit ratio
 * gs(color:C, seed:Int = -1):A // generate shape
 
-##### Overrriden methods
-* i:Void // initialize
-* b:Void // begin
-* u:Void // update
+##### Overriden methods
+* i():Void // initialize
+* b():Void // begin
+* u():Void // update
 * h(hitActor:Dynamic):Void // hit
 
 ###B // Bitmap
@@ -279,11 +279,11 @@ class Ball extends A {
 * yr(ratio:Float):G // set y ratio
 * ie:G // initialize end
 
-##### Overrriden methods
-* i:Void // initialize
-* b:Void // begin
-* u:Void // update
-* is:Void // initialize state
+##### Overriden methods
+* i():Void // initialize
+* b():Void // begin
+* u():Void // update
+* is():Void // initialize state
 * ls(d:Dynamic):Void // load state
 * ss(d:Dynamic):Void // save state
 
