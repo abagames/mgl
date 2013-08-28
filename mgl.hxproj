@@ -1,17 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project version="2">
   <!-- Output SWF options -->
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\mgl.swf" />
-    <movie fps="60" />
-    <movie width="465" />
-    <movie height="465" />
-    <movie version="11" />
-    <movie minorVersion="4" />
-    <movie platform="Flash Player" />
-    <movie background="#000000" />
+    <movie path="application.xml" />
+    <movie fps="0" />
+    <movie width="0" />
+    <movie height="0" />
+    <movie version="3" />
+    <movie minorVersion="0" />
+    <movie platform="NME" />
+    <movie background="#FFFFFF" />
+    <movie preferredSDK=";3;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -21,17 +22,17 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
-    <option mainClass="DummyMain" />
+    <option mainClass="Main" />
     <option enabledebug="True" />
-    <option additional="-swf-lib lib/sion/library.swf" />
+    <option additional="" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <!-- example: <library name="..." /> -->
+    <library name="nme" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\DummyMain.hx" />
+    <compile path="src\Main.hx" />
   </compileTargets>
   <!-- Assets to embed into the output SWF -->
   <library>
@@ -48,7 +49,8 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="Default" />
+    <option testMovie="Custom" />
+    <option testMovieCommand="" />
   </options>
   <!-- Plugin storage -->
   <storage />

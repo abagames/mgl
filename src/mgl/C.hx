@@ -1,14 +1,15 @@
 package mgl;
+using mgl.U;
 class C { // Color
-	public var ti(get, null):C; // transparent instance
-	public var di(get, null):C; // dark (black) instance
-	public var ri(get, null):C; // red instance
-	public var gi(get, null):C; // green instance
-	public var bi(get, null):C; // blue instance
-	public var yi(get, null):C; // yellow instance
-	public var mi(get, null):C; // magenta instance
-	public var ci(get, null):C; // cyan instance
-	public var wi(get, null):C; // white instance
+	static public var ti(get, null):C; // transparent instance
+	static public var di(get, null):C; // dark (black) instance
+	static public var ri(get, null):C; // red instance
+	static public var gi(get, null):C; // green instance
+	static public var bi(get, null):C; // blue instance
+	static public var yi(get, null):C; // yellow instance
+	static public var mi(get, null):C; // magenta instance
+	static public var ci(get, null):C; // cyan instance
+	static public var wi(get, null):C; // white instance
 	public var r:Int;
 	public var g:Int;
 	public var b:Int;
@@ -26,10 +27,8 @@ class C { // Color
 	static inline var MAX_VALUE = 250;
 	static inline var WHITENESS = 0;
 	static var random:R;
-	static var u:U;
 	public static function initialize():Void {
 		random = new R();
-		u = new U();
 	}
 	var blinkColor:C;
 	public function new(r:Int = 0, g:Int = 0, b:Int = 0) {
@@ -40,18 +39,18 @@ class C { // Color
 	public function getBlinkColor():C {
 		if (blinkColor == null) blinkColor = new C();
 		changeValueColor(blinkColor, 
-			random.i(128, -64), random.i(128, -64), random.i(128, -64));
+			random.pi(64), random.pi(64), random.pi(64));
 		return blinkColor;
 	}
-	function get_ti():C { return new C(-1); }
-	function get_di():C { return new C(0, 0, 0); }
-	function get_ri():C { return new C(MAX_VALUE, WHITENESS, WHITENESS); }
-	function get_gi():C { return new C(WHITENESS, MAX_VALUE, WHITENESS); }
-	function get_bi():C { return new C(WHITENESS, WHITENESS, MAX_VALUE); }
-	function get_yi():C { return new C(MAX_VALUE, MAX_VALUE, WHITENESS); }
-	function get_mi():C { return new C(MAX_VALUE, WHITENESS, MAX_VALUE); }
-	function get_ci():C { return new C(WHITENESS, MAX_VALUE, MAX_VALUE); }
-	function get_wi():C { return new C(MAX_VALUE, MAX_VALUE, MAX_VALUE); }
+	static function get_ti():C { return new C(-1); }
+	static function get_di():C { return new C(0, 0, 0); }
+	static function get_ri():C { return new C(MAX_VALUE, WHITENESS, WHITENESS); }
+	static function get_gi():C { return new C(WHITENESS, MAX_VALUE, WHITENESS); }
+	static function get_bi():C { return new C(WHITENESS, WHITENESS, MAX_VALUE); }
+	static function get_yi():C { return new C(MAX_VALUE, MAX_VALUE, WHITENESS); }
+	static function get_mi():C { return new C(MAX_VALUE, WHITENESS, MAX_VALUE); }
+	static function get_ci():C { return new C(WHITENESS, MAX_VALUE, MAX_VALUE); }
+	static function get_wi():C { return new C(MAX_VALUE, MAX_VALUE, MAX_VALUE); }
 	function get_i():Int {
 		return 0xff000000 + r * 0x10000 + g * 0x100 + b;
 	}
@@ -77,7 +76,7 @@ class C { // Color
 		return changeValue(Std.int(-LEVEL_VALUE / 2), Std.int(-LEVEL_VALUE / 2), LEVEL_VALUE);
 	}
 	function get_gbl():C {
-		return changeValue(random.i(128, -64), random.i(128, -64), random.i(128, -64));
+		return changeValue(random.pi(64), random.pi(64), random.pi(64));
 	}
 	function blend(c:C, ratio:Float):C {
 		return changeValue(
@@ -96,9 +95,9 @@ class C { // Color
 		color.r += rv; color.g += gv; color.b += bv;
 		color.normalize();
 	}
-	function normalize():Void {
-		r = u.ci(r, 0, MAX_VALUE);
-		g = u.ci(g, 0, MAX_VALUE);
-		b = u.ci(b, 0, MAX_VALUE);
+	public function normalize():Void {
+		r = r.ci(0, MAX_VALUE);
+		g = g.ci(0, MAX_VALUE);
+		b = b.ci(0, MAX_VALUE);
 	}
 }

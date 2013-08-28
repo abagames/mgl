@@ -1,9 +1,12 @@
 package mgl;
+#if flash
 import org.si.sion.SiONDriver;
 import org.si.sion.SiONData;
+#end
 using Math;
+using mgl.U;
 class S { // Sound
-	public var i(get, null):S; // instance
+	static public var i(get, null):S; // instance
 	public var mj(get, null):S; // major
 	public var mn(get, null):S; // minor
 	public var n(get, null):S; // noise
@@ -29,22 +32,24 @@ class S { // Sound
 	public var s(get, null):S; // stop
 
 	public static var ss:Array<S>;
-	static var g:G;
 	static var tones:Array<Array<String>>;
+	#if flash
 	static var driver:SiONDriver;
+	#end
 	static var isStarting = false;
-	static var _u:U;
-	public static function initialize(game:G):Void {
-		g = game;
+	public static function initialize():Void {
 		ss = new Array<S>();
 		tones = [
 		["c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"],
 		["c", "d", "e", "g", "a"],
 		["c", "d-", "e-", "g-", "a-"]];
+		#if flash
 		driver = new SiONDriver();
-		_u = new U();
+		#end
 	}
+	#if flash
 	var data:SiONData;
+	#end
 	var isPlaying = false;
 	var mml:String;
 	var type:SeType;
@@ -62,7 +67,7 @@ class S { // Sound
 	var toneIndex = 0;
 	var lastPlayTicks = 0;
 	public function new() { }
-	function get_i():S {
+	static function get_i():S {
 		return new S();
 	}
 	function get_mj():S {
@@ -92,7 +97,7 @@ class S { // Sound
 	}
 	function setMelody(randomSeed:Int, maxLength:Int, step:Int):S {
 		melodyRandomSeed = randomSeed;
-		melodyMaxLength = _u.ci(maxLength, 1, 3);
+		melodyMaxLength = maxLength.ci(1, 3);
 		melodyStep = step;
 		return this;
 	}
@@ -130,31 +135,39 @@ class S { // Sound
 	}
 	function get_e():S {
 		isStarting = false;
+		#if flash
 		data = driver.compile(mml);
 		driver.volume = 0;
 		driver.play();
+		#end
 		ss.push(this);
 		return this;
 	}
 	function get_p():S {
-		if (!g.ig || lastPlayTicks > 0) return this;
+		if (!G.ig || lastPlayTicks > 0) return this;
 		isPlaying = true;
 		return this;
 	}
 	function fadeIn(second:Float):S {
+		#if flash
 		driver.fadeIn(second);
+		#end
 		return this;
 	}
 	function fadeOut(second:Float):S {
+		#if flash
 		driver.fadeOut(second);
+		#end
 		return this;
 	}
 	function get_s():S {
 		isStarting = false;
+		#if flash
 		driver.stop();
 		driver.volume = 0;
 		fadeIn(0.1);
 		driver.play();
+		#end
 		return this;
 	}
 
@@ -177,26 +190,26 @@ class S { // Sound
 		if (melodyRandomSeed != 0) random = new R().s(melodyRandomSeed);
 		var tone = from * tiMax;
 		if (to == 0) to = from;
-		var tMin = _u.c(tone + min * tiMax, 0, tiMax);
-		var tMax = _u.c(tone + max * tiMax, 0, tiMax);
+		var tMin = (tone + min * tiMax).c(0, tiMax);
+		var tMax = (tone + max * tiMax).c(0, tiMax);
 		var step = (time > 1 ? (to - from) * tiMax / (time - 1) : 0.0);
 		var wa = 0.0;
 		var t = time;
 		while (t > 0) {
-			tone = _u.c(tone, tMin, tMax);
-			var tv = _u.c(tone + wa.sin() * (waveWidth / 2) * tiMax, tMin, tMax);
+			tone = tone.c(tMin, tMax);
+			var tv = (tone + wa.sin() * (waveWidth / 2) * tiMax).c(tMin, tMax);
 			wa += waveInterval;
 			if (random == null) {
 				mml += getToneMml(Std.int(tv));
 				t--;
 			} else {
-				if (random.i(7) == 0) {
+				if (random.ni(7) == 0) {
 					mml += "r";
 				} else {
 					mml += getToneMml(Std.int(tv));
-					tone += random.i(5, -2) * melodyStep;
+					tone += random.fi(-2, 2) * melodyStep;
 				}
-				var l = random.i(_u.ci(melodyMaxLength, 1, t), 1);
+				var l = random.fi(1, melodyMaxLength.ci(1, t));
 				if (l >= 2) mml += length / 2;
 				if (l == 3) mml += ".";
 				t -= l;
@@ -214,17 +227,20 @@ class S { // Sound
 			return (ti < 4 ? "o5" + tones[0][3 - ti] : "o4" + tones[0][15 - ti]);
 		}
 	}
-	public function u():Bool {
+	public function u():Void {
 		lastPlayTicks--;
-		if (!isPlaying) return true;
+		if (!isPlaying) return;
 		if (!isStarting) {
+			#if flash
 			driver.volume = 0.9;
+			#end
 			isStarting = true;
 		}
+		#if flash
 		driver.sequenceOn(data, null, 0, 0, 0);
+		#end
 		isPlaying = false;
 		lastPlayTicks = 5;
-		return true;
 	}
 }
 enum SeType {

@@ -1,22 +1,29 @@
 package mgl;
 class R { // Random
-	public function ni(v:Int):R { return newInstance(v); }
-	public function n(v:Float = 1, s:Float = 0):Float { return get() * v + s; }
-	public function i(v:Int, s:Int = 0):Int { return Std.int(n(v)) + s; }
-	public function p():Int { return i(2) * 2 - 1; }
-	public function pn(v:Float = 1):Float { return n(v) * p(); }
+	static public var i(get, null):R; // instance
+	public function n(v:Float = 1, s:Float = 0):Float { return get() * v + s; }	
+	public function ni(v:Int, s:Int = 0):Int { return Std.int(get() * (v + .999) + s); }	
+	public function f(from:Float, to:Float):Float { return get() * (to - from) + from; }
+	public function fi(from:Int, to:Int):Int { return Std.int(get() * (to - from + .999)) + from; }
+	public var pm(get, null):Int; // plus minus
+	public function p(v:Float = 1):Float { return f(-v, v); }
+	public function pi(v:Int):Int { return fi(-v, v); }
 	public function s(v:Int = -0x7fffffff):R { return setSeed(v); }
 
 	var x = 0;
 	var y = 0;
 	var z = 0;
 	var w = 0;
-	public function new(v:Int = -0x7fffffff) {
-		setSeed(v);
+	public function new() {
+		setSeed();
 	}
-	function newInstance(v:Int = -0x7fffffff):R {
-		return new R(v);
+	static function get_i():R {
+		return new R();
 	}
+	function get_pm():Int {
+		return ni(1) * 2 - 1;
+	}
+
 	function setSeed(v:Int = -0x7fffffff):R {
 		var sv:Int;
 		if (v == -0x7fffffff) sv = Std.int(Math.random() * 0x7fffffff);
@@ -27,13 +34,13 @@ class R { // Random
 		w = sv = 1812433253 * (sv ^ (sv >> 30)) + 3;
 		return this;
 	}
-
 	function get():Float {
 		var t:Int = x ^ (x << 11);
 		x = y;
 		y = z;
 		z = w;
 		w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
-		return cast(w, Float) / 0x7fffffff;
+		var fw:Float = w;
+		return fw / 0x7fffffff;
 	}
 }

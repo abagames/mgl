@@ -1,287 +1,221 @@
 package mgl;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
-import flash.display.MovieClip;
 import flash.display.Sprite;
-import flash.display.StageAlign;
-import flash.display.StageScaleMode;
+import flash.display.MovieClip;
 import flash.events.Event;
-import flash.filters.BlurFilter;
-import flash.filters.ColorMatrixFilter;
-import flash.geom.Point;
-import flash.geom.Rectangle;
+import flash.net.SharedObject;
+import flash.utils.ByteArray;
 import flash.Lib;
+using mgl.U;
 class G { // Game
-	public function new(current:MovieClip, main:Dynamic) { initialize(current, main); }
-	public var a:A;
-	public var c:C;
-	public var d:D;
-	public var k:K;
-	public var l:L;
-	public var m:M;
-	public var p:P;
-	public var r:R;
-	public var s:S;
-	public var t:T;
-	public var u:U;
-	public var v:V;
+	static public var ig(get, null):Bool; // is in game
+	static public var eg(get, null):Bool; // end game
+	static public var t(get, null):Int; // ticks
+	static public var r:R;
+	public function new(main:Dynamic) { initialize(main); }
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
+	public function vr(version:Int = 1):G { return setVersion(version); }
 	public var dm(get, null):G; // debugging mode
-	public function pl(platform:Dynamic):G { return setPlatform(platform); }
-	public var b(get, null):G; // begin
-	public var ig(get, null):Bool; // is in game
-	public var tc(get, null):Int; // ticks
-	public function ua(actors:Array<Dynamic>):G { return updateActors(actors); }
-	public var dp(get, null):G; // draw particles
-	public function fr(x:Float, y:Float, width:Float, height:Float, color:C):G {
-		return fillRect(bd, x, y, width, height, color);
-	}
-	public function cb(color:C):G { return clearBackground(color); }
-	public function frb(x:Float, y:Float, width:Float, height:Float, color:C):G {
-		return fillRect(baseBd, x, y, width, height, color);
-	}
-	public function sc(score:Int):G { return addScore(score); }
-	public var e(get, null):Bool; // end
+	public function yr(ratio:Float):G { return setYRatio(ratio); }
+	public var ie(get, null):G; // initialize end
+
+	public function i():Void { } // initialize
+	public function b():Void { } // begin
+	public function u():Void { } // update
+	public function is():Void { } // initialize state
+	public function ls(d:Dynamic):Void { } // load state
+	public function ss(d:Dynamic):Void { } // save state
 	
-	public var bd:BitmapData;
-	public var screenSize:V;
-	public var baseSprite:Sprite;
-	var current:MovieClip;
-	var main:Dynamic;
-	var title = "";
-	var title2 = "";
+	static public var ld(get, null):Bool; // load
+	static public var sv(get, null):Bool; // save
+
+	static public var isInGame = false;
+	static public var ticks = 0;
+	static public var fps = 0.0;
+	static var titleTicks = 0;
+	static var wasClicked = false;
+	static var wasReleased = false;
+	static var mainInstance:Dynamic;
+	static var title = "";
+	static var title2 = "";
+	static var version = 1;
+	var baseSprite:Sprite;
 	var isDebugging = false;
-	var platform:Dynamic;
-	var score = 0;
-	var isInGame = false;
-	var ticks = 0;
-	var fps = 0.0;
 	var isPaused = false;
-	var wasClicked = false;
-	var wasReleased = false;
-	var titleTicks = 0;
-	var blurBd:BitmapData;
-	var baseBd:BitmapData;
-	var sRect:Rectangle;
-	var fRect:Rectangle;
-	var fadeFilter:ColorMatrixFilter;
-	var blurFilter10:BlurFilter;
-	var blurFilter20:BlurFilter;
-	var zeroPoint:Point;
 	var backgroundColor:C;
 	var fpsCount = 0;
 	var lastTimer = 0;
-	function initialize(current:MovieClip, main:Dynamic):Void {
-		Lib.current = current;
-		this.main = main;
-		platform = new Platform();
-		initializeScreen();
-		C.initialize();
-		D.initialize(this);
-		L.initialize(this);
-		M.initialize(this);
-		P.initialize(this);
-		S.initialize(this);
-		T.initialize();
-		a = new A();
-		c = new C();
-		d = new D();
-		k = new K();
-		l = new L();
-		m = new M();
-		p = new P();
-		r = new R();
-		t = new T();
-		s = new S();
-		u = new U();
-		v = new V();
+	var lt:L;
+	function initialize(mi:Dynamic):Void {
+		Lib.current.stage.align = flash.display.StageAlign.TOP_LEFT;
+		baseSprite = new Sprite();
+		mainInstance = mi;
+		baseSprite.addEventListener(Event.ADDED_TO_STAGE, onAdded);
+		Lib.current.addChild(baseSprite);
 	}
-	function setTitle(title:String, title2:String):G {
-		this.title = title;
-		this.title2 = title2;
+	function onAdded(_):Void {
+		baseSprite.removeEventListener(Event.ADDED_TO_STAGE, onAdded);
+		#if ios
+		haxe.Timer.delay(added, 100);
+		#else
+		added();
+		#end
+	}
+	function added():Void {
+		B.initialize(baseSprite);
+		A.initialize();
+		C.initialize();
+		D.initialize();
+		F.initialize();
+		K.initialize();
+		L.initialize();
+		M.initialize(baseSprite);
+		P.initialize();
+		S.initialize();
+		T.initialize();
+		lt = L.i;
+		r = R.i;
+		mainInstance.i();
+	}
+	function setTitle(t:String, t2:String):G {
+		title = t;
+		title2 = t2;
+		return this;
+	}
+	function setVersion(v:Int):G {
+		version = v;
 		return this;
 	}
 	function get_dm():G {
 		isDebugging = true;
 		return this;
 	}
-	function setPlatform(platform:Dynamic):G {
-		this.platform = platform;
+	function setYRatio(ratio:Float):G {
+		B.pixelSize.y = B.pixelSize.x * ratio;
+		B.pixelWHRatio = B.pixelSize.x / B.pixelSize.y;
+		D.initialize();
 		return this;
 	}
-	function get_b():G {
-		initializeGame();
+	function get_ie():G {
+		G.ld;
 		if (isDebugging) beginGame();
-		else platform.showHighScore();
-		lastTimer = Lib.getTimer();
+		else initializeGame();
+		lastTimer = Std.int(Date.now().getTime());
 		Lib.current.addEventListener(Event.ACTIVATE, onActivated);
 		Lib.current.addEventListener(Event.DEACTIVATE, onDeactivated);
 		Lib.current.addEventListener(Event.ENTER_FRAME, updateFrame);
 		return this;
 	}
-	function get_ig():Bool {
+	static function get_ig():Bool {
 		return isInGame;
 	}
-	function get_tc():Int {
+	static function get_t():Int {
 		return ticks;
 	}
-	function updateActors(actors:Array<Dynamic>):G {
-		var i = 0;
-		while (i < actors.length) {
-			if (actors[i].u()) i++;
-			else actors.splice(i, 1);
-		}
-		return this;
-	}
-	function get_dp():G {
-		updateActors(P.ps);
-		return this;
-	}
-	function fillRect(fbd:BitmapData, x:Float, y:Float, width:Float, height:Float, color:C):G {
-		var w = width * screenSize.x;
-		var h = height * screenSize.y;
-		fRect.x = Std.int(x * screenSize.x) - Std.int(w / 2);
-		fRect.y = Std.int(y * screenSize.y) - Std.int(h / 2);
-		fRect.width = w;
-		fRect.height = h;
-		fbd.fillRect(fRect, color.i);
-		return this;
-	}
-	function clearBackground(color:C):G {
-		baseBd.fillRect(sRect, color.i);
-		return this;
-	}
-	function addScore(score:Int):G {
-		this.score += score;
-		return this;
-	}
-	function get_e():Bool {
+	static function get_eg():Bool {
 		if (!isInGame) return false;
-		s.fo();
-		platform.recordHighScore(score);
-		platform.showHighScore();
+		G.sv;
 		isInGame = false;
 		wasClicked = wasReleased = false;
 		ticks = 0;
 		titleTicks = 10;
 		return true;
 	}
-	
-	function initializeScreen() {
-		Lib.current.stage.align = StageAlign.TOP_LEFT;
-		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
-		fadeFilter = new ColorMatrixFilter(
-			[1, 0, 0, 0, 0,  0, 1, 0, 0, 0,  0, 0, 1, 0, 0,  0, 0, 0, 0.8, 0]);
-		blurFilter10 = new BlurFilter(10, 10);
-		blurFilter20 = new BlurFilter(20, 20);
-		zeroPoint = new Point();
-		screenSize = new V();
-		screenSize.xy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
-		bd = new BitmapData(screenSize.xi, screenSize.yi, true, 0);
-		blurBd = new BitmapData(screenSize.xi, screenSize.yi, true, 0);
-		baseBd = new BitmapData(screenSize.xi, screenSize.yi, false, 0);
-		baseSprite = new Sprite();
-		var baseBitmap = new Bitmap(baseBd);
-		baseSprite.addChild(baseBitmap);
-		var blurBitmap = new Bitmap(blurBd);
-		baseSprite.addChild(blurBitmap);
-		Lib.current.addChild(baseSprite);
-		sRect = new Rectangle(0, 0, screenSize.x, screenSize.y);
-		fRect = new Rectangle();
+	static function get_ld():Bool {
+		#if (flash || js)
+		try {
+			var storeKey = StringTools.replace(title + "_" + title2 + "_" + version, " ", "");
+			var sharedObject:SharedObject = SharedObject.getLocal(storeKey);
+			if (sharedObject.size < 10) {
+				mainInstance.is();
+			} else {
+				mainInstance.ls(sharedObject.data);
+				K.ls(sharedObject.data);
+			}
+			return true;
+		} catch (e:Dynamic) { }
+		#end
+		return false;
 	}
+	static function get_sv():Bool {
+		#if (flash || js)
+		try {
+			var storeKey = StringTools.replace(title + "_" + title2 + "_" + version, " ", "");
+			var sharedObject:SharedObject = SharedObject.getLocal(storeKey);
+			mainInstance.ss(sharedObject.data);
+			K.ss(sharedObject.data);
+			sharedObject.flush();
+			return true;
+		} catch (e:Dynamic) { }
+		#end
+		return false;
+	}
+	
 	function beginGame():Void {
-		s.s;
 		isInGame = true;
-		score = 0;
 		ticks = 0;
-		platform.closeHighScore();
 		r.s();
 		initializeGame();
 	}
 	function initializeGame():Void {
-		P.initialize(this);
-		T.initialize();
-		main.b();
-	}
-	function updateFrame(e:Event):Void {
-		beginScreen();
-		if (!isPaused) {
-			main.u();
-			updateActors(T.s);
-			if (isDebugging) {
-				l.ar.t("FPS: " + Std.string(Std.int(fps))).xy(1, 0.03).d.ac;
-			}
-			updateActors(S.ss);
-			ticks++;
-		} else {
-			l.t("PAUSED").xy(0.5, 0.45).d;
-			l.t(platform.clickStr + " TO RESUME").xy(0.5, 0.55).d;
-		}
-		l.ar.t(Std.string(score)).xy(1, 0).d.ac;
-		if (!isInGame) handleTitleScreen();
-		endScreen();
-		calcFps();
-	}
-	function beginScreen():Void {
-		bd.lock();
-		bd.fillRect(bd.rect, 0);
-	}
-	function endScreen():Void {
-		bd.unlock();
-		drawBlur();
-	}
-	function drawBlur():Void {
-		blurBd.lock();
-		blurBd.applyFilter(blurBd, blurBd.rect, zeroPoint, fadeFilter);
-		blurBd.copyPixels(bd, bd.rect, zeroPoint, null, null, true);
-		blurBd.applyFilter(blurBd, blurBd.rect, zeroPoint, blurFilter20);
-		blurBd.copyPixels(bd, bd.rect, zeroPoint, null, null, true);
-		blurBd.applyFilter(blurBd, blurBd.rect, zeroPoint, blurFilter10);
-		blurBd.copyPixels(bd, bd.rect, zeroPoint, null, null, true);
-		blurBd.unlock();
+		A.clear();
+		F.clear();
+		mainInstance.b();
 	}
 	function handleTitleScreen():Void {
-		var tx = platform.titleX;
+		var tx = 0.5;
 		if (title2.length <= 0) {
-			l.t(title).xy(tx, 0.4).d;
+			lt.tx(title).xy(tx, 0.4).d;
 		} else {
-			l.t(title).xy(tx, 0.38).d;
-			l.t(title2).xy(tx, 0.41).d;
+			lt.tx(title).xy(tx, 0.38).d;
+			lt.tx(title2).xy(tx, 0.41).d;
 		}
-		l.t(platform.clickStr).xy(tx, 0.54).d;
-		l.t("TO").xy(tx, 0.57).d;
-		l.t("START").xy(tx, 0.6).d;
-		if (m.ip) {
+		lt.tx("CLICK/TOUCH/PUSH").xy(tx, 0.54).d;
+		lt.tx("TO").xy(tx, 0.58).d;
+		lt.tx("START").xy(tx, 0.615).d;
+		if (M.ip || K.ib || K.iu || K.id || K.ir || K.il) {
 			if (wasReleased) wasClicked = true;
 		} else {
 			if (wasClicked) beginGame();
 			if (--titleTicks <= 0) wasReleased = true;
 		}
 	}
+	function updateFrame(e:Event):Void {
+		B.preUpdate();
+		K.u();
+		if (!isPaused) {
+			A.update();
+			F.update();
+			mainInstance.u();
+			if (isDebugging) {
+				lt.al.tx("FPS: " + Std.string(Std.int(fps))).xy(0, 0.95).d.ac;
+			}
+			for (s in S.ss) s.u();
+			ticks++;
+		} else {
+			lt.tx("PAUSED").xy(0.5, 0.45).d;
+			lt.tx("CLICK/TOUCH TO RESUME").xy(0.5, 0.55).d;
+		}
+		if (!isInGame) handleTitleScreen();
+		B.postUpdate();
+		calcFps();
+	}
 	function onActivated(e:Event):Void {
 		isPaused = false;
 	}
 	function onDeactivated(e:Event):Void {
-		k.r;
+		K.r;
 		if (isInGame) isPaused = true;
 	}
 	function calcFps():Void {
 		fpsCount++;
-		var currentTimer:Int = Lib.getTimer();
-		var delta:Int = currentTimer - lastTimer;
+		var currentTimer = Std.int(Date.now().getTime());
+		var delta = currentTimer - lastTimer;
 		if (delta >= 1000) {
 			fps = fpsCount * 1000 / delta;
 			lastTimer = currentTimer;
 			fpsCount = 0;
 		}
 	}
-}
-class Platform {
-	public var clickStr = "CLICK";
-	public var isTouchDevice = false;
-	public var titleX = 0.5;
-	public function new() { }
-	public function recordHighScore(score:Int):Void { }
-	public function showHighScore():Void { }
-	public function closeHighScore():Void { }
 }

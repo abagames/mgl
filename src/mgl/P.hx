@@ -1,9 +1,8 @@
 package mgl;
-import flash.display.BitmapData;
-import flash.geom.Rectangle;
 class P { // Particle
-	public var i(get, null):P; // instance
+	static public var i(get, null):P; // instance
 	public function p(pos:V):P { return setPos(pos); }
+	public function xy(x:Float, y:Float):P { return setXy(x, y); }
 	public function c(color:C):P { return setColor(color); }
 	public function cn(count:Int):P { return setCount(count); }
 	public function sz(size:Float):P { return setSize(size); }
@@ -12,28 +11,11 @@ class P { // Particle
 	public function an(angle:Float, angleWidth:Float):P { return setAngle(angle, angleWidth); }
 	public var a(get, null):P; // add
 
-	public static var ps:Array<P>;
-	static var bd:BitmapData;
-	static var screenSize:V;
 	static var random:R;
-	static var rect:Rectangle;
-	static var colorInstance:C;
-	static var screenWidth:Float;
-	static var screenHeight:Float;
-	public static function initialize(game:G):Void {
-		bd = game.bd;
-		screenSize = game.screenSize;
-		ps = new Array<P>();
+	public static function initialize():Void {
 		random = new R();
-		rect = new Rectangle();
-		colorInstance = new C();
 	}
-	var actor:A;
-	var ticks = 60;
-	var color:C;
-	var size = 0.01;
-	var targetSize:Float;
-	var isExpand = true;
+	public var actor:PActor;
 	var aPos:V;
 	var aColor:C;
 	var aCount = 1;
@@ -41,17 +23,21 @@ class P { // Particle
 	var aSpeed = 0.02;
 	var aTicks = 60;
 	var aAngle = 0.0;
-	var aAngleWidth = 6.28;
-	public function new() {
-		actor = new A();
+	var aAngleWidth = 360.0;
+	public function new(createActor:Bool = false) {
+		if (createActor) actor = new PActor();
 		aPos = new V();
-		aColor = colorInstance.wi;
+		aColor = C.wi;
 	}
-	function get_i():P {
+	static function get_i():P {
 		return new P();
 	}
 	function setPos(pos:V):P {
 		aPos.v(pos);
+		return this;
+	}
+	function setXy(x:Float, y:Float):P {
+		aPos.xy(x, y);
 		return this;
 	}
 	function setColor(color:C):P {
@@ -81,31 +67,41 @@ class P { // Particle
 	}
 	function get_a():P {
 		for (i in 0...aCount) {
-			var p = new P();
-			p.color = aColor;
-			p.targetSize = aSize;
+			var p = new P(true);
+			p.actor.color = aColor;
+			p.actor.targetSize = aSize;
 			p.actor.p.v(aPos);
-			p.actor.v.aa(aAngle + random.pn(aAngleWidth / 2), random.n(aSpeed));
-			p.ticks = Std.int(aTicks * random.n(1, 0.5));
-			ps.push(p);
+			p.actor.v.aa(aAngle + random.p(aAngleWidth / 2), random.n(aSpeed));
+			p.actor.removeTicks = Std.int(aTicks * random.f(0.5, 1.5));
 		}
 		return this;
 	}
-
-	public function u():Bool {
-		actor.p.a(actor.v);
-		actor.v.m(0.98);
+}
+class PActor extends A {
+	static var pixelSize:V;
+	override public function i() {
+		pixelSize = B.pixelSize;
+		dp(0);
+	}
+	public var removeTicks = 60;
+	public var color:C;
+	public var targetSize:Float;
+	var size = 0.01;
+	var isExpand = true;
+	override public function u() {
+		p.a(v);
+		v.m(0.98);
 		if (isExpand) {
 			size *= 1.5;
 			if (size > targetSize) isExpand = false;
 		} else {
 			size *= 0.95;
 		}
-		var s = size * screenSize.x;
-		rect.x = Std.int(actor.p.x * screenSize.x) - Std.int(s / 2);
-		rect.y = Std.int(actor.p.y * screenSize.y) - Std.int(s / 2);
-		rect.width = rect.height = Std.int(s);
-		bd.fillRect(rect, color.getBlinkColor().i);
-		return --ticks > 0;
+		var s = size * pixelSize.x;
+		var px = Std.int(p.x * pixelSize.x) - Std.int(s / 2);
+		var py = Std.int(p.y * pixelSize.y) - Std.int(s / 2);
+		var ps = Std.int(s);
+		B.pixelFillRect(px, py, ps, ps, color.getBlinkColor());
+		if (ticks > removeTicks) r;
 	}
 }

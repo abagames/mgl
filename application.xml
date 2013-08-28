@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<!-- NMML reference: https://gist.github.com/1763850 -->
+	
+	<!-- metadata, make sure 'package' is at least 3 segments (ie. com.mycompany.myproject) -->
+	<meta title="mgl" package="mgl" version="1.0.0" company="ABA Games" />
+	
+	<!-- output -->
+	<app main="Main" file="mgl" path="bin" swf-version="11.8" />
+	
+	<window background="#000000" fps="60" />
+	<window width="480" height="480" unless="mobile" />
+	<window orientation="landscape" vsync="false" antialiasing="0" if="cpp" />
+	
+	<!-- classpath, haxe libs -->
+	<source path="src" />
+	<haxelib name="openfl" />
+	<haxelib name="actuate" />
+	
+	<!-- assets -->
+	<icon path="assets/openfl.svg" />
+	<assets path="assets/img" rename="img" />
+	
+	<!-- optimize output
+	<haxeflag name="-dce full" /> -->
+	<haxeflag name="-swf-lib lib/sion/library.swf" if="flash" />
+	
+</project>
