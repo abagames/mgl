@@ -118,7 +118,7 @@ class Player extends A {
 		p.xy(p.x.lr( -.05, 1.05), p.y.lr( -.05, 1.05));
 		// Set the angle(a) to the velocity way(v.w)
 		a = v.w;
-		// Add the reddish green(C.gi.gr) particle from the position p to 
+		// Add the reddish green(C.gi.gr) particle from the position p.
 		P.i.p(p).c(C.gi.gr).an(a + 180, 45).s(v.l).a;
 		// Check the hit to the ball actors(A.acs("Ball")).
 		ih(A.acs("Ball"));
