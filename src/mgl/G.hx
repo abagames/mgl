@@ -12,6 +12,8 @@ class G { // Game
 	static public var ig(get, null):Bool; // is in game
 	static public var eg(get, null):Bool; // end game
 	static public var t(get, null):Int; // ticks
+	static public var ld(get, null):Bool; // load
+	static public var sv(get, null):Bool; // save
 	static public var r:R;
 	public function new(main:Dynamic) { initialize(main); }
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
@@ -27,9 +29,6 @@ class G { // Game
 	public function ls(d:Dynamic):Void { } // load state
 	public function ss(d:Dynamic):Void { } // save state
 	
-	static public var ld(get, null):Bool; // load
-	static public var sv(get, null):Bool; // save
-
 	static public var isInGame = false;
 	static public var ticks = 0;
 	static public var fps = 0.0;
@@ -134,7 +133,9 @@ class G { // Game
 				K.ls(sharedObject.data);
 			}
 			return true;
-		} catch (e:Dynamic) { }
+		} catch (e:Dynamic) {
+			mainInstance.is();
+		}
 		#end
 		return false;
 	}
