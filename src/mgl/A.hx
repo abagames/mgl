@@ -5,7 +5,7 @@ class A { // Actor
 	public var v:V; // velocity
 	public var a = 0.0; // angle
 	public var s = 0.0; // speed
-	public var tc(get, null):Int; // ticks
+	public var t(get, null):Int; // ticks
 	public var r(get, null):A; // remove
 	public function ih(actors:Array<Dynamic>, isCallHit:Bool = true):Bool {
 		return isHit(actors, isCallHit);
@@ -103,7 +103,7 @@ class A { // Actor
 		b();
 		group.s.push(this);
 	}
-	function get_tc():Int {
+	function get_t():Int {
 		return ticks;
 	}
 	function get_m():A {

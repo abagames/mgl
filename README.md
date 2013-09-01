@@ -171,7 +171,7 @@ class Ball extends A {
 * s:Float // speed
 
 ##### Methods
-* tc:Int // ticks
+* t:Int // ticks
 * r:A // remove
 * ih(actors:Array<Dynamic>, isCallHit:Bool = true):Bool // is hit
 * (static)acs(className:Name):Array<Dynamic> // get actors
