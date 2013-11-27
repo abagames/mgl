@@ -14,9 +14,9 @@ class S { // Sound
 	public function t(from:Float, time:Int = 1, to:Float = 0):S {
 		return addTone(from, time, to);
 	}
-	public function w(width:Float = 0, interval:Float = 0):S { return setWave(width, interval); }
-	public function m(randomSeed:Int = 0, maxLength:Int = 3, step:Int = 1):S {
-		return setMelody(randomSeed, maxLength, step);
+	public function w(width:Float = 0, interval:Float = 1):S { return setWave(width, interval); }
+	public function m(maxLength:Int = 3, step:Int = 1, seed:Int = -1):S {
+		return setMelody(maxLength, step, seed);
 	}
 	public function mm(min:Float = -1, max:Float = 1):S { return setMinMax(min, max); }
 	public function r(v:Int = 0):S { return addRest(v); }
@@ -31,13 +31,15 @@ class S { // Sound
 	public function fo(second:Float = 1):S { return fadeOut(second); }
 	public var s(get, null):S; // stop
 
-	public static var ss:Array<S>;
+	static public var ss:Array<S>;
+	static var baseRandomSeed = 0;
 	static var tones:Array<Array<String>>;
 	#if flash
 	static var driver:SiONDriver;
 	#end
 	static var isStarting = false;
-	public static function initialize():Void {
+	public static function initialize(main:Dynamic):Void {
+		baseRandomSeed = U.ch(main);
 		ss = new Array<S>();
 		tones = [
 		["c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"],
@@ -95,8 +97,9 @@ class S { // Sound
 		waveInterval = (interval == 0 ? 0 : Math.PI / 2 / interval);
 		return this;
 	}
-	function setMelody(randomSeed:Int, maxLength:Int, step:Int):S {
-		melodyRandomSeed = randomSeed;
+	function setMelody(maxLength:Int, step:Int, seed:Int):S {
+		if (seed < 0) seed = baseRandomSeed++;
+		melodyRandomSeed = seed;
 		melodyMaxLength = maxLength.ci(1, 3);
 		melodyStep = step;
 		return this;

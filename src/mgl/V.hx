@@ -20,8 +20,8 @@ class V { // Vector
 	public function s(v:V):V { return sub(v); }
 	public function m(v:Float):V { return multiply(v); }
 	public function d(v:Float):V { return divide(v); }
-	public function aa(angle:Float, speed:Float):V { return addAngle(angle, speed); }
-	public function r(angle:Float):V { return rotate(angle); }
+	public function aw(angle:Float, speed:Float):V { return addWay(angle, speed); }
+	public function rt(angle:Float):V { return rotate(angle); }
 	public function ii(spacing:Float = 0,
 	minX:Float = 0, maxX:Float = 1, minY:Float = 0, maxY:Float = 1):Bool {
 		return isIn(spacing, minX, maxX, minY, maxY);
@@ -63,7 +63,7 @@ class V { // Vector
 		return (ox * ox + oy * oy).sqrt();
 	}
 	function distanceToDistorted(pos:V, pixelWHRatio:Float):Float {
-		if (pixelWHRatio < 0) pixelWHRatio = B.pixelWHRatio;
+		if (pixelWHRatio < 0) pixelWHRatio = G.pixelWHRatio;
 		var ox = pos.x - x;
 		var oy = pos.y - y;
 		if (pixelWHRatio < 1) oy /= pixelWHRatio;
@@ -93,7 +93,7 @@ class V { // Vector
 		y /= v;
 		return this;
 	}
-	function addAngle(angle:Float, speed:Float):V {
+	function addWay(angle:Float, speed:Float):V {
 		var a = angle * Math.PI / 180;
 		x += a.sin() * speed;
 		y -= a.cos() * speed;
