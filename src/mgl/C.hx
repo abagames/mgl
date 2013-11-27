@@ -24,22 +24,21 @@ class C { // Color
 	public function bl(color:C, ratio:Float):C { return blend(color, ratio); }
 
 	static inline var LEVEL_VALUE = 80;
-	static inline var MAX_VALUE = 250;
+	static inline var MAX_VALUE = 240;
 	static inline var WHITENESS = 0;
 	static var random:R;
+	static var blinkColor:C;
 	public static function initialize():Void {
 		random = new R();
+		blinkColor = new C();
 	}
-	var blinkColor:C;
 	public function new(r:Int = 0, g:Int = 0, b:Int = 0) {
 		this.r = r;
 		this.g = g;
 		this.b = b;
 	}
 	public function getBlinkColor():C {
-		if (blinkColor == null) blinkColor = new C();
-		changeValueColor(blinkColor, 
-			random.pi(64), random.pi(64), random.pi(64));
+		changeValueColor(blinkColor, random.pi(64), random.pi(64), random.pi(64));
 		return blinkColor;
 	}
 	static function get_ti():C { return new C(-1); }
@@ -92,12 +91,14 @@ class C { // Color
 	}
 	function changeValueColor(color:C, rv:Int, gv:Int, bv:Int):Void {
 		color.v(this);
-		color.r += rv; color.g += gv; color.b += bv;
+		color.r += rv;
+		color.g += gv;
+		color.b += bv;
 		color.normalize();
 	}
 	public function normalize():Void {
-		r = r.ci(0, MAX_VALUE);
-		g = g.ci(0, MAX_VALUE);
-		b = b.ci(0, MAX_VALUE);
+		r = r.ci(0, 255);
+		g = g.ci(0, 255);
+		b = b.ci(0, 255);
 	}
 }
