@@ -11,17 +11,24 @@ import flash.ui.GameInputDevice;
 using Math;
 class K { // Key
 	static public var s:Array<Bool>;
-	static public var iu(get, null):Bool; // isUpPressed
-	static public var id(get, null):Bool; // isDownPressed
-	static public var ir(get, null):Bool; // isRightPressed
-	static public var il(get, null):Bool; // isLeftPressed
-	static public var ib(get, null):Bool; // isButtonPressed
-	static public var ib1(get, null):Bool; // isButton1Pressed
-	static public var ib2(get, null):Bool; // isButton2Pressed
+	static public var iu(get, null):Bool; // isUpPressing
+	static public var id(get, null):Bool; // isDownPressing
+	static public var ir(get, null):Bool; // isRightPressing
+	static public var il(get, null):Bool; // isLeftPressing
+	static public var ib(get, null):Bool; // isButtonPressing
+	static public var ib1(get, null):Bool; // isButton1Pressing
+	static public var ib2(get, null):Bool; // isButton2Pressing
+	static public var ipb(get, null):Bool; // isPressedButton
+	static public var ipb1(get, null):Bool; // iPressedsButton1
+	static public var ipb2(get, null):Bool; // isPressedButton2
 	static public var st(get, null):V; // stick
-	static public var r(get, null):Bool; // reset
 
-	static inline var GI_STICK_THRESHOLD = .5;
+	static public var rs(get, null):Bool; // reset
+
+	static var buttonState:ButtonState;
+	static var button1State:ButtonState;
+	static var button2State:ButtonState;
+	static inline var GI_STICK_THRESHOLD = 0.5;
 	static var stick:V;
 	static var giStick:V;
 	static var giButton1 = false;
@@ -37,6 +44,9 @@ class K { // Key
 		for (i in 0...256) s.push(false);
 		stick = new V();
 		giStick = new V();
+		buttonState = new ButtonState(get_ib);
+		button1State = new ButtonState(get_ib1);
+		button2State = new ButtonState(get_ib2);
 		#if flash
 		if (GameInput.isSupported) {
 			input = new GameInput();
@@ -73,6 +83,15 @@ class K { // Key
 	static function get_ib2():Bool {
 		return s[0x58] || s[0xbf] || giButton2;
 	}	
+	static function get_ipb():Bool {
+		return buttonState.isPressed;
+	}
+	static function get_ipb1():Bool {
+		return button1State.isPressed;
+	}
+	static function get_ipb2():Bool {
+		return button2State.isPressed;
+	}
 	static function get_st():V {
 		stick.n(0);
 		stick.a(giStick);
@@ -83,34 +102,38 @@ class K { // Key
 		if (stick.l > 0) stick.d(stick.l);
 		return stick;
 	}
-	static function get_r():Bool {
+	static function get_rs():Bool {
 		for (i in 0...256) s[i] = false;
 		return true;
 	}
 	
-	static public function u():Void {
+	static public function update():Void {
 		#if flash
 		giStick.n(0);
 		giButton1 = giButton2 = false;
-		if (device == null) return;
-		try {
-			var c0:GameInputControl = device.getControlAt(0);
-			var c1:GameInputControl = device.getControlAt(1);
-			var c2:GameInputControl = device.getControlAt(2);
-			var c3:GameInputControl = device.getControlAt(3);
-			if (c0.value.abs() > GI_STICK_THRESHOLD) giStick.x += c0.value;
-			if (c1.value.abs() > GI_STICK_THRESHOLD) giStick.y -= c1.value;
-			if (c2.value.abs() > GI_STICK_THRESHOLD) giStick.x += c2.value;
-			if (c3.value.abs() > GI_STICK_THRESHOLD) giStick.y -= c3.value;
-			if (isUdReverse) giStick.y *= -1;
-			var c4:GameInputControl = device.getControlAt(4);
-			var c5:GameInputControl = device.getControlAt(5);
-			var c6:GameInputControl = device.getControlAt(6);
-			var c7:GameInputControl = device.getControlAt(7);
-			giButton1 = (c4.value > GI_STICK_THRESHOLD) || (c6.value > GI_STICK_THRESHOLD);
-			giButton2 = (c5.value > GI_STICK_THRESHOLD) || (c7.value > GI_STICK_THRESHOLD);
-		} catch (e:Dynamic) {}
+		if (device != null) {
+			try {
+				var c0:GameInputControl = device.getControlAt(0);
+				var c1:GameInputControl = device.getControlAt(1);
+				var c2:GameInputControl = device.getControlAt(2);
+				var c3:GameInputControl = device.getControlAt(3);
+				if (c0.value.abs() > GI_STICK_THRESHOLD) giStick.x += c0.value;
+				if (c1.value.abs() > GI_STICK_THRESHOLD) giStick.y -= c1.value;
+				if (c2.value.abs() > GI_STICK_THRESHOLD) giStick.x += c2.value;
+				if (c3.value.abs() > GI_STICK_THRESHOLD) giStick.y -= c3.value;
+				if (isUdReverse) giStick.y *= -1;
+				var c4:GameInputControl = device.getControlAt(4);
+				var c5:GameInputControl = device.getControlAt(5);
+				var c6:GameInputControl = device.getControlAt(6);
+				var c7:GameInputControl = device.getControlAt(7);
+				giButton1 = (c4.value > GI_STICK_THRESHOLD) || (c6.value > GI_STICK_THRESHOLD);
+				giButton2 = (c5.value > GI_STICK_THRESHOLD) || (c7.value > GI_STICK_THRESHOLD);
+			} catch (e:Dynamic) { }
+		}
 		#end
+		buttonState.update();
+		button1State.update();
+		button2State.update();
 	}
 	static public function ls(d) {
 		#if flash
@@ -127,7 +150,7 @@ class K { // Key
 		#if flash
 		if (e.keyCode == 82 && !s[82]) {
 			isUdReverse = !isUdReverse;
-			T.i.tx("REVERSE Y AXIS").xy(.2, .95);
+			T.i.tx("REVERSE Y AXIS").xy(0.2, 0.95).t();
 			isRPressed = true;
 		}
 		#end
@@ -136,5 +159,24 @@ class K { // Key
 	}
 	static function onReleased(e:KeyboardEvent) {
 		s[e.keyCode] = false;
+	}
+}
+class ButtonState {
+	public var isPressed = false;
+	var isPressing = false;
+	var isPressingFunc:Void -> Bool;
+	public function new(isPressingFunc:Void -> Bool) {
+		this.isPressingFunc = isPressingFunc;
+	}
+	public function update():Void {
+		isPressed = false;
+		if (isPressingFunc()) {
+			if (!isPressing) {
+				isPressed = true;
+				isPressing = true;
+			}
+		} else {
+			isPressing = false;
+		}
 	}
 }
