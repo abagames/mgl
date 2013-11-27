@@ -4,17 +4,23 @@ import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.display.MovieClip;
 import flash.events.Event;
+import flash.filters.BlurFilter;
+import flash.filters.ColorMatrixFilter;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 import flash.net.SharedObject;
 import flash.utils.ByteArray;
 import flash.Lib;
-using mgl.U;
 class G { // Game
 	static public var ig(get, null):Bool; // is in game
 	static public var eg(get, null):Bool; // end game
 	static public var t(get, null):Int; // ticks
 	static public var ld(get, null):Bool; // load
 	static public var sv(get, null):Bool; // save
-	static public var r:R;
+	static public var rn:R;
+	static public function fr(x:Float, y:Float, width:Float, height:Float, color:C):Void {
+		Screen.fillRect(x, y, width, height, color);
+	}
 	public function new(main:Dynamic) { initialize(main); }
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
 	public function vr(version:Int = 1):G { return setVersion(version); }
@@ -22,34 +28,40 @@ class G { // Game
 	public function yr(ratio:Float):G { return setYRatio(ratio); }
 	public var ie(get, null):G; // initialize end
 
-	public function i():Void { } // initialize
+	public function i():Void { ie; } // initialize
 	public function b():Void { } // begin
 	public function u():Void { } // update
 	public function is():Void { } // initialize state
 	public function ls(d:Dynamic):Void { } // load state
 	public function ss(d:Dynamic):Void { } // save state
-	
+
 	static public var isInGame = false;
 	static public var ticks = 0;
 	static public var fps = 0.0;
-	static var titleTicks = 0;
-	static var wasClicked = false;
-	static var wasReleased = false;
+	static public var pixelSize:V;
+	static public var pixelWHRatio = 1.0;
+	static public var baseDotSize = 1;
 	static var mainInstance:Dynamic;
 	static var title = "";
 	static var title2 = "";
 	static var version = 1;
+	static var gInstance:G;
 	var baseSprite:Sprite;
+	var titleTicks = 0;
+	var wasClicked = false;
+	var wasReleased = false;
 	var isDebugging = false;
 	var isPaused = false;
 	var backgroundColor:C;
 	var fpsCount = 0;
 	var lastTimer = 0;
-	var lt:L;
 	function initialize(mi:Dynamic):Void {
-		Lib.current.stage.align = flash.display.StageAlign.TOP_LEFT;
 		baseSprite = new Sprite();
 		mainInstance = mi;
+		gInstance = this;
+		pixelSize = new V().xy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
+		pixelWHRatio = pixelSize.x / pixelSize.y;
+		baseDotSize = U.ci(Std.int(Math.min(pixelSize.x, pixelSize.y) / 160) + 1, 1, 20);
 		baseSprite.addEventListener(Event.ADDED_TO_STAGE, onAdded);
 		Lib.current.addChild(baseSprite);
 	}
@@ -62,19 +74,17 @@ class G { // Game
 		#end
 	}
 	function added():Void {
-		B.initialize(baseSprite);
+		Screen.initialize(baseSprite);
 		A.initialize();
 		C.initialize();
-		D.initialize();
+		D.initialize(mainInstance);
 		F.initialize();
 		K.initialize();
-		L.initialize();
 		M.initialize(baseSprite);
 		P.initialize();
-		S.initialize();
+		S.initialize(mainInstance);
 		T.initialize();
-		lt = L.i;
-		r = R.i;
+		rn = R.i;
 		mainInstance.i();
 	}
 	function setTitle(t:String, t2:String):G {
@@ -91,15 +101,18 @@ class G { // Game
 		return this;
 	}
 	function setYRatio(ratio:Float):G {
-		B.pixelSize.y = B.pixelSize.x * ratio;
-		B.pixelWHRatio = B.pixelSize.x / B.pixelSize.y;
-		D.initialize();
+		pixelSize.y = pixelSize.x * ratio;
+		pixelWHRatio = pixelSize.x / pixelSize.y;
 		return this;
 	}
 	function get_ie():G {
 		G.ld;
-		if (isDebugging) beginGame();
-		else initializeGame();
+		if (isDebugging) {
+			beginGame();
+		} else {
+			initializeGame();
+			beginTitle();
+		}
 		lastTimer = Std.int(Date.now().getTime());
 		Lib.current.addEventListener(Event.ACTIVATE, onActivated);
 		Lib.current.addEventListener(Event.DEACTIVATE, onDeactivated);
@@ -115,10 +128,7 @@ class G { // Game
 	static function get_eg():Bool {
 		if (!isInGame) return false;
 		G.sv;
-		isInGame = false;
-		wasClicked = wasReleased = false;
-		ticks = 0;
-		titleTicks = 10;
+		gInstance.beginTitle();
 		return true;
 	}
 	static function get_ld():Bool {
@@ -153,29 +163,34 @@ class G { // Game
 		return false;
 	}
 	
+	function beginTitle():Void {
+		var tx = 0.5;
+		if (title2.length <= 0) {
+			T.i.tx(title).xy(tx, 0.4).ac.tf;
+		} else {
+			T.i.tx(title).xy(tx, 0.38).ac.tf;
+			T.i.tx(title2).xy(tx, 0.41).ac.tf;
+		}
+		T.i.tx("CLICK/TOUCH/PUSH").xy(tx, 0.54).ac.tf;
+		T.i.tx("TO").xy(tx, 0.58).ac.tf;
+		T.i.tx("START").xy(tx, 0.615).ac.tf;
+		isInGame = false;
+		wasClicked = wasReleased = false;
+		titleTicks = 10;
+	}
 	function beginGame():Void {
 		isInGame = true;
-		ticks = 0;
-		r.s();
 		initializeGame();
 	}
 	function initializeGame():Void {
-		A.clear();
-		F.clear();
+		A.cl;
+		F.cl;
+		ticks = 0;
+		rn.s();
 		mainInstance.b();
 	}
 	function handleTitleScreen():Void {
-		var tx = 0.5;
-		if (title2.length <= 0) {
-			lt.tx(title).xy(tx, 0.4).d;
-		} else {
-			lt.tx(title).xy(tx, 0.38).d;
-			lt.tx(title2).xy(tx, 0.41).d;
-		}
-		lt.tx("CLICK/TOUCH/PUSH").xy(tx, 0.54).d;
-		lt.tx("TO").xy(tx, 0.58).d;
-		lt.tx("START").xy(tx, 0.615).d;
-		if (M.ip || K.ib || K.iu || K.id || K.ir || K.il) {
+		if (M.ib || K.ib || K.iu || K.id || K.ir || K.il) {
 			if (wasReleased) wasClicked = true;
 		} else {
 			if (wasClicked) beginGame();
@@ -183,30 +198,31 @@ class G { // Game
 		}
 	}
 	function updateFrame(e:Event):Void {
-		B.preUpdate();
-		K.u();
+		Screen.preUpdate();
+		M.update();
+		K.update();
 		if (!isPaused) {
 			A.update();
 			F.update();
 			mainInstance.u();
 			if (isDebugging) {
-				lt.al.tx("FPS: " + Std.string(Std.int(fps))).xy(0, 0.95).d.ac;
+				T.i.tx('FPS: ${Std.int(fps)}').xy(0.01, 0.97);
 			}
 			for (s in S.ss) s.u();
 			ticks++;
 		} else {
-			lt.tx("PAUSED").xy(0.5, 0.45).d;
-			lt.tx("CLICK/TOUCH TO RESUME").xy(0.5, 0.55).d;
+			T.i.tx("PAUSED").xy(0.5, 0.45).ac.d;
+			T.i.tx("CLICK/TOUCH TO RESUME").xy(0.5, 0.55).ac.d;
 		}
 		if (!isInGame) handleTitleScreen();
-		B.postUpdate();
+		Screen.postUpdate();
 		calcFps();
 	}
 	function onActivated(e:Event):Void {
 		isPaused = false;
 	}
 	function onDeactivated(e:Event):Void {
-		K.r;
+		K.rs;
 		if (isInGame) isPaused = true;
 	}
 	function calcFps():Void {
@@ -218,5 +234,98 @@ class G { // Game
 			lastTimer = currentTimer;
 			fpsCount = 0;
 		}
+	}
+}
+class Screen {
+	static var baseSprite:Sprite;
+	static var pixelSize:V;
+	static var pixelWHRatio = 1.0;
+	static var baseDotSize = 1;
+	static var pixelRect:Rectangle;
+	static var pixelCount = 0;
+	static var bd:BitmapData;
+	static var blurBd:BitmapData;
+	static var baseBd:BitmapData;
+	static var blurBitmap:Bitmap;
+	static var rect:Rectangle;
+	static var zeroPoint:Point;
+	static var fadeFilter:ColorMatrixFilter;
+	static var blurFilter:BlurFilter;
+	static var lowFpsCount = -120;
+	static var hasBlur = true;
+	static public function initialize(bs:Sprite):Void {
+		baseSprite = bs;
+		pixelSize = G.pixelSize;
+		pixelWHRatio = G.pixelWHRatio;
+		baseDotSize = G.baseDotSize;
+		pixelRect = new Rectangle(0, 0, pixelSize.x, pixelSize.y);
+		pixelCount = pixelSize.xi * pixelSize.yi;
+		baseBd = new BitmapData(pixelSize.xi, pixelSize.yi, false, 0);
+		baseSprite.addChild(new Bitmap(baseBd));
+		#if js
+		bd = new BitmapData(pixelSize.xi, pixelSize.yi, true, 0);
+		baseSprite.addChild(new Bitmap(bd));
+		hasBlur = false;
+		#else
+		bd = new BitmapData(pixelSize.xi, pixelSize.yi, true, 0);
+		blurBd = new BitmapData(pixelSize.xi, pixelSize.yi, true, 0);
+		blurBitmap = new Bitmap(blurBd);
+		baseSprite.addChild(blurBitmap);
+		fadeFilter = new ColorMatrixFilter(
+			[1, 0, 0, 0, 0,  0, 1, 0, 0, 0,  0, 0, 1, 0, 0,  0, 0, 0, 0.8, 0]);
+		blurFilter = new BlurFilter(10, 10);
+		#end
+		rect = new Rectangle();
+		zeroPoint = new Point();
+	}
+	static public function postUpdate():Void {
+		#if !js
+		bd.unlock();
+		#end
+		if (hasBlur) drawBlur();
+	}
+	static public function preUpdate():Void {
+		if (hasBlur) {
+			if (G.fps < 40) {
+				if (++lowFpsCount > 120) stopBlur();
+			} else {
+				lowFpsCount = 0;
+			}
+		}
+		#if !js
+		bd.lock();
+		#end
+		bd.fillRect(pixelRect, 0);
+	}
+	static public inline function pixelFillRect(x:Int, y:Int, width:Int, height:Int, c:C):Void {
+		rect.x = x;
+		rect.y = y;
+		rect.width = width;
+		rect.height = height;
+		bd.fillRect(rect, c.i);
+	}
+	static public inline function fillRect(x:Float, y:Float, width:Float, height:Float, color:C):Void {
+		var w = width * pixelSize.x;
+		var h = height * pixelSize.y;
+		var px = Std.int(x * pixelSize.x) - Std.int(w / 2);
+		var py = Std.int(y * pixelSize.y) - Std.int(h / 2);
+		var pw = Std.int(w);
+		var ph = Std.int(h);
+		pixelFillRect(px, py, pw, ph, color);
+	}
+	static function drawBlur():Void {
+		#if !js
+		blurBd.lock();
+		blurBd.applyFilter(blurBd, blurBd.rect, zeroPoint, fadeFilter);
+		blurBd.copyPixels(bd, bd.rect, zeroPoint, null, null, true);
+		blurBd.applyFilter(blurBd, blurBd.rect, zeroPoint, blurFilter);
+		blurBd.copyPixels(bd, bd.rect, zeroPoint, null, null, true);
+		blurBd.unlock();
+		#end
+	}
+	static function stopBlur():Void {
+		baseSprite.removeChild(blurBitmap);
+		baseSprite.addChild(new Bitmap(bd));
+		hasBlur = false;
 	}
 }
