@@ -7,8 +7,12 @@ class A { // Actor
 	static public var cl(get, null):Bool; // clear
 	static public function cls(className:String):Void { clearSpecificActors(className); }
 	static public function sc(className:String, vx:Float, vy:Float = 0,
-	minX:Float = -9999999, maxX:Float = 9999999, minY:Float = -9999999, maxY:Float = 9999999):Void {
+	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		scroll(className, vx, vy, minX, maxX, minY, maxY);
+	}
+	static public function scs(classNames:Array<String>, vx:Float, vy:Float = 0,
+	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
+		scrollActors(classNames, vx, vy, minX, maxX, minY, maxY);
 	}
 	public var p:V; // position
 	public var z = 0.0;
@@ -17,7 +21,7 @@ class A { // Actor
 	public var s = 0.0; // speed
 	public var t(get, null):Int; // ticks
 	public var r(get, null):Bool; // remove
-	public function hr(width:Float, height:Float = -1):A { return setHitRect(width, height); }
+	public function hr(width:Float = -999, height:Float = -1):A { return setHitRect(width, height); }
 	public function ih(actorClassName:String):Bool {
 		return isHit(actorClassName);
 	}
@@ -71,14 +75,20 @@ class A { // Actor
 	minX:Float, maxX:Float, minY:Float, maxY:Float):Void {
 		var actors = getActors(className);
 		for (a in actors) {
-			a.p.x = U.lr(a.p.x + vx, minX, maxX);
-			a.p.y = U.lr(a.p.y + vy, minY, maxY);
+			a.p.x += vx;
+			a.p.y += vy;
+			if (minX < maxX) a.p.x = U.lr(a.p.x, minX, maxX);
+			if (minY < maxY) a.p.y = U.lr(a.p.y, minY, maxY);
 		}
+	}
+	static function scrollActors(classNames:Array<String>, vx:Float, vy:Float,
+	minX:Float, maxX:Float, minY:Float, maxY:Float):Void {
+		for (cn in classNames) scroll(cn, vx, vy, minX, maxX, minY, maxY);
 	}
 	public var isRemoving = false;
 	public var ticks = 0;
+	var d:D; // dot pixel art
 	var hitRect:V;
-	var d:D;
 	var group:ActorGroup;
 	var ho:V;
 	var fs:Array<F>;
