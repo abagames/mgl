@@ -5,8 +5,8 @@ class T { // Text
 	public function tx(text:String):T { return setText(text); }
 	public function p(pos:V):T { return setPos(pos); }
 	public function xy(x:Float, y:Float):T { return setXy(x, y); }
-	public function sz(dotSize:Int = -1):T { return setDotSize(dotSize); }	
 	public function c(color:C):T { return setColor(color); }
+	public function ds(dotScale:Float = -1):T { return setDotScale(dotScale); }	
 	public var al(get, null):T; // align left
 	public var ac(get, null):T; // align center
 	public var ar(get, null):T; // align right
@@ -18,6 +18,8 @@ class T { // Text
 	public var ao(get, null):T; // add once
 	public var r(get, null):Bool; // remove
 	public var d(get, null):T; // draw
+
+	public var ta(get, null):A; // T actor
 	
 	static var shownMessages:Array<String>;
 	static public function initialize():Void {
@@ -46,12 +48,12 @@ class T { // Text
 		actor.p.xy(x, y);
 		return this;
 	}
-	function setDotSize(dotSize:Int):T {
-		actor.letter.setDotSize(dotSize);
-		return this;
-	}
 	function setColor(color:C):T {
 		actor.letter.setColor(color);
+		return this;
+	}
+	function setDotScale(dotScale:Float):T {
+		actor.letter.setDotScale(dotScale);
 		return this;
 	}
 	function get_al():T {
@@ -103,6 +105,9 @@ class T { // Text
 		actor.draw();
 		actor.r;
 		return this;
+	}
+	function get_ta():A {
+		return actor;
 	}
 }
 class TActor extends A {
@@ -213,12 +218,12 @@ class Letter {
 	public function alignVerticalCenter():Void {
 		isAlignVerticalCenter = true;
 	}
-	public function setDotSize(dotSize:Int):Void {
-		if (dotSize < 0) this.dotSize = baseDotSize;
-		this.dotSize = dotSize;
-	}
 	public function setColor(color:C):Void {
 		this.color = color;
+	}
+	public function setDotScale(dotScale:Float):Void {
+		if (dotScale < 0) dotSize = baseDotSize;
+		dotSize = Std.int(dotScale * baseDotSize);
 	}
 	public function drawToScreen():Void {
 		draw(Screen.pixelFillRect);
