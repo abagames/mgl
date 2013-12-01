@@ -3,9 +3,8 @@ import mgl.G.Screen;
 import mgl.T.Letter;
 using Math;
 using mgl.U;
-class D { // DotShape
+class D { // DotPixelArt
 	static public var i(get, null):D; // instance
-	public function sz(dotSize:Int):D { return setDotSize(dotSize); }
 	public function c(color:C):D { return setColor(color); }
 	public function cs(color:C):D { return setColorSpot(color); }
 	public function cb(color:C = null):D { return setColorBottom(color); }
@@ -14,6 +13,7 @@ class D { // DotShape
 		return setSpotInterval(x, y, xy);
 	}
 	public function st(threshold:Float):D { return setSpotThreshold(threshold); }
+	public function ds(dotScale:Float = -1):D { return setDotScale(dotScale); }
 	public function o(x:Float = 0, y:Float = 0):D { return setOffset(x, y); }
 	public function fr(width:Float, height:Float = -1, edgeWidth:Int = 0):D {
 		return fillRect(width, height, edgeWidth);
@@ -94,11 +94,6 @@ class D { // DotShape
 	static function get_i():D  {
 		return new D();
 	}
-	function setDotSize(dotSize:Int = -1):D {
-		if (dotSize < 0) this.dotSize = baseDotSize;
-		else this.dotSize = dotSize;
-		return this;
-	}
 	function setColor(color:C):D {
 		this.color = color;
 		return this;
@@ -123,6 +118,11 @@ class D { // DotShape
 	}
 	function setSpotThreshold(threshold:Float):D {
 		spotThreshold =  threshold;
+		return this;
+	}
+	function setDotScale(dotScale:Float):D {
+		if (dotScale < 0) dotSize = baseDotSize;
+		else dotSize = Std.int(dotScale * baseDotSize);
 		return this;
 	}
 	function setOffset(x:Float, y:Float):D {
@@ -154,7 +154,7 @@ class D { // DotShape
 	function generateCircle(diameter:Float, seed:Int):D {
 		var oc = C.di.v(color);
 		setGeneratedColors(color, seed);
-		fc(diameter, 1).c(oc).cb(oc.gd).si().lc(diameter);
+		fc(diameter).c(oc).cb(oc.gd).si().lc(diameter);
 		return this;
 	}
 	function generateShape(width:Float, height:Float, seed:Int,
@@ -231,7 +231,6 @@ class D { // DotShape
 		l.setText(text);
 		l.alignCenter();
 		l.alignVerticalCenter();
-		l.setDotSize(1);
 		l.draw(pixelFillRect);
 		return this;
 	}
