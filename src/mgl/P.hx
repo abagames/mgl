@@ -3,7 +3,7 @@ import mgl.G.Screen;
 class P { // Particle
 	static public var i(get, null):P; // instance
 	static public function sc(vx:Float, vy:Float = 0,
-	minX:Float = -9999999, maxX:Float = 9999999, minY:Float = -9999999, maxY:Float = 9999999):Void {
+	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		A.sc("mgl.PActor", vx, vy, minX, maxX, minY, maxY);
 	}
 	public function p(pos:V):P { return setPos(pos); }
