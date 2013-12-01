@@ -6,9 +6,13 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[REVGRAV](http://abagames.sakura.ne.jp/flash/rg/)
+
 [SPACE SHIPS CONTACT ACCIDENTAL](http://abagames.sakura.ne.jp/flash/ssca/)
 
 ####Sample game (using the older version mgl)
+
+[YOU HAVE ONE SHOT](http://abagames.sakura.ne.jp/flash/yhos/)
 
 [SIDE SHOT BOOSTER](http://abagames.sakura.ne.jp/flash/ssb/)
 
@@ -24,6 +28,19 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 [WASD THRUST](http://wonderfl.net/c/cUIn)
 
+###Advantages
+
+* A basic game loop is automatically managed.
+* You can do spawing, moving and removing the actor in an easy-to-write manner.
+* Since the dot pixel art and the sound effect are generated procedually, you don't have to care about them.
+* Many useful classes for particles, key handling, mouse handling, fiber, random, text, color and 2d vector.
+
+### Limitations
+
+* Not suitable for a large scale game because of lacking flexibility in handling a game loop.
+* A code tends to be unreadable due to short method and class names.
+* No 3d, neither external bitmaps nor sounds loading support.
+
 ###Sample code
 
 [BALL 28 IN SPACE](http://abagames.sakura.ne.jp/flash/b2is/)
@@ -32,6 +49,7 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 import mgl.*;
 using mgl.F;
 using mgl.U;
+// A basic game loop(G) handling class.
 class Main extends G {
 	function new() {
 		super(this);
@@ -45,7 +63,7 @@ class Main extends G {
 	// First initializer.
 	override function i() {
 		Ball.main = this;
-		// Set sounds(S) played at the game begining/ending.
+		// Generate sounds(S) played at the game begining/ending.
 		beginGameSound = S.i.mj.m().t(.5, 7, .3).t(.3, 7, .8).e;
 		endGameSound = S.i.mj.m().t(.2, 7, .8).t(.8, 7, .2).e;
 		// Set the title(tt) and end the initializer(ie).
@@ -93,12 +111,12 @@ class Main extends G {
 		new Main();
 	}
 }
-// Player actor.
+// Player actor(A).
 class Player extends A {
 	static var tickSound:S;
 	// Static initializer called only once.
 	override function i() {
-		// Set the green(c(C.gi)) shape(gs) with the dot size(sz) 3.
+		// Generate the green(c(C.gi)) shape(gs) with the dot size(sz) 3.
 		d = D.i.c(C.gi).sz(3).gs(.04, .05);
 		// Set the hir rect.
 		hr(.04, .05);
@@ -165,7 +183,32 @@ class Ball extends A {
 
 ###Classes
 
+###G // Game
+
+A basic game loop handler. You have to override the i(), b() and u() method to initialize, begin and update a game.
+
+##### Methods
+* (static)ig:Bool // is in game
+* (static)eg:Bool // end game
+* (static)t:Int // ticks
+* (static)fr(x:Float, y:Float, width:Float, height:Float, color:C):Void // fill rect
+* tt(title:String, title2:String = ""):G // set title
+* vr(version:Int = 1):G // set version
+* dm:G // debugging mode
+* yr(ratio:Float):G // set y ratio
+* ie:G // initialize end
+
+##### Overriden methods
+* i():Void // initialize
+* b():Void // begin
+* u():Void // update
+* is():Void // initialize state
+* ls(d:Dynamic):Void // load state
+* ss(d:Dynamic):Void // save state
+
 ####A // Actor
+
+An actor moves on a screen. An actor has a position, a velocity and a dot pixel art.
 
 ##### Variables
 * p:V // position
@@ -173,6 +216,7 @@ class Ball extends A {
 * v:V // velocity
 * w:Float = 0 // way
 * s:Float = 0 // speed
+* d:D // dot pixel art
 
 ##### Methods
 * (static)acs(className:String):Array<Dynamic> // get actors
@@ -193,34 +237,9 @@ class Ball extends A {
 * u():Void // update
 * h(hitActor:Dynamic):Void // hit
 
-####C // Color
+###D // DotPixelArt
 
-##### Variables
-* r:Int // red
-* g:Int // green
-* b:Int // blue
-
-##### Methods
-* (static)ti:C // transparent instance
-* (static)di:C // dark (black) instance
-* (static)ri:C // red instance
-* (static)gi:C // green instance
-* (static)bi:C // blue instance
-* (static)yi:C // yellow instance
-* (static)mi:C // magenta instance
-* (static)ci:C // cyan instance
-* (static)wi:C // white instance
-* i:Int // integer value
-* v(v:C):C // set value
-* gd:C // go dark
-* gw:C // go white
-* gr:C // go red
-* gg:C // go green
-* gb:C // go blue
-* gbl:C // go blink
-* bl(color:C, ratio:Float):C // blend
-
-####D // DotShape
+A pixel art for an actor. You can write a rectangle, a circle and an auto generated shape.
 
 ##### Methods
 * (static)i:D // instance
@@ -250,103 +269,9 @@ class Ball extends A {
 * dc(color:C = null):D // set draw color
 * d:D // draw
 
-####F // Fiber
+###S // Sound
 
-##### Methods
-* (static)i():F // instance
-* (static)ip(parent:Dynamic):F // instance with parent
-* (static)cl:Bool // clear
-* d(block:Expr):F // do
-* w(count:Float):F // wait
-* dw(count:Float):F // decrement wait
-* dd:F // disable auto decrement
-* dl:F // disable loop
-* u:F // update
-* l:F // loop
-* r:F; // remove
-* cn:Float; // count
-
-####G // Game
-
-##### Methods
-* (static)ig:Bool // is in game
-* (static)eg:Bool // end game
-* (static)t:Int // ticks
-* (static)fr(x:Float, y:Float, width:Float, height:Float, color:C):Void // fill rect
-* tt(title:String, title2:String = ""):G // set title
-* vr(version:Int = 1):G // set version
-* dm:G // debugging mode
-* yr(ratio:Float):G // set y ratio
-* ie:G // initialize end
-
-##### Overriden methods
-* i():Void // initialize
-* b():Void // begin
-* u():Void // update
-* is():Void // initialize state
-* ls(d:Dynamic):Void // load state
-* ss(d:Dynamic):Void // save state
-
-####K // Key
-
-##### Variables
-* (static)s:Array<Bool> // pressed keys
-
-##### Methods
-* (static)iu:Bool // is up pressing
-* (static)id:Bool // is down pressing
-* (static)ir:Bool // is right pressing
-* (static)il:Bool // is left pressing
-* (static)ib:Bool // is button pressing
-* (static)ib1:Bool // is button1 pressing
-* (static)ib2:Bool // is button2 pressing
-* (static)ipb:Bool // is pressed button
-* (static)ipb1:Bool // is pressed button1
-* (static)ipb2:Bool // is pressed button2
-* (static)st:V // stick
-
-####M // Mouse
-
-##### Variables
-* (static)p:V // pos
-* (static)ip:Bool // is button pressing
-* (static)ipb:Bool // is pressed button
-
-####P // Particle
-
-##### Methods
-* (static)i:P // instance
-* (static)sc(className:String, vx:Float, vy:Float = 0,
-	minX:Float = -9999999, maxX:Float = 9999999,
-	minY:Float = -9999999, maxY:Float = 9999999):Void // scroll
-* p(pos:V):P // set position
-* xy(x:Float, y:Float):P // set xy
-* z(z:Float = 0):P // set z
-* c(color:C):P // set color
-* cn(count:Int):P // set count
-* sz(size:Float):P // set size
-* s(speed:Float):P // set speed
-* t(ticks:Float):P // set ticks
-* w(angle:Float, angleWidth:Float):P // set way
-* a:P // add
-
-####R // Random
-
-##### Methods
-* (static)i:R // instance
-* n(v:Float = 1, s:Float = 0):Float // number
-* ni(v:Int, s:Int = 0):Int // number int
-* f(from:Float to:Float):Float // from to
-* fi(from:Float to:Float):Int // from to int
-* pm:Int // plus minus
-* p(v:Float = 1):Float // plus minus number
-* pi(v:Int):Int // plus minus number int
-* s(v:Int = -0x7fffffff):R // set seed
-* bst(stage:Int):R // set difficulty basis stage
-* st(stage:Int, seedOffset:Int = 0):R // set stage seed
-* dc:Float // difficulty corrected random
-
-####S // SoundEffect
+A 8-bit era style sound effect.
 
 ##### Methods
 * (static)i:S // instance
@@ -370,7 +295,29 @@ class Ball extends A {
 * fo(second:Float = 1):S // fade out
 * s:S // stop
 
+####P // Particle
+
+Particles splashed from a specified position.
+
+##### Methods
+* (static)i:P // instance
+* (static)sc(className:String, vx:Float, vy:Float = 0,
+	minX:Float = -9999999, maxX:Float = 9999999,
+	minY:Float = -9999999, maxY:Float = 9999999):Void // scroll
+* p(pos:V):P // set position
+* xy(x:Float, y:Float):P // set xy
+* z(z:Float = 0):P // set z
+* c(color:C):P // set color
+* cn(count:Int):P // set count
+* sz(size:Float):P // set size
+* s(speed:Float):P // set speed
+* t(ticks:Float):P // set ticks
+* w(angle:Float, angleWidth:Float):P // set way
+* a:P // add
+
 ####T // Text
+
+Showing a text on a screen in a certain duration ticks.
 
 ##### Methods
 * (static)i:T // instance
@@ -391,24 +338,103 @@ class Ball extends A {
 * r:Bool // remove
 * d:T // draw
 
-####U // Utility
+####R // Random
+
+Random number generator.
 
 ##### Methods
-* (static)c(v:Float, min:Float = 0.0, max:Float = 1.0):Float // clamp
-* (static)ci(v:Int, min:Int, max:Int):Int // clamp int
-* (static)nw(v:Float):Float // normalize way
-* (static)aw(v:Float, targetAngle:Float, angleVel:Float):Float // aim way
-* (static)lr(v:Float, min:Float, max:Float):Float // loop range
-* (static)lri(v:Int, min:Int, max:Int):Int // loop range int
-* (static)rn(v:Float = 1, s:Float = 0):Float // random number
-* (static)rni(v:Int, s:Int = 0):Int // random number int
-* (static)rf(from:Float, to:Float):Float // random from to
-* (static)rfi(from:Int, to:Int):Int // random from to int
-* (static)rp(v:Float = 1):Float // random plus minus number
-* (static)rpi(v:Int):Int // random plus minus number int
-* (static)ch(o:Dynamic):Int // class hash
+* (static)i:R // instance
+* n(v:Float = 1, s:Float = 0):Float // number
+* ni(v:Int, s:Int = 0):Int // number int
+* f(from:Float to:Float):Float // from to
+* fi(from:Float to:Float):Int // from to int
+* pm:Int // plus minus
+* p(v:Float = 1):Float // plus minus number
+* pi(v:Int):Int // plus minus number int
+* s(v:Int = -0x7fffffff):R // set seed
+* bst(stage:Int):R // set difficulty basis stage
+* st(stage:Int, seedOffset:Int = 0):R // set stage seed
+* dc:Float // difficulty corrected random
+
+####F // Fiber
+
+Set the do block and the block runs constantly for a specified wait ticks.
+
+##### Methods
+* (static)i():F // instance
+* (static)ip(parent:Dynamic):F // instance with parent
+* (static)cl:Bool // clear
+* d(block:Expr):F // do
+* w(count:Float):F // wait
+* dw(count:Float):F // decrement wait
+* dd:F // disable auto decrement
+* dl:F // disable loop
+* u:F // update
+* l:F // loop
+* r:F; // remove
+* cn:Float; // count
+
+####C // Color
+
+RGB color.
+
+##### Variables
+* r:Int // red
+* g:Int // green
+* b:Int // blue
+
+##### Methods
+* (static)ti:C // transparent instance
+* (static)di:C // dark (black) instance
+* (static)ri:C // red instance
+* (static)gi:C // green instance
+* (static)bi:C // blue instance
+* (static)yi:C // yellow instance
+* (static)mi:C // magenta instance
+* (static)ci:C // cyan instance
+* (static)wi:C // white instance
+* i:Int // integer value
+* v(v:C):C // set value
+* gd:C // go dark
+* gw:C // go white
+* gr:C // go red
+* gg:C // go green
+* gb:C // go blue
+* gbl:C // go blink
+* bl(color:C, ratio:Float):C // blend
+
+####K // Key
+
+Key and joystick input status.
+
+##### Variables
+* (static)s:Array<Bool> // pressed keys
+
+##### Methods
+* (static)iu:Bool // is up pressing
+* (static)id:Bool // is down pressing
+* (static)ir:Bool // is right pressing
+* (static)il:Bool // is left pressing
+* (static)ib:Bool // is button pressing
+* (static)ib1:Bool // is button1 pressing
+* (static)ib2:Bool // is button2 pressing
+* (static)ipb:Bool // is pressed button
+* (static)ipb1:Bool // is pressed button1
+* (static)ipb2:Bool // is pressed button2
+* (static)st:V // stick input vector
+
+####M // Mouse
+
+Mouse input status.
+
+##### Variables
+* (static)p:V // pos
+* (static)ip:Bool // is button pressing
+* (static)ipb:Bool // is pressed button
 
 ####V // Vector
+
+2D vector.
 
 ##### Variables
 * x:Float = 0 // x
@@ -434,6 +460,25 @@ class Ball extends A {
 * rt(angle:Float):V // rotate
 * ii(spacing:Float = 0,
 	minX:Float = 0, maxX:Float = 1, minY:Float = 0, maxY:Float = 1):Bool // is in
+
+####U // Utility
+
+Utility methods.
+
+##### Methods
+* (static)c(v:Float, min:Float = 0.0, max:Float = 1.0):Float // clamp
+* (static)ci(v:Int, min:Int, max:Int):Int // clamp int
+* (static)nw(v:Float):Float // normalize way
+* (static)aw(v:Float, targetAngle:Float, angleVel:Float):Float // aim way
+* (static)lr(v:Float, min:Float, max:Float):Float // loop range
+* (static)lri(v:Int, min:Int, max:Int):Int // loop range int
+* (static)rn(v:Float = 1, s:Float = 0):Float // random number
+* (static)rni(v:Int, s:Int = 0):Int // random number int
+* (static)rf(from:Float, to:Float):Float // random from to
+* (static)rfi(from:Int, to:Int):Int // random from to int
+* (static)rp(v:Float = 1):Float // random plus minus number
+* (static)rpi(v:Int):Int // random plus minus number int
+* (static)ch(o:Dynamic):Int // class hash
 
 License
 ----------
