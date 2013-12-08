@@ -31,8 +31,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 ###Advantages
 
 * A basic game loop is automatically managed.
-* You can do spawing, moving and removing the actor in an easy-to-write manner.
-* Since the dot pixel art and the sound effect are generated procedually, you don't have to care about them.
+* You can do spawning, moving and removing the actor in an easy-to-write manner.
+* Since the dot pixel art and the sound effect are generated procedurally, you don't have to care about them.
 * Many useful classes for particles, key handling, mouse handling, fiber, random, text, color and 2d vector.
 
 ### Limitations
