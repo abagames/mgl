@@ -39,7 +39,7 @@ class F { // Fiber
 				fibers[i].u;
 				i++;
 			}
-		}		
+		}
 	}
 	public var isRemoving = false;
 	var block:Void -> Void;
@@ -76,6 +76,7 @@ class F { // Fiber
 		if (isAutoDecrement) count--;
 		if (count > 0) return this;
 		if (isLooping) l;
+		else count = 9999999;
 		block();
 		return this;
 	}
