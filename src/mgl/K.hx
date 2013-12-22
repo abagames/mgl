@@ -2,6 +2,7 @@ package mgl;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.Lib;
+import mgl.K.ButtonState;
 #if flash
 import flash.events.GameInputEvent;
 import flash.ui.GameInput;
@@ -18,6 +19,10 @@ class K { // Key
 	static public var ib(get, null):Bool; // isButtonPressing
 	static public var ib1(get, null):Bool; // isButton1Pressing
 	static public var ib2(get, null):Bool; // isButton2Pressing
+	static public var ipu(get, null):Bool; // isPressedUp
+	static public var ipd(get, null):Bool; // isPressedDown
+	static public var ipr(get, null):Bool; // isPressedRight
+	static public var ipl(get, null):Bool; // isPressedLeft
 	static public var ipb(get, null):Bool; // isPressedButton
 	static public var ipb1(get, null):Bool; // iPressedsButton1
 	static public var ipb2(get, null):Bool; // isPressedButton2
@@ -25,6 +30,10 @@ class K { // Key
 
 	static public var rs(get, null):Bool; // reset
 
+	static var uState:ButtonState;
+	static var dState:ButtonState;
+	static var rState:ButtonState;
+	static var lState:ButtonState;
 	static var buttonState:ButtonState;
 	static var button1State:ButtonState;
 	static var button2State:ButtonState;
@@ -44,6 +53,10 @@ class K { // Key
 		for (i in 0...256) s.push(false);
 		stick = new V();
 		giStick = new V();
+		uState = new ButtonState(get_iu);
+		dState = new ButtonState(get_id);
+		rState = new ButtonState(get_ir);
+		lState = new ButtonState(get_il);
 		buttonState = new ButtonState(get_ib);
 		button1State = new ButtonState(get_ib1);
 		button2State = new ButtonState(get_ib2);
@@ -83,6 +96,18 @@ class K { // Key
 	static function get_ib2():Bool {
 		return s[0x58] || s[0xbf] || giButton2;
 	}	
+	static function get_ipu():Bool {
+		return uState.isPressed;
+	}
+	static function get_ipd():Bool {
+		return dState.isPressed;
+	}
+	static function get_ipr():Bool {
+		return rState.isPressed;
+	}
+	static function get_ipl():Bool {
+		return lState.isPressed;
+	}
 	static function get_ipb():Bool {
 		return buttonState.isPressed;
 	}
@@ -131,6 +156,10 @@ class K { // Key
 			} catch (e:Dynamic) { }
 		}
 		#end
+		uState.update();
+		dState.update();
+		rState.update();
+		lState.update();
 		buttonState.update();
 		button1State.update();
 		button2State.update();
