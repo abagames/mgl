@@ -158,11 +158,13 @@ class D { // DotPixelArt
 		return this;
 	}
 	function generateShape(width:Float, height:Float, seed:Int,
-		fillRatio:Float = 0.5, sideRatio:Float = 0.2, crossRatio:Float = 0.2):D {
+		fillRatio:Float = 0.4, sideRatio:Float = 0.2, crossRatio:Float = 0.2):D {
 		if (height < 0) height = width;
 		if (seed < 0) seed = baseRandomSeed++;
 		var w = Std.int(width * pixelSize.x / dotSize / 2);
 		var h = Std.int(height * pixelSize.y / dotSize);
+		if (w < 3) w = 3;
+		if (h < 3) h = 3;
 		var oy = -Std.int(h / 2);
 		var pixels = new Array<Array<Int>>();
 		for (x in 0...w) {
@@ -176,14 +178,14 @@ class D { // DotPixelArt
 		var r = R.i.s(seed);
 		for (i in 0...Std.int(w * h * fillRatio)) {
 			for (j in 0...100) {
-				if (nextPixels.length <= 0) nextPixels.push(V.i.xy(r.fi(2, w - 3), r.fi(2, h - 3)));
+				if (nextPixels.length <= 0) nextPixels.push(V.i.xy(r.fi(1, w - 2), r.fi(1, h - 2)));
 				var np = nextPixels[r.ni(nextPixels.length - 1)];
 				var nx = np.xi, ny = np.yi;
 				nextPixels.remove(np);
 				if (pixels[nx][ny] > 0) continue;
 				var countSide = 0, countCross = 1;
-				for (ix in (nx - 1).ci(0, w - 1)...(nx + 2).ci(0, w)) {
-					for (iy in (ny - 1).ci(0, h - 1)...(ny + 2).ci(0, h)) {
+				for (ix in (nx - 1).ci(0, w - 2)...(nx + 2).ci(1, w - 1)) {
+					for (iy in (ny - 1).ci(1, h - 2)...(ny + 2).ci(2, h - 1)) {
 						if (pixels[ix][iy] > 0) {
 							if (ix == nx || iy == ny) countSide++;
 							else countCross++;
@@ -194,8 +196,8 @@ class D { // DotPixelArt
 					setDot(nx, ny + oy, ny / h);
 					setDot(-nx, ny + oy, ny / h);
 					pixels[nx][ny] = 1;
-					for (ix in (nx - 1).ci(0, w - 1)...(nx + 2).ci(0, w)) {
-						for (iy in (ny - 1).ci(0, h - 1)...(ny + 2).ci(0, h)) {
+					for (ix in (nx - 1).ci(0, w - 2)...(nx + 2).ci(1, w - 1)) {
+						for (iy in (ny - 1).ci(1, h - 2)...(ny + 2).ci(2, h - 1)) {
 							if (pixels[ix][iy] == 0) {
 								for (np in nextPixels) if (np.xi == ix && np.yi == iy) continue;
 								nextPixels.push(V.i.xy(ix, iy));
@@ -206,8 +208,6 @@ class D { // DotPixelArt
 				}
 			}
 		}
-		for (x in 0...w) pixels[x][0] = pixels[x][h - 1] = 0;
-		for (y in 0...h) pixels[0][y] = pixels[w - 1][y] = 0;
 		c(oc).cb(oc.gd).si();
 		for (x in 1...w - 1) {
 			for (y in 1...h - 1) {
