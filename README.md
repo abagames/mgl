@@ -6,6 +6,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[LONG EDGE WINS](http://abagames.sakura.ne.jp/flash/lew/)
+
 [REVGRAV](http://abagames.sakura.ne.jp/flash/rg/)
 
 [SPACE SHIPS CONTACT ACCIDENTAL](http://abagames.sakura.ne.jp/flash/ssca/)
