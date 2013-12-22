@@ -9,7 +9,7 @@ class R { // Random
 	public function p(v:Float = 1):Float { return f(-v, v); }
 	public function pi(v:Int):Int { return fi(-v, v); }
 	public function s(v:Int = -0x7fffffff):R { return setSeed(v); }
-	public function bst(stage:Int):Void { difficultyBasisStage = stage; }
+	public function bst(stage:Int):R { difficultyBasisStage = stage; return this; }
 	public function st(stage:Int, seedOffset:Int = 0):R {
 		this.stage = stage;
 		return setSeed(stage + seedOffset);
