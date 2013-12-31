@@ -8,6 +8,7 @@ class F { // Fiber
 		return macro $f.doBlock(function() { $block; });
 	}
 	public function w(count:Float):F { return wait(count); }
+	public function aw(count:Float):F { return addWait(count); }
 	public function dw(count:Float):F { return decrementWait(count); }
 	public var dd(get, null):F; // disable auto decrement
 	public var dl(get, null):F; // disable loop
@@ -59,6 +60,10 @@ class F { // Fiber
 		this.count = defaultCount = count;
 		return this;
 	}
+	function addWait(ac:Float):F {
+		count += ac;
+		return this;
+	}
 	function decrementWait(dc:Float):F {
 		count -= dc;
 		return this;
@@ -76,7 +81,6 @@ class F { // Fiber
 		if (isAutoDecrement) count--;
 		if (count > 0) return this;
 		if (isLooping) l;
-		else count = 9999999;
 		block();
 		return this;
 	}
