@@ -87,8 +87,8 @@ class A { // Actor
 	}
 	public var isRemoving = false;
 	public var ticks = 0;
+	public var hitRect:V;
 	var d:D; // dot pixel art
-	var hitRect:V;
 	var group:ActorGroup;
 	var ho:V;
 	var fs:Array<F>;
@@ -133,7 +133,9 @@ class A { // Actor
 		var hitTest:Dynamic -> Bool;
 		var ac = actors[0];
 		var xyr = (hitRect.x / hitRect.y - 1).abs();
-		var acxyr = (ac.hitRect.x / ac.hitRect.y - 1).abs();
+		var ahx:Float = ac.hitRect.x;
+		var ahy:Float = ac.hitRect.y;
+		var acxyr = (ahx / ahy - 1).abs();
 		if (xyr > acxyr) {
 			hitTest = function(ac:Dynamic):Bool {
 				ho.v(p).s(ac.p);
