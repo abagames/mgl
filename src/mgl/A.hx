@@ -22,8 +22,8 @@ class A { // Actor
 	public var t(get, null):Int; // ticks
 	public var r(get, null):Bool; // remove
 	public function hr(width:Float = -999, height:Float = -1):A { return setHitRect(width, height); }
-	public function ih(actorClassName:String):Bool {
-		return isHit(actorClassName);
+	public function ih(actorClassName:String, onHit:Dynamic -> Void = null):Bool {
+		return isHit(actorClassName, onHit);
 	}
 	// Functions should be used in an i (initialize) function
 	public function dp(priority:Int):A { return setDisplayPriority(priority); }
@@ -31,7 +31,6 @@ class A { // Actor
 	public function i():Void { } // initialize
 	public function b():Void { } // begin
 	public function u():Void { } // update
-	public function h(hitActor:Dynamic):Void { } // hit
 	
 	public var m(get, null):A; // move
 
@@ -126,7 +125,7 @@ class A { // Actor
 		isRemoving = true;
 		return true;
 	}
-	function isHit(actorClassName:String):Bool {
+	function isHit(actorClassName:String, onHit:Dynamic -> Void):Bool {
 		var pixelWHRatio = G.pixelWHRatio;
 		var actors = A.acs(actorClassName);
 		if (actors.length <= 0) return false;
@@ -155,7 +154,7 @@ class A { // Actor
 		for (a in actors) {
 			if (this == a || a.isRemoving) continue;
 			if (hitTest(a)) {
-				h(a);
+				if (onHit != null) onHit(a);
 				hf = true;
 			}
 		}
