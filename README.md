@@ -6,13 +6,17 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
+
+[WASD THRUST](http://abagames.sakura.ne.jp/flash/wt/)
+
+####Sample game (using the older version mgl)
+
 [LONG EDGE WINS](http://abagames.sakura.ne.jp/flash/lew/)
 
 [REVGRAV](http://abagames.sakura.ne.jp/flash/rg/)
 
 [SPACE SHIPS CONTACT ACCIDENTAL](http://abagames.sakura.ne.jp/flash/ssca/)
-
-####Sample game (using the older version mgl)
 
 [YOU HAVE ONE SHOT](http://abagames.sakura.ne.jp/flash/yhos/)
 
@@ -27,8 +31,6 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 [DUAL PISTOLS RG](http://wonderfl.net/c/ilHX)
 
 [TOSSED HUMANS SPLIT OVER](http://wonderfl.net/c/d8Rm)
-
-[WASD THRUST](http://wonderfl.net/c/cUIn)
 
 ###Advantages
 
@@ -230,7 +232,7 @@ An actor moves on a screen. An actor has a position, a velocity and a dot pixel 
 * t:Int // ticks
 * r:Bool // remove
 * hr(width:Float, height:Float = -1):A // set hit rect
-* ih(className:String):Bool // is hit
+* ih(className:String, onHit:Dynamic -> Void = null):Bool // is hit
 * dp(priority:Int):A // set display priority
 
 ##### Overriden methods
@@ -368,6 +370,7 @@ Set the do block and the block runs constantly for a specified wait ticks.
 * (static)cl:Bool // clear
 * d(block:Expr):F // do
 * w(count:Float):F // wait
+* aw(count:Float):F // add wait
 * dw(count:Float):F // decrement wait
 * dd:F // disable auto decrement
 * dl:F // disable loop
