@@ -228,6 +228,7 @@ class D { // DotPixelArt
 	}
 	function drawText(text:String):D {
 		var l = new Letter();
+		l.setDotSize();
 		l.setText(text);
 		l.alignCenter();
 		l.alignVerticalCenter();

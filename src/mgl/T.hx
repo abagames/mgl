@@ -225,6 +225,9 @@ class Letter {
 		if (dotScale < 0) dotSize = baseDotSize;
 		dotSize = Std.int(dotScale * baseDotSize);
 	}
+	public function setDotSize(dotSize:Int = 1):Void {
+		this.dotSize = dotSize;
+	}
 	public function drawToScreen():Void {
 		draw(Screen.pixelFillRect);
 	}
