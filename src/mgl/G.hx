@@ -31,6 +31,7 @@ class G { // Game
 	public function i():Void { ie; } // initialize
 	public function b():Void { } // begin
 	public function u():Void { } // update
+	public function e():Void { } // end
 	public function is():Void { } // initialize state
 	public function ls(d:Dynamic):Void { } // load state
 	public function ss(d:Dynamic):Void { } // save state
@@ -128,6 +129,7 @@ class G { // Game
 	static function get_eg():Bool {
 		if (!isInGame) return false;
 		G.sv;
+		gInstance.e();
 		gInstance.beginTitle();
 		return true;
 	}
@@ -198,7 +200,7 @@ class G { // Game
 		}
 	}
 	function updateFrame(e:Event):Void {
-		Screen.preUpdate();
+		Screen.preUpdate(isPaused);
 		M.update();
 		K.update();
 		if (!isPaused) {
@@ -284,8 +286,8 @@ class Screen {
 		#end
 		if (hasBlur) drawBlur();
 	}
-	static public function preUpdate():Void {
-		if (hasBlur) {
+	static public function preUpdate(isPaused:Bool):Void {
+		if (!isPaused && hasBlur) {
 			if (G.fps < 40) {
 				if (++lowFpsCount > 120) stopBlur();
 			} else {
