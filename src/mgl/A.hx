@@ -59,7 +59,11 @@ class A { // Actor
 	static function getActors(className:String):Array<Dynamic> {
 		var g = groups.get(className);
 		if (g == null) return emptyGroup;
-		return g.s;
+		var actors = new Array<Dynamic>();
+		for (a in g.s) {
+			if (!a.isRemoving) actors.push(a);
+		}
+		return actors;
 	}
 	static function get_cl():Bool {
 		for (g in groups) g.s = new Array<A>();
