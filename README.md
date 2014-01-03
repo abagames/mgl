@@ -6,6 +6,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/)
+
 [POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
 
 [WASD THRUST](http://abagames.sakura.ne.jp/flash/wt/)
