@@ -22,6 +22,7 @@ class A { // Actor
 	public var t(get, null):Int; // ticks
 	public var r(get, null):Bool; // remove
 	public function hr(width:Float = -999, height:Float = -1):A { return setHitRect(width, height); }
+	public function hc(diameter:Float = -999):A { return setHitCircle(diameter); }
 	public function ih(actorClassName:String, onHit:Dynamic -> Void = null):Bool {
 		return isHit(actorClassName, onHit);
 	}
@@ -91,6 +92,7 @@ class A { // Actor
 	public var isRemoving = false;
 	public var ticks = 0;
 	public var hitRect:V;
+	public var hitDiameter = -999.0;
 	var d:D; // dot pixel art
 	var group:ActorGroup;
 	var ho:V;
@@ -124,39 +126,52 @@ class A { // Actor
 		hitRect.y = (height >= 0 ? height : width);
 		return this;
 	}
+	function setHitCircle(diameter:Float):A {
+		hitDiameter = diameter;
+		setHitRect(diameter, diameter);
+		return this;
+	}
 	function get_r():Bool {
 		if (isRemoving) return false;
 		isRemoving = true;
 		return true;
 	}
 	function isHit(actorClassName:String, onHit:Dynamic -> Void):Bool {
-		var pixelWHRatio = G.pixelWHRatio;
 		var actors = A.acs(actorClassName);
 		if (actors.length <= 0) return false;
 		var hitTest:Dynamic -> Bool;
 		var ac = actors[0];
-		var xyr = (hitRect.x / hitRect.y - 1).abs();
-		var ahx:Float = ac.hitRect.x;
-		var ahy:Float = ac.hitRect.y;
-		var acxyr = (ahx / ahy - 1).abs();
-		if (xyr > acxyr) {
-			hitTest = function(ac:Dynamic):Bool {
-				ho.v(p).s(ac.p);
-				if (w != 0) ho.rt(-w);
-				return (ho.x.abs() <= (hitRect.x + ac.hitRect.x) / 2 &&
-					ho.y.abs() <= (hitRect.y + ac.hitRect.y) / 2);
+		if (hitDiameter > 0 && ac.hitDiameter > 0) {
+			hitTest = function (ac:Dynamic):Bool {
+				return p.dtd(ac.p) <= (hitDiameter + ac.hitDiameter) / 2;
 			}
 		} else {
-			hitTest = function(ac:Dynamic):Bool {
-				ho.v(p).s(ac.p);
-				if (ac.w != 0) ho.rt(-ac.w);
-				return (ho.x.abs() <= (hitRect.x + ac.hitRect.x) / 2 &&
-					ho.y.abs() <= (hitRect.y + ac.hitRect.y) / 2);
+			var xyr = (hitRect.x / hitRect.y - 1).abs();
+			var ahx:Float = ac.hitRect.x;
+			var ahy:Float = ac.hitRect.y;
+			var acxyr = (ahx / ahy - 1).abs();
+			if (xyr > acxyr) {
+				hitTest = function(ac:Dynamic):Bool {
+					ho.v(p).s(ac.p);
+					if (w != 0) ho.rt(-w);
+					return (ho.x.abs() <= (hitRect.x + ac.hitRect.x) / 2 &&
+						ho.y.abs() <= (hitRect.y + ac.hitRect.y) / 2);
+				}
+			} else {
+				hitTest = function(ac:Dynamic):Bool {
+					ho.v(p).s(ac.p);
+					if (ac.w != 0) ho.rt(-ac.w);
+					return (ho.x.abs() <= (hitRect.x + ac.hitRect.x) / 2 &&
+						ho.y.abs() <= (hitRect.y + ac.hitRect.y) / 2);
+				}
 			}
 		}
 		var hf = false;
-		for (a in actors) {
+		for (ac in actors) {
+			var a:A = ac;
 			if (this == a || a.isRemoving) continue;
+			var sz = (hitRect.x + hitRect.y + a.hitRect.x + a.hitRect.y) / 2;
+			if ((p.x - a.p.x) > sz && (p.y - a.p.y) > sz) continue;
 			if (hitTest(a)) {
 				if (onHit != null) onHit(a);
 				hf = true;
