@@ -6,6 +6,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[BALLOON BURROWER](http://abagames.sakura.ne.jp/flash/bb/)
+
 [SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/)
 
 [POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
@@ -122,8 +124,8 @@ class Player extends A {
 	static var tickSound:S;
 	// Static initializer called only once.
 	override function i() {
-		// Generate the green(c(C.gi)) shape(gs) with the dot size(sz) 3.
-		d = D.i.c(C.gi).sz(3).gs(.04, .05);
+		// Generate the green(c(C.gi)) shape(gs).
+		d = D.i.c(C.gi).gs(.04, .05);
 		// Set the hir rect.
 		hr(.04, .05);
 		// Set the tick sound.
@@ -147,12 +149,10 @@ class Player extends A {
 		// Add the reddish green(C.gi.gr) particle from the position p.
 		P.i.p(p).c(C.gi.gr).w(w + 180, 45).s(v.l).a;
 		// Check the hit to the Ball actors.
-		ih("Ball");
-	}
-	// If the player hit the ball(b)
-	override function h(b) {
-		// remove the ball.
-		b.remove();
+		ih("Ball", function(b) {
+			// If the player hit the ball, remove the ball.
+			b.remove();
+		});
 	}
 }
 // Ball actor.
@@ -249,13 +249,13 @@ A pixel art for an actor. You can write a rectangle, a circle and an auto genera
 
 ##### Methods
 * (static)i:D // instance
-* sz(dotSize:Int):D // set dot size
 * c(color:C):D // set color
 * cs(color:C):D // set color spot
 * cb(color:C):D // set color bottom
 * cbs(color:C):D // set color bottom spot
 * si(x:Float = 0, y:Float = 0, xy:Float = 0):D // set spot interval
 * st(threshold:Float):D // set spot threshold
+* ds(dotScale:Int):D // set dot scale
 * o(x:Float = 0, y:Float = 0):D // set offset
 * fr(width:Float, height:Float, edgeWidth:Int = 0):D // fill rectangle
 * lr(width:Float, height:Float, edgeWidth:Int = 1):D // line rectangle
@@ -330,8 +330,8 @@ Showing a text on a screen in a certain duration ticks.
 * tx(text:String):T // set text
 * p(pos:V):T // set position
 * xy(x:Float, y:Float):T // set xy
-* sz(dotSize:Int = -1):T // set dot size
 * c(color:C):T // set color
+* ds(dotScale:Int = -1):T // set dot scale
 * al:T // align left
 * ar:T // align right
 * ac:T // align center
