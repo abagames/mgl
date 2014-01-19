@@ -28,6 +28,8 @@ class A { // Actor
 	}
 	// Functions should be used in an i (initialize) function
 	public function dp(priority:Int):A { return setDisplayPriority(priority); }
+	public var db(get, null):A; // draw to back
+	public var df(get, null):A; // draw to front
 
 	public function i():Void { } // initialize
 	public function b():Void { } // begin
@@ -45,6 +47,7 @@ class A { // Actor
 		var groupsArray = Lambda.array(groups);
 		groupsArray.sort(ActorGroup.compare);
 		for (g in groupsArray) {
+			if (g.isDrawingToBack) G.db;
 			var actors = g.s;
 			var i = 0;
 			while (i < actors.length) {
@@ -55,6 +58,7 @@ class A { // Actor
 					i++;
 				}
 			}
+			G.df;
 		}
 	}
 	static function getActors(className:String):Array<Dynamic> {
@@ -184,6 +188,16 @@ class A { // Actor
 		group.displayPriority = priority;
 		return this;
 	}
+	function get_db():A {
+		var group = groups.get(Type.getClassName(Type.getClass(this)));
+		group.isDrawingToBack = true;
+		return this;
+	}
+	function get_df():A {
+		var group = groups.get(Type.getClassName(Type.getClass(this)));
+		group.isDrawingToBack = false;
+		return this;
+	}
 	function get_m():A {
 		p.a(v);
 		p.aw(w, s);
@@ -205,6 +219,7 @@ class ActorGroup {
 	public var className:String;
 	public var s:Array<A>;
 	public var displayPriority = 10;
+	public var isDrawingToBack = false;
 	public var hitRect:V;
 	public var d:D;
 	public function new(className:String) {

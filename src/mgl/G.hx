@@ -21,6 +21,8 @@ class G { // Game
 	static public function fr(x:Float, y:Float, width:Float, height:Float, color:C):Void {
 		Screen.fillRect(x, y, width, height, color);
 	}
+	static public var df(get, null):Bool; // draw to front
+	static public var db(get, null):Bool; // draw to back
 	public function new(main:Dynamic) { initialize(main); }
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
 	public function vr(version:Int = 1):G { return setVersion(version); }
@@ -53,7 +55,6 @@ class G { // Game
 	var wasReleased = false;
 	var isDebugging = false;
 	var isPaused = false;
-	var backgroundColor:C;
 	var fpsCount = 0;
 	var lastTimer = 0;
 	function initialize(mi:Dynamic):Void {
@@ -128,6 +129,7 @@ class G { // Game
 	}
 	static function get_eg():Bool {
 		if (!isInGame) return false;
+		S.fo();
 		G.sv;
 		gInstance.e();
 		gInstance.beginTitle();
@@ -164,6 +166,14 @@ class G { // Game
 		#end
 		return false;
 	}
+	static function get_df():Bool {
+		Screen.drawToFront();
+		return true;
+	}
+	static function get_db():Bool {
+		Screen.drawToBack();
+		return true;
+	}
 	
 	function beginTitle():Void {
 		var tx = 0.5;
@@ -181,6 +191,7 @@ class G { // Game
 		titleTicks = 10;
 	}
 	function beginGame():Void {
+		S.s;
 		isInGame = true;
 		initializeGame();
 	}
@@ -246,6 +257,7 @@ class Screen {
 	static var pixelRect:Rectangle;
 	static var pixelCount = 0;
 	static var bd:BitmapData;
+	static var currentBd:BitmapData;
 	static var blurBd:BitmapData;
 	static var baseBd:BitmapData;
 	static var blurBitmap:Bitmap;
@@ -277,6 +289,7 @@ class Screen {
 			[1, 0, 0, 0, 0,  0, 1, 0, 0, 0,  0, 0, 1, 0, 0,  0, 0, 0, 0.8, 0]);
 		blurFilter = new BlurFilter(10, 10);
 		#end
+		currentBd = bd;
 		rect = new Rectangle();
 		zeroPoint = new Point();
 	}
@@ -304,7 +317,7 @@ class Screen {
 		rect.y = y;
 		rect.width = width;
 		rect.height = height;
-		bd.fillRect(rect, c.i);
+		currentBd.fillRect(rect, c.i);
 	}
 	static public inline function fillRect(x:Float, y:Float, width:Float, height:Float, color:C):Void {
 		var w = width * pixelSize.x;
@@ -314,6 +327,12 @@ class Screen {
 		var pw = Std.int(w);
 		var ph = Std.int(h);
 		pixelFillRect(px, py, pw, ph, color);
+	}
+	static public function drawToFront():Void {
+		currentBd = bd;
+	}
+	static public function drawToBack():Void {
+		currentBd = baseBd;
 	}
 	static function drawBlur():Void {
 		#if !js
