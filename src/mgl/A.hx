@@ -28,8 +28,8 @@ class A { // Actor
 	}
 	// Functions should be used in an i (initialize) function
 	public function dp(priority:Int):A { return setDisplayPriority(priority); }
-	public var db(get, null):A; // draw to back
-	public var df(get, null):A; // draw to front
+	public var db(get, null):A; // draw to background
+	public var df(get, null):A; // draw to foreground
 
 	public function i():Void { } // initialize
 	public function b():Void { } // begin

@@ -200,6 +200,8 @@ A basic game loop handler. You have to override the i(), b() and u() method to i
 * (static)eg:Bool // end game
 * (static)t:Int // ticks
 * (static)fr(x:Float, y:Float, width:Float, height:Float, color:C):Void // fill rect
+* (static)df // draw to foreground
+* (static)bf // draw to background
 * tt(title:String, title2:String = ""):G // set title
 * vr(version:Int = 1):G // set version
 * dm:G // debugging mode
@@ -231,13 +233,18 @@ An actor moves on a screen. An actor has a position, a velocity and a dot pixel 
 * (static)cl:Bool // clear actors
 * (static)cls(className:String):Void // clear specific actors
 * (static)sc(className:String, vx:Float, vy:Float = 0,
-	minX:Float = -9999999, maxX:Float = 9999999,
-	minY:Float = -9999999, maxY:Float = 9999999):Void // scroll
+	minX:Float = 0, maxX:Float = 0,
+	minY:Float = 0, maxY:Float = 0):Void // scroll
+* (static)scs(classNames:Array<String>, vx:Float, vy:Float = 0,
+	minX:Float = 0, maxX:Float = 0,
+	minY:Float = 0, maxY:Float = 0):Void // scroll actors
 * t:Int // ticks
 * r:Bool // remove
 * hr(width:Float, height:Float = -1):A // set hit rect
 * ih(className:String, onHit:Dynamic -> Void = null):Bool // is hit
 * dp(priority:Int):A // set display priority
+* df // draw to foreground
+* bf // draw to background
 
 ##### Overriden methods
 * i():Void // initialize
@@ -283,6 +290,9 @@ A 8-bit era style sound effect.
 
 ##### Methods
 * (static)i:S // instance
+* (static)fi(second:Float = 1):S // fade in
+* (static)fo(second:Float = 1):S // fade out
+* (static)s:S // stop
 * mj:S // major
 * mn:S // minor
 * n:S // noise
@@ -295,13 +305,13 @@ A 8-bit era style sound effect.
 * rp(v:Int = 1):S // set repeat
 * rr(v:Int = 0):S // set repeat rest
 * l(v:Int = 64):S // set length
-* v(v:Int = 16):S // set volume
+* v(v:Float = 1):S // set volume
 * lp:S // loop
 * e:S // end
+* dm(seed:Int = -1,
+	bassPattern:Int = -1, snarePattern:Int = -1, hihatPattern:Int = -1,
+	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):S // set drum machine
 * p:S // play
-* fi(second:Float = 1):S // fade in
-* fo(second:Float = 1):S // fade out
-* s:S // stop
 
 ####P // Particle
 
@@ -310,8 +320,8 @@ Particles splashed from a specified position.
 ##### Methods
 * (static)i:P // instance
 * (static)sc(className:String, vx:Float, vy:Float = 0,
-	minX:Float = -9999999, maxX:Float = 9999999,
-	minY:Float = -9999999, maxY:Float = 9999999):Void // scroll
+	minX:Float = 0, maxX:Float = 0,
+	minY:Float = 0, maxY:Float = 0):Void // scroll
 * p(pos:V):P // set position
 * xy(x:Float, y:Float):P // set xy
 * z(z:Float = 0):P // set z

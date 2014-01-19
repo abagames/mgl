@@ -21,8 +21,8 @@ class G { // Game
 	static public function fr(x:Float, y:Float, width:Float, height:Float, color:C):Void {
 		Screen.fillRect(x, y, width, height, color);
 	}
-	static public var df(get, null):Bool; // draw to front
-	static public var db(get, null):Bool; // draw to back
+	static public var df(get, null):Bool; // draw to foreground
+	static public var db(get, null):Bool; // draw to background
 	public function new(main:Dynamic) { initialize(main); }
 	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
 	public function vr(version:Int = 1):G { return setVersion(version); }
