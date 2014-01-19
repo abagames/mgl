@@ -2,11 +2,16 @@ package mgl;
 #if flash
 import org.si.sion.SiONDriver;
 import org.si.sion.SiONData;
+import org.si.sound.DrumMachine;
 #end
 using Math;
 using mgl.U;
 class S { // Sound
 	static public var i(get, null):S; // instance
+	static public function fi(second:Float = 1):Void { fadeIn(second); }
+	static public function fo(second:Float = 1):Void { fadeOut(second); }
+	static public var s(get, null):Bool; // stop
+	static public function dq(v:Int = 0):Void { setDefaultQuant(v); }
 	public var mj(get, null):S; // major
 	public var mn(get, null):S; // minor
 	public var n(get, null):S; // noise
@@ -23,14 +28,19 @@ class S { // Sound
 	public function rp(v:Int = 1):S { return setRepeat(v); }
 	public function rr(v:Int = 0):S { return setRepeatRest(v); }
 	public function l(v:Int = 64):S { return setLength(v); }
-	public function v(v:Int = 16):S { return setVolume(v); }
+	public function v(v:Float = 1):S { return setVolume(v); }
+	public function q(v:Int = 0):S { return setQuant(v); }
 	public var lp(get, null):S; // loop
 	public var e(get, null):S; // end
+	public function dm(seed:Int = -1,
+	bassPattern:Int = -1, snarePattern:Int = -1, hihatPattern:Int = -1,
+	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):S {
+		return setDrumMachine(seed, bassPattern, snarePattern, hihatPattern,
+			bassVoice, snareVoice, hihatVoice);
+	}
 	public var p(get, null):S; // play
-	public function fi(second:Float = 1):S { return fadeIn(second); }
-	public function fo(second:Float = 1):S { return fadeOut(second); }
-	public var s(get, null):S; // stop
 
+	static inline var BASE_VOLUME:Int = 5;
 	static public var ss:Array<S>;
 	static var baseRandomSeed = 0;
 	static var tones:Array<Array<String>>;
@@ -38,6 +48,7 @@ class S { // Sound
 	static var driver:SiONDriver;
 	#end
 	static var isStarting = false;
+	static var defaultQuant = 0;
 	public static function initialize(main:Dynamic):Void {
 		baseRandomSeed = U.ch(main);
 		ss = new Array<S>();
@@ -51,12 +62,14 @@ class S { // Sound
 	}
 	#if flash
 	var data:SiONData;
+	var drumMachine:DrumMachine;
 	#end
 	var isPlaying = false;
 	var mml:String;
 	var type:SeType;
 	var length = 64;
-	var volume = 16;
+	var volume = BASE_VOLUME;
+	var quant = 0;
 	var min = -1.0;
 	var max = 1.0;
 	var waveWidth = 0.0;
@@ -68,9 +81,34 @@ class S { // Sound
 	var repeatRest = 0;
 	var toneIndex = 0;
 	var lastPlayTicks = 0;
-	public function new() { }
+	public function new() {
+		quant = defaultQuant;
+	}
 	static function get_i():S {
 		return new S();
+	}
+	static function fadeIn(second:Float):Void {
+		#if flash
+		driver.fadeIn(second);
+		#end
+	}
+	static function fadeOut(second:Float):Void {
+		#if flash
+		driver.fadeOut(second);
+		#end
+	}
+	static function get_s():Bool {
+		isStarting = false;
+		#if flash
+		driver.stop();
+		driver.volume = 0;
+		fadeIn(0.5);
+		driver.play();
+		#end
+		return true;
+	}
+	static function setDefaultQuant(v:Int):Void {
+		defaultQuant = v;
 	}
 	function get_mj():S {
 		begin(Major);
@@ -127,9 +165,13 @@ class S { // Sound
 		mml += "l" + v;
 		return this;
 	}
-	function setVolume(v:Int):S {
-		volume = v;
+	function setVolume(v:Float):S {
+		volume = Std.int(v * BASE_VOLUME);
 		mml += "v" + v;
+		return this;
+	}
+	function setQuant(v:Int):S {
+		quant = v;
 		return this;
 	}
 	function get_lp():S {
@@ -146,31 +188,33 @@ class S { // Sound
 		ss.push(this);
 		return this;
 	}
+	function setDrumMachine(seed:Int,
+	bassPattern:Int, snarePattern:Int, hihatPattern:Int,
+	bassVoice:Int, snareVoice:Int, hihatVoice:Int):S {
+		if (seed < 0) seed = baseRandomSeed++;
+		var r = R.i.s(seed);
+		if (bassPattern < 0) bassPattern = r.fi(1, 31);
+		if (snarePattern < 0) snarePattern = r.fi(1, 18);
+		if (hihatPattern < 0) hihatPattern = r.fi(1, 17);
+		if (bassVoice < 0) bassVoice = r.fi(1, 6);
+		if (snareVoice < 0) snareVoice = r.fi(1, 6);
+		if (hihatVoice < 0) hihatVoice = r.fi(1, 4);
+		isStarting = false;
+		#if flash
+		drumMachine = new DrumMachine(bassPattern, snarePattern, hihatPattern,
+			bassVoice, snareVoice, hihatVoice);
+		drumMachine.bassVolume = 1;
+		drumMachine.snareVolume = .7;
+		drumMachine.hihatVolume = .5;
+		driver.volume = 0;
+		driver.play();
+		#end
+		ss.push(this);
+		return this;
+	}
 	function get_p():S {
 		if (!G.ig || lastPlayTicks > 0) return this;
 		isPlaying = true;
-		return this;
-	}
-	function fadeIn(second:Float):S {
-		#if flash
-		driver.fadeIn(second);
-		#end
-		return this;
-	}
-	function fadeOut(second:Float):S {
-		#if flash
-		driver.fadeOut(second);
-		#end
-		return this;
-	}
-	function get_s():S {
-		isStarting = false;
-		#if flash
-		driver.stop();
-		driver.volume = 0;
-		fadeIn(0.1);
-		driver.play();
-		#end
 		return this;
 	}
 
@@ -235,12 +279,13 @@ class S { // Sound
 		if (!isPlaying) return;
 		if (!isStarting) {
 			#if flash
-			driver.volume = 0.9;
+			driver.volume = 10;
 			#end
 			isStarting = true;
 		}
 		#if flash
-		driver.sequenceOn(data, null, 0, 0, 0);
+		if (data != null) driver.sequenceOn(data, null, 0, 0, quant);
+		if (drumMachine != null) drumMachine.play();
 		#end
 		isPlaying = false;
 		lastPlayTicks = 5;
