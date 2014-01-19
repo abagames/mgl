@@ -6,6 +6,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/)
+
 [BALLOON BURROWER](http://abagames.sakura.ne.jp/flash/bb/)
 
 [SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/)
@@ -489,7 +491,7 @@ Utility methods.
 
 License
 ----------
-Copyright &copy; 2013 ABA Games
+Copyright &copy; 2013-2014 ABA Games
 
 Distributed under the [MIT License][MIT].
 
