@@ -40,7 +40,7 @@ class S { // Sound
 	}
 	public var p(get, null):S; // play
 
-	static inline var BASE_VOLUME:Int = 5;
+	static inline var BASE_VOLUME:Int = 4;
 	static public var ss:Array<S>;
 	static var baseRandomSeed = 0;
 	static var tones:Array<Array<String>>;
@@ -102,7 +102,6 @@ class S { // Sound
 		#if flash
 		driver.stop();
 		driver.volume = 0;
-		fadeIn(0.5);
 		driver.play();
 		#end
 		return true;
@@ -204,8 +203,8 @@ class S { // Sound
 		drumMachine = new DrumMachine(bassPattern, snarePattern, hihatPattern,
 			bassVoice, snareVoice, hihatVoice);
 		drumMachine.bassVolume = .9;
-		drumMachine.snareVolume = .7;
-		drumMachine.hihatVolume = .5;
+		drumMachine.snareVolume = .8;
+		drumMachine.hihatVolume = .7;
 		driver.volume = 0;
 		driver.play();
 		#end
@@ -279,6 +278,7 @@ class S { // Sound
 		if (!isPlaying) return;
 		if (!isStarting) {
 			#if flash
+			fadeIn(0.5);
 			driver.volume = .9;
 			#end
 			isStarting = true;
