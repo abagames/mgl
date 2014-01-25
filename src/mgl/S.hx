@@ -203,7 +203,7 @@ class S { // Sound
 		#if flash
 		drumMachine = new DrumMachine(bassPattern, snarePattern, hihatPattern,
 			bassVoice, snareVoice, hihatVoice);
-		drumMachine.bassVolume = 1;
+		drumMachine.bassVolume = .9;
 		drumMachine.snareVolume = .7;
 		drumMachine.hihatVolume = .5;
 		driver.volume = 0;
@@ -279,7 +279,7 @@ class S { // Sound
 		if (!isPlaying) return;
 		if (!isStarting) {
 			#if flash
-			driver.volume = 1;
+			driver.volume = .9;
 			#end
 			isStarting = true;
 		}
