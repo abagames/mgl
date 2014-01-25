@@ -167,7 +167,7 @@ class S { // Sound
 	}
 	function setVolume(v:Float):S {
 		volume = Std.int(v * BASE_VOLUME);
-		mml += "v" + v;
+		mml += "v" + volume;
 		return this;
 	}
 	function setQuant(v:Int):S {
@@ -279,7 +279,7 @@ class S { // Sound
 		if (!isPlaying) return;
 		if (!isStarting) {
 			#if flash
-			driver.volume = 10;
+			driver.volume = 1;
 			#end
 			isStarting = true;
 		}
