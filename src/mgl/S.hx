@@ -202,9 +202,9 @@ class S { // Sound
 		#if flash
 		drumMachine = new DrumMachine(bassPattern, snarePattern, hihatPattern,
 			bassVoice, snareVoice, hihatVoice);
-		drumMachine.bassVolume = .9;
-		drumMachine.snareVolume = .8;
-		drumMachine.hihatVolume = .7;
+		drumMachine.bassVolume = .95;
+		drumMachine.snareVolume = .9;
+		drumMachine.hihatVolume = .85;
 		driver.volume = 0;
 		driver.play();
 		#end
@@ -278,17 +278,20 @@ class S { // Sound
 		if (!isPlaying) return;
 		if (!isStarting) {
 			#if flash
-			fadeIn(0.5);
-			driver.volume = .9;
+			fadeIn(1);
+			driver.volume = .95;
 			#end
 			isStarting = true;
 		}
 		#if flash
 		if (data != null) driver.sequenceOn(data, null, 0, 0, quant);
-		if (drumMachine != null) drumMachine.play();
+		if (drumMachine != null) {
+			drumMachine.quantize = quant;
+			drumMachine.play();
+		}
 		#end
 		isPlaying = false;
-		lastPlayTicks = 5;
+		lastPlayTicks = 10;
 	}
 }
 enum SeType {
