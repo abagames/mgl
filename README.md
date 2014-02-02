@@ -6,6 +6,8 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ####Sample game
 
+[LEFT RIGHT HAND RULE](http://abagames.sakura.ne.jp/flash/lrh/)
+
 [REFLECTOR SATELLITES](http://abagames.sakura.ne.jp/flash/rs/)
 
 [SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/)
