@@ -34,7 +34,7 @@ class U { // Utility
 		return r;
 	}
 	static public inline function lri(v:Int, min:Int, max:Int):Int { // loopRange int
-		var w = max - min;
+		var w = max - min + 1;
 		v -= min;
 		var r:Int;
 		if (v >= 0) r = v % w + min;
