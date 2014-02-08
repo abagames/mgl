@@ -163,9 +163,9 @@ class Player extends Actor {
 		new Particle().setPosition(position).setColor(Color.green.goRed())
 			.setWay(way + 180, 45).setSpeed(v.l).add();
 		// Check the hit to the Ball actors.
-		ih("Ball", function(b) {
+		isHit("Ball", function(ball) {
 			// If the player hit the ball, erase the ball.
-			b.erase();
+			ball.erase();
 		});
 	}
 }
