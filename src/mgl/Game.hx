@@ -11,44 +11,64 @@ import flash.geom.Rectangle;
 import flash.net.SharedObject;
 import flash.utils.ByteArray;
 import flash.Lib;
-class G { // Game
+class Game {
+	static public var isInGame(get, null):Bool;
 	static public var ig(get, null):Bool; // is in game
+	static public function endGame():Bool { return get_eg(); }
 	static public var eg(get, null):Bool; // end game
+	static public var ticks(get, null):Int;
 	static public var t(get, null):Int; // ticks
+	static public function load():Bool { return get_ld(); }
 	static public var ld(get, null):Bool; // load
+	static public function save():Bool { return get_sv(); }
 	static public var sv(get, null):Bool; // save
-	static public var rn:R;
-	static public function fr(x:Float, y:Float, width:Float, height:Float, color:C):Void {
+	static public var random(get, null):Random;
+	static public var rn:Random;
+	static public function fillRect(x:Float, y:Float, width:Float, height:Float, color:Color):Void {
 		Screen.fillRect(x, y, width, height, color);
 	}
+	static public function fr(x:Float, y:Float, width:Float, height:Float, color:Color):Void {
+		Screen.fillRect(x, y, width, height, color);
+	}
+	static public function drawToForeground():Bool { return get_df(); }
 	static public var df(get, null):Bool; // draw to foreground
+	static public function drawToBackground():Bool { return get_db(); }
 	static public var db(get, null):Bool; // draw to background
-	public function new(main:Dynamic) { initialize(main); }
-	public function tt(title:String, title2:String = ""):G { return setTitle(title, title2); }
-	public function vr(version:Int = 1):G { return setVersion(version); }
-	public var dm(get, null):G; // debugging mode
-	public function yr(ratio:Float):G { return setYRatio(ratio); }
-	public var ie(get, null):G; // initialize end
+	public function new(main:Dynamic) { initializeFirst(main); }
+	public function tt(title:String, title2:String = ""):Game { return setTitle(title, title2); }
+	public function vr(version:Int = 1):Game { return setVersion(version); }
+	public function enableDebuggingMode():Game { return get_dm(); }
+	public var dm(get, null):Game; // enable debugging mode
+	public function yr(ratio:Float):Game { return setYRatio(ratio); }
+	public function initializeEnd():Game { return get_ie(); }
+	public var ie(get, null):Game; // initialize end
 
-	public function i():Void { ie; } // initialize
+	public function initialize():Void { }
+	public function i():Void { } // initialize
+	public function begin():Void { }
 	public function b():Void { } // begin
+	public function update():Void { }
 	public function u():Void { } // update
+	public function end():Void { }
 	public function e():Void { } // end
+	public function initializeState():Void { }
 	public function is():Void { } // initialize state
+	public function loadState(d:Dynamic):Void { }
 	public function ls(d:Dynamic):Void { } // load state
+	public function saveState(d:Dynamic):Void { }
 	public function ss(d:Dynamic):Void { } // save state
 
-	static public var isInGame = false;
-	static public var ticks = 0;
+	static public var isInGameState = false;
+	static public var currentTicks = 0;
 	static public var fps = 0.0;
-	static public var pixelSize:V;
+	static public var pixelSize:Vector;
 	static public var pixelWHRatio = 1.0;
 	static public var baseDotSize = 1;
 	static var mainInstance:Dynamic;
 	static var title = "";
 	static var title2 = "";
 	static var version = 1;
-	static var gInstance:G;
+	static var gInstance:Game;
 	var baseSprite:Sprite;
 	var titleTicks = 0;
 	var wasClicked = false;
@@ -57,13 +77,13 @@ class G { // Game
 	var isPaused = false;
 	var fpsCount = 0;
 	var lastTimer = 0;
-	function initialize(mi:Dynamic):Void {
+	function initializeFirst(mi:Dynamic):Void {
 		baseSprite = new Sprite();
 		mainInstance = mi;
 		gInstance = this;
-		pixelSize = new V().xy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
+		pixelSize = new Vector().setXy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		pixelWHRatio = pixelSize.x / pixelSize.y;
-		baseDotSize = U.ci(Std.int(Math.min(pixelSize.x, pixelSize.y) / 160) + 1, 1, 20);
+		baseDotSize = Util.ci(Std.int(Math.min(pixelSize.x, pixelSize.y) / 160) + 1, 1, 20);
 		baseSprite.addEventListener(Event.ADDED_TO_STAGE, onAdded);
 		Lib.current.addChild(baseSprite);
 	}
@@ -77,38 +97,43 @@ class G { // Game
 	}
 	function added():Void {
 		Screen.initialize(baseSprite);
-		A.initialize();
-		C.initialize();
-		D.initialize(mainInstance);
-		F.initialize();
-		K.initialize();
-		M.initialize(baseSprite);
-		P.initialize();
-		S.initialize(mainInstance);
-		T.initialize();
-		rn = R.i;
+		Actor.initializeAll();
+		Color.initialize();
+		DotPixelArt.initialize(mainInstance);
+		Fiber.initialize();
+		Key.initialize();
+		Mouse.initialize(baseSprite);
+		Particle.initialize();
+		Sound.initialize(mainInstance);
+		Text.initialize();
+		rn = Random.i;
+		mainInstance.initialize();
 		mainInstance.i();
+		get_ie();
 	}
-	function setTitle(t:String, t2:String):G {
+	public function setTitle(t:String, t2:String = ""):Game {
 		title = t;
 		title2 = t2;
 		return this;
 	}
-	function setVersion(v:Int):G {
+	public function setVersion(v:Int = 1):Game {
 		version = v;
 		return this;
 	}
-	function get_dm():G {
+	function get_dm():Game {
 		isDebugging = true;
 		return this;
 	}
-	function setYRatio(ratio:Float):G {
+	public function setYRatio(ratio:Float):Game {
 		pixelSize.y = pixelSize.x * ratio;
 		pixelWHRatio = pixelSize.x / pixelSize.y;
 		return this;
 	}
-	function get_ie():G {
-		G.ld;
+	var isGameLoopStarted = false;
+	function get_ie():Game {
+		if (isGameLoopStarted) return this;
+		isGameLoopStarted = true;
+		Game.load();
 		if (isDebugging) {
 			beginGame();
 		} else {
@@ -121,16 +146,23 @@ class G { // Game
 		Lib.current.addEventListener(Event.ENTER_FRAME, updateFrame);
 		return this;
 	}
+	static function get_isInGame():Bool {
+		return isInGameState;
+	}
 	static function get_ig():Bool {
-		return isInGame;
+		return isInGameState;
+	}
+	static function get_ticks():Int {
+		return currentTicks;
 	}
 	static function get_t():Int {
-		return ticks;
+		return currentTicks;
 	}
 	static function get_eg():Bool {
-		if (!isInGame) return false;
-		S.fo();
-		G.sv;
+		if (!isInGameState) return false;
+		Sound.fadeOut();
+		Game.save();
+		gInstance.end();
 		gInstance.e();
 		gInstance.beginTitle();
 		return true;
@@ -141,13 +173,16 @@ class G { // Game
 			var storeKey = StringTools.replace(title + "_" + title2 + "_" + version, " ", "");
 			var sharedObject:SharedObject = SharedObject.getLocal(storeKey);
 			if (sharedObject.size < 10) {
+				mainInstance.initializeState();
 				mainInstance.is();
 			} else {
+				mainInstance.loadState(sharedObject.data);
 				mainInstance.ls(sharedObject.data);
-				K.ls(sharedObject.data);
+				Key.loadState(sharedObject.data);
 			}
 			return true;
 		} catch (e:Dynamic) {
+			mainInstance.initializeState();
 			mainInstance.is();
 		}
 		#end
@@ -158,13 +193,17 @@ class G { // Game
 		try {
 			var storeKey = StringTools.replace(title + "_" + title2 + "_" + version, " ", "");
 			var sharedObject:SharedObject = SharedObject.getLocal(storeKey);
+			mainInstance.saveState(sharedObject.data);
 			mainInstance.ss(sharedObject.data);
-			K.ss(sharedObject.data);
+			Key.saveState(sharedObject.data);
 			sharedObject.flush();
 			return true;
 		} catch (e:Dynamic) { }
 		#end
 		return false;
+	}
+	static function get_random():Random {
+		return rn;
 	}
 	static function get_df():Bool {
 		Screen.drawToFront();
@@ -178,32 +217,34 @@ class G { // Game
 	function beginTitle():Void {
 		var tx = 0.5;
 		if (title2.length <= 0) {
-			T.i.tx(title).xy(tx, 0.4).ac.tf;
+			new Text().setText(title).setXy(tx, 0.4).alignCenter().setTickForever();
 		} else {
-			T.i.tx(title).xy(tx, 0.38).ac.tf;
-			T.i.tx(title2).xy(tx, 0.41).ac.tf;
+			new Text().setText(title).setXy(tx, 0.38).alignCenter().setTickForever();
+			new Text().setText(title2).setXy(tx, 0.41).alignCenter().setTickForever();
 		}
-		T.i.tx("CLICK/TOUCH/PUSH").xy(tx, 0.54).ac.tf;
-		T.i.tx("TO").xy(tx, 0.58).ac.tf;
-		T.i.tx("START").xy(tx, 0.615).ac.tf;
-		isInGame = false;
+		new Text().setText("CLICK/TOUCH/PUSH").setXy(tx, 0.54).alignCenter().setTickForever();
+		new Text().setText("TO").setXy(tx, 0.58).alignCenter().setTickForever();
+		new Text().setText("START").setXy(tx, 0.615).alignCenter().setTickForever();
+		isInGameState = false;
 		wasClicked = wasReleased = false;
 		titleTicks = 10;
 	}
 	function beginGame():Void {
-		S.s;
-		isInGame = true;
+		Sound.stop();
+		isInGameState = true;
 		initializeGame();
 	}
 	function initializeGame():Void {
-		A.cl;
-		F.cl;
-		ticks = 0;
-		rn.s();
+		Actor.clear();
+		Fiber.clear();
+		currentTicks = 0;
+		random.setSeed(0);
 		mainInstance.b();
+		mainInstance.begin();
 	}
 	function handleTitleScreen():Void {
-		if (M.ib || K.ib || K.iu || K.id || K.ir || K.il) {
+		if (Mouse.isButtonPressing || Key.isButtonPressing ||
+		Key.isUpPressing || Key.isDownPressing || Key.isRightPressing || Key.isLeftPressing) {
 			if (wasReleased) wasClicked = true;
 		} else {
 			if (wasClicked) beginGame();
@@ -212,22 +253,23 @@ class G { // Game
 	}
 	function updateFrame(e:Event):Void {
 		Screen.preUpdate(isPaused);
-		M.update();
-		K.update();
+		Mouse.update();
+		Key.update();
 		if (!isPaused) {
-			A.update();
-			F.update();
+			Actor.updateAll();
+			Fiber.updateAll();
+			mainInstance.update();
 			mainInstance.u();
 			if (isDebugging) {
-				T.i.tx('FPS: ${Std.int(fps)}').xy(0.01, 0.97);
+				new Text().setText('FPS: ${Std.int(fps)}').setXy(0.01, 0.97);
 			}
-			for (s in S.ss) s.u();
-			ticks++;
+			for (s in Sound.ss) s.u();
+			currentTicks++;
 		} else {
-			T.i.tx("PAUSED").xy(0.5, 0.45).ac.d;
-			T.i.tx("CLICK/TOUCH TO RESUME").xy(0.5, 0.55).ac.d;
+			new Text().setText("PAUSED").setXy(0.5, 0.45).alignCenter().draw();
+			new Text().setText("CLICK/TOUCH TO RESUME").setXy(0.5, 0.55).alignCenter().draw();
 		}
-		if (!isInGame) handleTitleScreen();
+		if (!isInGameState) handleTitleScreen();
 		Screen.postUpdate();
 		calcFps();
 	}
@@ -235,8 +277,8 @@ class G { // Game
 		isPaused = false;
 	}
 	function onDeactivated(e:Event):Void {
-		K.rs;
-		if (isInGame) isPaused = true;
+		Key.rs;
+		if (isInGameState) isPaused = true;
 	}
 	function calcFps():Void {
 		fpsCount++;
@@ -251,7 +293,7 @@ class G { // Game
 }
 class Screen {
 	static var baseSprite:Sprite;
-	static var pixelSize:V;
+	static var pixelSize:Vector;
 	static var pixelWHRatio = 1.0;
 	static var baseDotSize = 1;
 	static var pixelRect:Rectangle;
@@ -269,9 +311,9 @@ class Screen {
 	static var hasBlur = true;
 	static public function initialize(bs:Sprite):Void {
 		baseSprite = bs;
-		pixelSize = G.pixelSize;
-		pixelWHRatio = G.pixelWHRatio;
-		baseDotSize = G.baseDotSize;
+		pixelSize = Game.pixelSize;
+		pixelWHRatio = Game.pixelWHRatio;
+		baseDotSize = Game.baseDotSize;
 		pixelRect = new Rectangle(0, 0, pixelSize.x, pixelSize.y);
 		pixelCount = pixelSize.xi * pixelSize.yi;
 		baseBd = new BitmapData(pixelSize.xi, pixelSize.yi, false, 0);
@@ -301,7 +343,7 @@ class Screen {
 	}
 	static public function preUpdate(isPaused:Bool):Void {
 		if (!isPaused && hasBlur) {
-			if (G.fps < 40) {
+			if (Game.fps < 40) {
 				if (++lowFpsCount > 120) stopBlur();
 			} else {
 				lowFpsCount = 0;
@@ -312,14 +354,14 @@ class Screen {
 		#end
 		bd.fillRect(pixelRect, 0);
 	}
-	static public inline function pixelFillRect(x:Int, y:Int, width:Int, height:Int, c:C):Void {
+	static public inline function pixelFillRect(x:Int, y:Int, width:Int, height:Int, c:Color):Void {
 		rect.x = x;
 		rect.y = y;
 		rect.width = width;
 		rect.height = height;
-		currentBd.fillRect(rect, c.i);
+		currentBd.fillRect(rect, c.int);
 	}
-	static public inline function fillRect(x:Float, y:Float, width:Float, height:Float, color:C):Void {
+	static public inline function fillRect(x:Float, y:Float, width:Float, height:Float, color:Color):Void {
 		var w = width * pixelSize.x;
 		var h = height * pixelSize.y;
 		var px = Std.int(x * pixelSize.x) - Std.int(w / 2);

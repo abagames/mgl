@@ -1,25 +1,35 @@
 package mgl;
-import mgl.G.Screen;
-class T { // Text
-	static public var i(get, null):T; // instance
-	public function tx(text:String):T { return setText(text); }
-	public function p(pos:V):T { return setPos(pos); }
-	public function xy(x:Float, y:Float):T { return setXy(x, y); }
-	public function c(color:C):T { return setColor(color); }
-	public function ds(dotScale:Float = -1):T { return setDotScale(dotScale); }	
-	public var al(get, null):T; // align left
-	public var ac(get, null):T; // align center
-	public var ar(get, null):T; // align right
-	public var avc(get, null):T; // align vertical center
-	public function v(vel:V):T { return setVel(vel); }
-	public function vxy(x:Float, y:Float):T { return setVelXy(x, y); }
-	public function t(ticks:Int = 60):T { return setTicks(ticks); }
-	public var tf(get, null):T; // tick forever
-	public var ao(get, null):T; // add once
+import mgl.Game.Screen;
+using mgl.Util;
+class Text {
+	static public var i(get, null):Text; // instance
+	public function tx(text:String):Text { return setText(text); }
+	public function p(pos:Vector):Text { return setPosition(pos); }
+	public function xy(x:Float, y:Float):Text { return setXy(x, y); }
+	public function c(color:Color):Text { return setColor(color); }
+	public function ds(dotScale:Float = -1):Text { return setDotScale(dotScale); }
+	public function alignLeft():Text { return get_al(); }
+	public var al(get, null):Text; // align left
+	public function alignCenter():Text { return get_ac(); }
+	public var ac(get, null):Text; // align center
+	public function alignRight():Text { return get_ar(); }
+	public var ar(get, null):Text; // align right
+	public function alignVerticalCenter():Text { return get_avc(); }
+	public var avc(get, null):Text; // align vertical center
+	public function v(vel:Vector):Text { return setVelocity(vel); }
+	public function vxy(x:Float, y:Float):Text { return setVelocityXy(x, y); }
+	public function t(ticks:Int = 60):Text { return setTicks(ticks); }
+	public function setTickForever():Text { return get_tf(); }
+	public var tf(get, null):Text; // set tick forever
+	public function addOnce():Text { return get_ao(); }
+	public var ao(get, null):Text; // add once
+	public function remove():Bool { return get_r(); }
 	public var r(get, null):Bool; // remove
-	public var d(get, null):T; // draw
+	public function draw():Text { return get_d(); }
+	public var d(get, null):Text; // draw
 
-	public var ta(get, null):A; // T actor
+	public var tActor(get, null):Actor; // T actor
+	public var ta(get, null):Actor; // T actor
 	
 	static var shownMessages:Array<String>;
 	static public function initialize():Void {
@@ -32,63 +42,63 @@ class T { // Text
 	public function new() {
 		actor = new TActor();
 	}
-	static function get_i():T {
-		return new T();
+	static function get_i():Text {
+		return new Text();
 	}
-	function setText(text:String):T {
+	public function setText(text:String):Text {
 		this.text = text;
 		actor.letter.setText(text);
 		return this;
 	}
-	function setPos(pos:V):T {
+	public function setPosition(pos:Vector):Text {
 		actor.p.v(pos);
 		return this;
 	}
-	function setXy(x:Float, y:Float):T {
+	public function setXy(x:Float, y:Float):Text {
 		actor.p.xy(x, y);
 		return this;
 	}
-	function setColor(color:C):T {
+	public function setColor(color:Color):Text {
 		actor.letter.setColor(color);
 		return this;
 	}
-	function setDotScale(dotScale:Float):T {
+	public function setDotScale(dotScale:Float = -1):Text {
 		actor.letter.setDotScale(dotScale);
 		return this;
 	}
-	function get_al():T {
+	function get_al():Text {
 		actor.letter.alignLeft();
 		return this;
 	}
-	function get_ar():T {
+	function get_ar():Text {
 		actor.letter.alignRight();
 		return this;
 	}
-	function get_ac():T {
+	function get_ac():Text {
 		actor.letter.alignCenter();
 		return this;
 	}
-	function get_avc():T {
+	function get_avc():Text {
 		actor.letter.alignVerticalCenter();
 		return this;
 	}
-	function setVel(vel:V):T {
+	public function setVelocity(vel:Vector):Text {
 		actor.v.v(vel);
 		return this;
 	}
-	function setVelXy(x:Float, y:Float):T {
+	public function setVelocityXy(x:Float, y:Float):Text {
 		actor.v.xy(x, y);
 		return this;
 	}
-	function setTicks(ticks:Int):T {
+	public function setTicks(ticks:Int = 60):Text {
 		actor.removeTicks = ticks;
 		return this;
 	}
-	function get_tf():T {
+	function get_tf():Text {
 		actor.removeTicks = 9999999;
 		return this;
 	}
-	function get_ao():T {
+	function get_ao():Text {
 		for (m in shownMessages) {
 			if (m == text) {
 				actor.r;
@@ -99,28 +109,31 @@ class T { // Text
 		return this;
 	}
 	function get_r():Bool {
-		return actor.r;
+		return actor.remove();
 	}
-	function get_d():T {
+	function get_d():Text {
 		actor.draw();
-		actor.r;
+		actor.remove();
 		return this;
 	}
-	function get_ta():A {
+	function get_tActor():Actor {
+		return actor;
+	}
+	function get_ta():Actor {
 		return actor;
 	}
 }
-class TActor extends A {
+class TActor extends Actor {
 	override public function i() {
 		dp(100);
 	}
 	public var removeTicks = 1;
 	public var letter:Letter;
 	var isFirstTicks = true;
-	override public function b() {
+	override function begin() {
 		letter = new Letter();
 	}
-	override public function u() {
+	override function update() {
 		if (isFirstTicks) {
 			v.d(removeTicks);
 			isFirstTicks = false;
@@ -136,14 +149,14 @@ class TActor extends A {
 }
 class Letter {
 	static inline var COUNT = 66;
-	static var pixelSize:V;
+	static var pixelSize:Vector;
 	static var baseDotSize = 1;
-	static var dotPatterns:Array<Array<V>>;
+	static var dotPatterns:Array<Array<Vector>>;
 	static var charToIndex:Array<Int>;
 	static public function initialize():Void {
-		pixelSize = G.pixelSize;
-		baseDotSize = U.ci(Std.int(G.baseDotSize / 2), 1, 10);
-		dotPatterns = new Array<Array<V>>();
+		pixelSize = Game.pixelSize;
+		baseDotSize = Std.int(Game.baseDotSize / 2).clampInt(1, 10);
+		dotPatterns = new Array<Array<Vector>>();
 		charToIndex = new Array<Int>();
 		var patterns = [
 		0x4644AAA4, 0x6F2496E4, 0xF5646949, 0x167871F4, 0x2489F697, 0xE9669696, 0x79F99668, 
@@ -155,16 +168,16 @@ class Letter {
 		];
 		var p = 0, d = 32;
 		var pIndex = 0;
-		var dots:Array<V>;
+		var dots:Array<Vector>;
 		for (i in 0...COUNT) {
-			dots = new Array<V>();
+			dots = new Array<Vector>();
 			for (j in 0...5) {
 				for (k in 0...4) {
 					if (++d >= 32) {
 						p = patterns[pIndex++];
 						d = 0;
 					}
-					if (p & 1 > 0) dots.push(new V().xy(k, j));
+					if (p & 1 > 0) dots.push(new Vector().xy(k, j));
 					p >>= 1;
 				}
 			}
@@ -189,21 +202,21 @@ class Letter {
 		}
 	}
 	var text:String;
-	var pos:V;
+	var pos:Vector;
 	var align:LetterAlign;
 	var isAlignVerticalCenter = false;
 	var dotSize = 1;
-	var color:C;
+	var color:Color;
 	public function new() {
-		pos = new V();
+		pos = new Vector();
 		align = Left;
 		dotSize = baseDotSize;
-		color = C.wi;
+		color = Color.white;
 	}
 	public function setText(text:String):Void {
 		this.text = text;
 	}
-	public function setPos(pos:V):Void {
+	public function setPos(pos:Vector):Void {
 		this.pos.v(pos);
 	}
 	public function alignLeft():Void {
@@ -218,7 +231,7 @@ class Letter {
 	public function alignVerticalCenter():Void {
 		isAlignVerticalCenter = true;
 	}
-	public function setColor(color:C):Void {
+	public function setColor(color:Color):Void {
 		this.color = color;
 	}
 	public function setDotScale(dotScale:Float):Void {
@@ -231,7 +244,7 @@ class Letter {
 	public function drawToScreen():Void {
 		draw(Screen.pixelFillRect);
 	}
-	public function draw(df:Int -> Int -> Int -> Int -> C -> Void):Void {
+	public function draw(df:Int -> Int -> Int -> Int -> Color -> Void):Void {
 		var tx = Std.int(pos.x * pixelSize.x);
 		var ty = Std.int(pos.y * pixelSize.y);
 		var lw = dotSize * 5;
@@ -251,7 +264,7 @@ class Letter {
 			tx += lw;
 		}
 	}
-	inline function drawDots(i:Int, x:Int, y:Int, df:Int -> Int -> Int -> Int -> C -> Void):Void {
+	inline function drawDots(i:Int, x:Int, y:Int, df:Int -> Int -> Int -> Int -> Color -> Void):Void {
 		for (p in dotPatterns[i]) {
 			var px = x + p.xi * dotSize;
 			var py = y + p.yi * dotSize;

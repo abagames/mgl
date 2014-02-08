@@ -1,9 +1,11 @@
 package mgl;
 using Math;
-class A { // Actor
+using mgl.Util;
+class Actor {
 	static public function acs(className:String):Array<Dynamic> {
 		return getActors(className);
 	}
+	static public function clear():Bool { return get_cl(); }
 	static public var cl(get, null):Bool; // clear
 	static public function cls(className:String):Void { clearSpecificActors(className); }
 	static public function sc(className:String, vx:Float, vy:Float = 0,
@@ -14,40 +16,55 @@ class A { // Actor
 	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		scrollActors(classNames, vx, vy, minX, maxX, minY, maxY);
 	}
-	public var p:V; // position
+	public var position(get, set):Vector;
+	public var p:Vector; // position
 	public var z = 0.0;
-	public var v:V; // velocity
+	public var velocity(get, set):Vector;
+	public var v:Vector; // velocity
+	public var way(get, set):Float;
 	public var w = 0.0; // way
+	public var speed(get, set):Float;
 	public var s = 0.0; // speed
+	public var dotPixelArt(get, set):DotPixelArt;
+	public var d:DotPixelArt; // dot pixel art
+	public var ticks(get, null):Int;
 	public var t(get, null):Int; // ticks
+	public function remove():Bool { return get_r(); }
 	public var r(get, null):Bool; // remove
-	public function hr(width:Float = -999, height:Float = -1):A { return setHitRect(width, height); }
-	public function hc(diameter:Float = -999):A { return setHitCircle(diameter); }
+	public function hr(width:Float = -999, height:Float = -1):Actor { return setHitRect(width, height); }
+	public function hc(diameter:Float = -999):Actor { return setHitCircle(diameter); }
 	public function ih(actorClassName:String, onHit:Dynamic -> Void = null):Bool {
 		return isHit(actorClassName, onHit);
 	}
 	// Functions should be used in an i (initialize) function
-	public function dp(priority:Int):A { return setDisplayPriority(priority); }
-	public var db(get, null):A; // draw to background
-	public var df(get, null):A; // draw to foreground
+	public function dp(priority:Int):Actor { return setDisplayPriority(priority); }
+	public function drawToBackground():Actor { return get_db(); }
+	public var db(get, null):Actor; // draw to background
+	public function drawToForeground():Actor { return get_df(); }
+	public var df(get, null):Actor; // draw to foreground
 
-	public function i():Void { } // initialize
-	public function b():Void { } // begin
-	public function u():Void { } // update
+	public function initialize():Void { }
+	public function i():Void { }
+	public function begin():Void { }
+	public function b():Void { }
+	public function update():Void { }
+	public function u():Void { }
 	
-	public var m(get, null):A; // move
+	public function move():Actor { return get_m(); }
+	public var m(get, null):Actor;
 
 	static var groups:Map<String, ActorGroup>;
-	static var emptyGroup:Array<A>;
-	static public function initialize() {
+	static var emptyGroup:Array<Actor>;
+	static public function initializeAll() {
 		groups = new Map<String, ActorGroup>();
-		emptyGroup = new Array<A>();
+		emptyGroup = new Array<Actor>();
 	}
-	static public function update():Void {
+	static public function updateAll():Void {
 		var groupsArray = Lambda.array(groups);
 		groupsArray.sort(ActorGroup.compare);
 		for (g in groupsArray) {
-			if (g.isDrawingToBack) G.db;
+			if (g.isDrawingToBack) Game.drawToBackground();
+			else Game.drawToForeground();
 			var actors = g.s;
 			var i = 0;
 			while (i < actors.length) {
@@ -58,10 +75,10 @@ class A { // Actor
 					i++;
 				}
 			}
-			G.df;
+			Game.df;
 		}
 	}
-	static function getActors(className:String):Array<Dynamic> {
+	static public function getActors(className:String):Array<Dynamic> {
 		var g = groups.get(className);
 		if (g == null) return emptyGroup;
 		var actors = new Array<Dynamic>();
@@ -71,83 +88,122 @@ class A { // Actor
 		return actors;
 	}
 	static function get_cl():Bool {
-		for (g in groups) g.s = new Array<A>();
+		for (g in groups) g.s = new Array<Actor>();
 		return true;
 	}
-	static function clearSpecificActors(className:String):Void {
+	static public function clearSpecificActors(className:String):Void {
 		var g = groups.get(className);
 		if (g == null) return;
-		g.s = new Array<A>();
+		g.s = new Array<Actor>();
 	}
-	static function scroll(className:String, vx:Float, vy:Float,
-	minX:Float, maxX:Float, minY:Float, maxY:Float):Void {
+	static public function scroll(className:String, vx:Float, vy:Float = 0,
+	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		var actors = getActors(className);
 		for (a in actors) {
 			a.p.x += vx;
 			a.p.y += vy;
-			if (minX < maxX) a.p.x = U.lr(a.p.x, minX, maxX);
-			if (minY < maxY) a.p.y = U.lr(a.p.y, minY, maxY);
+			if (minX < maxX) a.p.x = a.p.x.loopRange(minX, maxX);
+			if (minY < maxY) a.p.y = a.p.y.loopRange(minY, maxY);
 		}
 	}
-	static function scrollActors(classNames:Array<String>, vx:Float, vy:Float,
-	minX:Float, maxX:Float, minY:Float, maxY:Float):Void {
+	static public function scrollActors(classNames:Array<String>, vx:Float, vy:Float = 0,
+	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		for (cn in classNames) scroll(cn, vx, vy, minX, maxX, minY, maxY);
 	}
 	public var isRemoving = false;
-	public var ticks = 0;
-	public var hitRect:V;
+	public var currentTicks = 0;
+	public var hitRect:Vector;
 	public var hitDiameter = -999.0;
-	var d:D; // dot pixel art
 	var group:ActorGroup;
-	var ho:V;
-	var fs:Array<F>;
+	var ho:Vector;
+	var fs:Array<Fiber>;
 	public function new() {
-		p = new V();
-		v = new V();
-		hitRect = new V().xy(-999, -999);
-		ho = new V();
-		fs = new Array<F>();
+		p = new Vector();
+		v = new Vector();
+		hitRect = new Vector().setXy(-999, -999);
+		ho = new Vector();
+		fs = new Array<Fiber>();
 		var className = Type.getClassName(Type.getClass(this));
 		group = groups.get(className);
 		if (group == null) {
 			group = new ActorGroup(className);
 			groups.set(className, group);
+			initialize();
 			i();
-			group.hitRect.v(hitRect);
+			group.hitRect.setValue(hitRect);
 			group.d = d;
 		} else {
-			hitRect.v(group.hitRect);
+			hitRect.setValue(group.hitRect);
 			d = group.d;
 		}
+		begin();
 		b();
 		group.s.push(this);
 	}
+	function get_position():Vector {
+		return p;
+	}
+	function set_position(v:Vector):Vector {
+		p = v;
+		return p;
+	}
+	function get_velocity():Vector {
+		return v;
+	}
+	function set_velocity(v:Vector):Vector {
+		this.v = v;
+		return this.v;
+	}
+	function get_way():Float {
+		return w;
+	}
+	function set_way(v:Float):Float {
+		w = v;
+		return w;
+	}
+	function get_speed():Float {
+		return s;
+	}
+	function set_speed(v:Float):Float {
+		s = v;
+		return s;
+	}
+	function get_dotPixelArt():DotPixelArt {
+		return d;
+	}
+	function set_dotPixelArt(v:DotPixelArt):DotPixelArt {
+		d = v;
+		return d;
+	}
+	function get_ticks():Int {
+		return currentTicks;
+	}
 	function get_t():Int {
-		return ticks;
-	}
-	function setHitRect(width:Float, height:Float):A {
-		hitRect.x = width;
-		hitRect.y = (height >= 0 ? height : width);
-		return this;
-	}
-	function setHitCircle(diameter:Float):A {
-		hitDiameter = diameter;
-		setHitRect(diameter, diameter);
-		return this;
+		return currentTicks;
 	}
 	function get_r():Bool {
 		if (isRemoving) return false;
 		isRemoving = true;
 		return true;
 	}
-	function isHit(actorClassName:String, onHit:Dynamic -> Void):Bool {
-		var actors = A.acs(actorClassName);
+	public function setHitRect(width:Float = -999, height:Float = -1):Actor {
+		hitRect.x = width;
+		hitRect.y = (height >= 0 ? height : width);
+		return this;
+	}
+	public function setHitCircle(diameter:Float = -999):Actor {
+		hitDiameter = diameter;
+		setHitRect(diameter, diameter);
+		return this;
+	}
+	public function isHit(actorClassName:String, onHit:Dynamic -> Void = null):Bool {
+		var actors = Actor.getActors(actorClassName);
 		if (actors.length <= 0) return false;
 		var hitTest:Dynamic -> Bool;
 		var ac = actors[0];
 		if (hitDiameter > 0 && ac.hitDiameter > 0) {
 			hitTest = function (ac:Dynamic):Bool {
-				return p.dtd(ac.p) <= (hitDiameter + ac.hitDiameter) / 2;
+				return p.distanceToDistorted(ac.p) <= (hitDiameter + ac.hitDiameter) / 2;
 			}
 		} else {
 			var xyr = (hitRect.x / hitRect.y - 1).abs();
@@ -156,15 +212,15 @@ class A { // Actor
 			var acxyr = (ahx / ahy - 1).abs();
 			if (xyr > acxyr) {
 				hitTest = function(ac:Dynamic):Bool {
-					ho.v(p).s(ac.p);
-					if (w != 0) ho.rt(-w);
+					ho.setValue(p).sub(ac.p);
+					if (w != 0) ho.rotate(-w);
 					return (ho.x.abs() <= (hitRect.x + ac.hitRect.x) / 2 &&
 						ho.y.abs() <= (hitRect.y + ac.hitRect.y) / 2);
 				}
 			} else {
 				hitTest = function(ac:Dynamic):Bool {
-					ho.v(p).s(ac.p);
-					if (ac.w != 0) ho.rt(-ac.w);
+					ho.setValue(p).sub(ac.p);
+					if (ac.w != 0) ho.rotate(-ac.w);
 					return (ho.x.abs() <= (hitRect.x + ac.hitRect.x) / 2 &&
 						ho.y.abs() <= (hitRect.y + ac.hitRect.y) / 2);
 				}
@@ -172,7 +228,7 @@ class A { // Actor
 		}
 		var hf = false;
 		for (ac in actors) {
-			var a:A = ac;
+			var a:Actor = ac;
 			if (this == a || a.isRemoving) continue;
 			var sz = (hitRect.x + hitRect.y + a.hitRect.x + a.hitRect.y) / 2;
 			if ((p.x - a.p.x) > sz && (p.y - a.p.y) > sz) continue;
@@ -183,33 +239,34 @@ class A { // Actor
 		}
 		return hf;
 	}
-	function setDisplayPriority(priority:Int):A {
+	function setDisplayPriority(priority:Int):Actor {
 		var group = groups.get(Type.getClassName(Type.getClass(this)));
 		group.displayPriority = priority;
 		return this;
 	}
-	function get_db():A {
+	function get_db():Actor {
 		var group = groups.get(Type.getClassName(Type.getClass(this)));
 		group.isDrawingToBack = true;
 		return this;
 	}
-	function get_df():A {
+	function get_df():Actor {
 		var group = groups.get(Type.getClassName(Type.getClass(this)));
 		group.isDrawingToBack = false;
 		return this;
 	}
-	function get_m():A {
-		p.a(v);
-		p.aw(w, s);
+	function get_m():Actor {
+		p.add(v);
+		p.addWay(w, s);
 		return this;
 	}
 
 	function updateFrame():Void {
-		m;
-		F.updateAll(fs);
+		move();
+		Fiber.updateAll(fs);
+		update();
 		u();
-		if (d != null) d.p(p).z(z).rt(w).d;
-		ticks++;
+		if (d != null) d.setPosition(p).setZ(z).rotate(w).draw();
+		currentTicks++;
 	}
 }
 class ActorGroup {
@@ -217,14 +274,14 @@ class ActorGroup {
 		return x.displayPriority - y.displayPriority;
 	}
 	public var className:String;
-	public var s:Array<A>;
+	public var s:Array<Actor>;
 	public var displayPriority = 10;
 	public var isDrawingToBack = false;
-	public var hitRect:V;
-	public var d:D;
+	public var hitRect:Vector;
+	public var d:DotPixelArt;
 	public function new(className:String) {
 		this.className = className;
-		s = new Array<A>();
-		hitRect = new V();
+		s = new Array<Actor>();
+		hitRect = new Vector();
 	}
 }

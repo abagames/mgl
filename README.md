@@ -46,13 +46,13 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 * A basic game loop is automatically managed.
 * You can do spawning, moving and removing the actor in an easy-to-write manner.
+* Using a method chaining and a shortened name helps to write a logic with a one-liner.
 * Since the dot pixel art and the sound effect are generated procedurally, you don't have to care about them.
 * Many useful classes for particles, key handling, mouse handling, fiber, random, text, color and 2d vector.
 
 ### Limitations
 
 * Not suitable for a large scale game because of lacking flexibility in handling a game loop.
-* A code tends to be unreadable due to short method and class names.
 * No 3d, neither external bitmaps nor sounds loading support.
 
 ###Sample code
@@ -61,447 +61,464 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 ```haxe
 import mgl.*;
-using mgl.F;
-using mgl.U;
-// A basic game loop(G) handling class.
-class Main extends G {
+using mgl.Fiber;
+using mgl.Util;
+// A basic game loop handling class.
+class Main extends Game {
+	static public function main() {
+		new Main();
+	}
 	function new() {
 		super(this);
 	}
-	var beginGameSound:S;
-	var endGameSound:S;
-	// Start -> i() --> Title -> b() -> u()(every frame) -> Begin the game -v
-	//               ^   v--------------------------------------------------<
-	//               ^  b() -> u()(every frame) -> End the game -v
-	//               ^-------------------------------------------<
+	var bgmDrumSound:Sound;
+	var endGameSound:Sound;
+	// initialize() --> Title -> begin() -> update()(every frame) -> Begin the game -v
+	//                    ^    v-----------------------------------------------------<
+	//                    ^  begin() -> update()(every frame) -> End the game -v
+	//                    ^----------------------------------------------------<
 	// First initializer.
-	override function i() {
+	override function initialize() {
 		Ball.main = this;
-		// Generate sounds(S) played at the game begining/ending.
-		beginGameSound = S.i.mj.m().t(.5, 7, .3).t(.3, 7, .8).e;
-		endGameSound = S.i.mj.m().t(.2, 7, .8).t(.8, 7, .2).e;
-		// Set the title(tt) and end the initializer(ie).
-		tt("BALL 28 IN SPACE").ie;
+		// Generate sounds.
+		bgmDrumSound = new Sound().setDrumMachine();
+		endGameSound = new Sound().major().setMelody()
+			.addTone(.3, 10, .7).addTone(.6, 10, .4).end();
+		// Apply quarter-note quantization.
+		Sound.setDefaultQuant(4);
+		// Set the title.
+		setTitle("BALL 28 IN SPACE");
 	}
 	public var ballLeft:Int;
 	var nextBallCount:Int;
 	var time:Int;
 	// Begin the title/game.
-	override function b() {
+	override function begin() {
 		Ball.player = new Player();
 		nextBallCount = 0;
 		ballLeft = 28;
 		time = 0;
-		// Play(p) the game begining sound.
-		beginGameSound.p;
+		// Play the bgm.
+		bgmDrumSound.play();
 	}
 	// Update every frame.
-	override function u() {
+	override function update() {
 		var sc = Std.int(time / 1000);
 		var ms = '00${time % 1000}';
 		ms = ms.substr(ms.length - 3);
-		// Draw elapsed time at the upper right(xy(.99, .01)) aligned right(ar).
-		T.i.xy(.99, .01).ar.tx('TIME: $sc.$ms').d;
+		// Draw elapsed time at the upper right aligned right.
+		new Text().setXy(.99, .01).alignRight().setText('TIME: $sc.$ms').draw();
 		// If the game isn't begun then return.
-		if (!G.ig) return;
+		if (!Game.isInGame) return;
 		time += 16;
-		// Draw the number of left balls at the upper left(xy(.01, .01)).
-		T.i.xy(.01, .01).tx('LEFT: $ballLeft').d;
+		// Draw the number of left balls at the upper left.
+		new Text().setXy(.01, .01).setText('LEFT: $ballLeft').draw();
 		if (ballLeft <= 0) {
 			// Play the game ending sound.
-			endGameSound.p;
+			endGameSound.play();
 			// End the game.
-			G.eg;
-		// Get all ball actors(A.acs("Ball")) and check a total of them.
-		} else if (A.acs("Ball").length <= 0) {
+			Game.endGame();
+		// Get all ball actors and check a total of them.
+		} else if (Actor.getActors("Ball").length <= 0) {
 			nextBallCount++;
 			for (i in 0...nextBallCount) new Ball();
 		}
-		// Instructions drawn only once(ao).
-		if (G.t == 0) T.i.xy(.1, .1).tx("[urdl]: MOVE").t(180).ao;
-		if (G.t == 60) T.i.xy(.1, .15).tx("[Z]: BREAK").t(180).ao;
-	}
-	public static function main() {
-		new Main();
+		// Instructions drawn only once.
+		if (Game.ticks == 0) {
+			new Text().setXy(.1, .1).setText("[urdl]: MOVE").setTicks(180).addOnce();
+		}
+		if (Game.ticks == 60) {
+			new Text().setXy(.1, .15).setText("[Z]: BREAK").setTicks(180).addOnce();
+		}
 	}
 }
-// Player actor(A).
-class Player extends A {
-	static var tickSound:S;
+// Player actor.
+class Player extends Actor {
+	static var tickSound:Sound;
 	// Static initializer called only once.
-	override function i() {
-		// Generate the green(c(C.gi)) shape(gs).
-		d = D.i.c(C.gi).gs(.04, .05);
+	override function initialize() {
+		// Generate the green shape.
+		dotPixelArt = new DotPixelArt().setColor(Color.green).generateShape(.04, .05);
 		// Set the hir rect.
-		hr(.04, .05);
+		setHitRect(.04, .05);
 		// Set the tick sound.
-		tickSound = S.i.mn.t(.4, 3, .2).e;
+		tickSound = new Sound().minor().addTone(.5, 3, .3).end();
 	}
 	// Begin this actor.
-	override function b() {
-		// Set the position(p) to (.5, .5).
-		p.n(.5);
-		// Create the fiber(F) to play the tick sound every 30 frames(w(30)).
-		F.ip(this).w(30).d( { tickSound.p; } );
+	override function begin() {
+		// Set the position to (.5, .5).
+		position.setNumber(.5);
+		// Create the fiber to play the tick sound every 30 frames.
+		new Fiber(this).wait(30).doIt( { tickSound.play(); } );
 	}
 	// Update every frame.
-	override function u() {
-		// Get the joystick input(K.st) and add to the velocity(v).
-		v.a(K.st.m(.003)).m(K.ib ? .6 : .95);
+	override function update() {
+		// Get the joystick input and add to the velocity.
+		velocity.add(Key.stick.multiply(.003)).multiply(Key.isButtonPressing ? .6 : .95);
 		// Loop the position between -.05 and 1.05.
-		p.xy(p.x.lr( -.05, 1.05), p.y.lr( -.05, 1.05));
-		// Set the way(w) to the velocity way(v.w)
-		w = v.w;
-		// Add the reddish green(C.gi.gr) particle from the position p.
-		P.i.p(p).c(C.gi.gr).w(w + 180, 45).s(v.l).a;
+		position.setXy(position.x.loopRange(-.05, 1.05), position.y.loopRange(-.05, 1.05));
+		// Set the way to the velocity way.
+		way = v.way;
+		// Add the reddish green particle from the position.
+		new Particle().setPosition(position).setColor(Color.green.goRed())
+			.setWay(way + 180, 45).setSpeed(v.l).add();
 		// Check the hit to the Ball actors.
 		ih("Ball", function(b) {
-			// If the player hit the ball, remove the ball.
-			b.remove();
+			// If the player hit the ball, erase the ball.
+			b.erase();
 		});
 	}
 }
 // Ball actor.
-class Ball extends A {
+class Ball extends Actor {
 	static public var main:Main;
 	static public var player:Player;
-	static var removeSound:S;
-	override function i() {
-		// Set the circle(cs)/yellow(C.yi) shape.
-		d = D.i.c(C.yi).gc(.04);
-		hr(.04);
+	static var removeSound:Sound;
+	override function initialize() {
+		// Set the circle yellow shape.
+		dotPixelArt = new DotPixelArt().setColor(Color.yellow).generateCircle(.04);
+		setHitRect(.04);
 		// Set the removing sound.
-		removeSound = S.i.mn.t(.7).r().t(.7).e;
+		removeSound = new Sound().minor().addTone(.7).addRest().addTone(.7).end();
 	}
-	override function b() {
+	override function begin() {
 		for (i in 0...10) {
-			// Set the random position from .1 to .9(.1.rf(.9)).
-			p.xy(.1.rf(.9), .1.rf(.9));
-			// If the distance to(dtd) the player is far enough then break.
-			if (p.dtd(player.p) > .3) break;
+			// Set the random position from .1 to .9.
+			position.setXy(.1.randomFromTo(.9), .1.randomFromTo(.9));
+			// If the distance to the player is far enough then break.
+			if (position.distanceTo(player.p) > .3) break;
 		}
 	}
-	public function remove() {
-		// Add 20(cn(20)) particles.
-		P.i.p(p).c(C.yi.gr).cn(20).sz(.03).a;
+	public function erase() {
+		// Add 20 particles.
+		new Particle().setPosition(position).setColor(Color.yellow.goRed())
+			.setCount(20).setSize(.03).add();
 		main.ballLeft--;
 		// Play the removing sound.
-		removeSound.p;
+		removeSound.play();
 		// Remove this actor.
-		r;
+		remove();
 	}
 }
 ```
 
 ###Classes
 
-###G // Game
+A shortened form of a class/method name is described in ( ).
 
-A basic game loop handler. You have to override the i(), b() and u() method to initialize, begin and update a game.
+###Game (G)
+
+A basic game loop handler. You have to override the initialize(), begin() and update() method.
 
 ##### Methods
-* (static)ig:Bool // is in game
-* (static)eg:Bool // end game
-* (static)t:Int // ticks
-* (static)fr(x:Float, y:Float, width:Float, height:Float, color:C):Void // fill rect
-* (static)df // draw to foreground
-* (static)bf // draw to background
-* tt(title:String, title2:String = ""):G // set title
-* vr(version:Int = 1):G // set version
-* dm:G // debugging mode
-* yr(ratio:Float):G // set y ratio
-* ie:G // initialize end
+* (static)isInGame():Bool (ig)
+* (static)endGame():Bool (eg)
+* (static)ticks:Int (t)
+* (static)fillRect(x:Float, y:Float, width:Float, height:Float, color:C):Void (fr)
+* (static)drawToForeground() (df)
+* (static)drawToBackground() (db)
+* setTitle(title:String, title2:String = ""):G (tt)
+* setVersion(version:Int = 1):G (vr)
+* enableDebuggingMode():G (dm)
+* setYRatio(ratio:Float):G (yr)
+* initializeEnd()e:G (ie)
 
 ##### Overriden methods
-* i():Void // initialize
-* b():Void // begin
-* u():Void // update
-* is():Void // initialize state
-* ls(d:Dynamic):Void // load state
-* ss(d:Dynamic):Void // save state
+* initialize():Void (i)
+* begin():Void (b)
+* update():Void (u)
+* initializeState():Void (is)
+* loadState(d:Dynamic):Void (ls)
+* saveState(d:Dynamic):Void (ss)
 
-####A // Actor
+####Actor (A)
 
 An actor moves on a screen. An actor has a position, a velocity and a dot pixel art.
 
 ##### Variables
-* p:V // position
-* z:Float = 0 // z position
-* v:V // velocity
-* w:Float = 0 // way
-* s:Float = 0 // speed
-* d:D // dot pixel art
+* position:V (p)
+* z:Float = 0
+* velocity:V (v)
+* way:Float = 0 (w)
+* speed:Float = 0 (s)
+* dotPixelArt:D (d)
 
 ##### Methods
-* (static)acs(className:String):Array<Dynamic> // get actors
-* (static)cl:Bool // clear actors
-* (static)cls(className:String):Void // clear specific actors
-* (static)sc(className:String, vx:Float, vy:Float = 0,
+* (static)getActors(className:String):Array<Dynamic> (acs)
+* (static)clearActors():Bool (cl)
+* (static)clearSpecificActors(className:String):Void (cls)
+* (static)scroll(className:String, vx:Float, vy:Float = 0,
 	minX:Float = 0, maxX:Float = 0,
-	minY:Float = 0, maxY:Float = 0):Void // scroll
-* (static)scs(classNames:Array<String>, vx:Float, vy:Float = 0,
+	minY:Float = 0, maxY:Float = 0):Void (sc)
+* (static)scrollActors(classNames:Array<String>, vx:Float, vy:Float = 0,
 	minX:Float = 0, maxX:Float = 0,
-	minY:Float = 0, maxY:Float = 0):Void // scroll actors
-* t:Int // ticks
-* r:Bool // remove
-* hr(width:Float, height:Float = -1):A // set hit rect
-* ih(className:String, onHit:Dynamic -> Void = null):Bool // is hit
-* dp(priority:Int):A // set display priority
-* df // draw to foreground
-* bf // draw to background
+	minY:Float = 0, maxY:Float = 0):Void (scs)
+* ticks:Int (t)
+* remove():Bool (r)
+* setHitRect(width:Float = -999, height:Float = -1):A (hr)
+* setHitCircle(diameter:Float = -999):A (hc)
+* isHit(className:String, onHit:Dynamic -> Void = null):Bool (ih)
+* setDisplayPriority(priority:Int):A (dp)
+* drawToForeground() (df)
+* drawToBackground() (bf)
 
 ##### Overriden methods
-* i():Void // initialize
-* b():Void // begin
-* u():Void // update
-* h(hitActor:Dynamic):Void // hit
+* initialize():Void (i)
+* begin():Void (b)
+* update():Void (u)
 
-###D // DotPixelArt
+###DotPixelArt (D)
 
 A pixel art for an actor. You can write a rectangle, a circle and an auto generated shape.
 
 ##### Methods
-* (static)i:D // instance
-* c(color:C):D // set color
-* cs(color:C):D // set color spot
-* cb(color:C):D // set color bottom
-* cbs(color:C):D // set color bottom spot
-* si(x:Float = 0, y:Float = 0, xy:Float = 0):D // set spot interval
-* st(threshold:Float):D // set spot threshold
-* ds(dotScale:Int):D // set dot scale
-* o(x:Float = 0, y:Float = 0):D // set offset
-* fr(width:Float, height:Float, edgeWidth:Int = 0):D // fill rectangle
-* lr(width:Float, height:Float, edgeWidth:Int = 1):D // line rectangle
-* gr(width:Float, height:Float, seed:Int = -1):D // generate rectangle
-* fc(diameter:Float, edgeWidth:Int = 0):D // fill circle
-* lc(diameter:Float, edgeWidth:Int = 1):D // line circle
-* gc(diameter:Float, seed:Int = -1):D // generate circle
-* gs(width:Float, height:Float, seed:Int = -1):D // generate shape
-* p(pos:V):D // set pos
-* xy(x:Float, y:Float):D // set xy
-* z(z:Float = 0):D // set z
-* rt(angle:Float = 0):D // rotate
-* sc(x:Float = 1, y:Float = -1):D // set scale
-* ed:D // enable dot scale
-* dd:D // disable dot scale
-* er:D // enable rolling shape
-* dc(color:C = null):D // set draw color
-* d:D // draw
+* new():D (i)
+* setColor(color:C):D (c)
+* setColorSpot(color:C):D (cs)
+* setColorBottom(color:C):D (cb)
+* setColorBottomSpot(color:C):D (cbs)
+* setSpotInterval(x:Float = 0, y:Float = 0, xy:Float = 0):D (si)
+* setSpotThreshold(threshold:Float):D (st)
+* setDotScale(dotScale:Int):D (ds)
+* setOffset(x:Float = 0, y:Float = 0):D (o)
+* fillRectangle(width:Float, height:Float, edgeWidth:Int = 0):D (fr)
+* lineRectangle(width:Float, height:Float, edgeWidth:Int = 1):D (lr)
+* generateRectangle(width:Float, height:Float, seed:Int = -1):D (gr)
+* fillCircle(diameter:Float, edgeWidth:Int = 0):D (fc)
+* lineCircle(diameter:Float, edgeWidth:Int = 1):D (lc)
+* generateCircle(diameter:Float, seed:Int = -1):D (gc)
+* generateShape(width:Float, height:Float = -1, seed:Int = -1):D (gs)
+* setPosition(pos:V):D (p)
+* setXy(x:Float, y:Float):D (xy)
+* setZ(z:Float = 0):D (z)
+* rotate(angle:Float = 0):D (rt)
+* setScale(x:Float = 1, y:Float = -1):D (sc)
+* enableDotScale():D (ed)
+* disableDotScale():D (dd)
+* enableRollingShape():D (er)
+* setDrawColor(color:C = null):D (dc)
+* draw():D (d)
 
-###S // Sound
+###Sound (S)
 
 A 8-bit era style sound effect.
 
 ##### Methods
-* (static)i:S // instance
-* (static)fi(second:Float = 1):S // fade in
-* (static)fo(second:Float = 1):S // fade out
-* (static)s:S // stop
-* mj:S // major
-* mn:S // minor
-* n:S // noise
-* ns:S // noise scale
-* t(from:Float, time:Int = 1, to:Float = 0):S // add tone
-* w(width:Float = 0, interval:Float = 0):S // set wave
-* m(maxLength:Int = 3, step:Int = 1, randomSeed:Int = -1):S // set melody
-* mm(min:Float = -1, max:Float = 1):S // set min max
-* r(v:Int = 0):S // add rest
-* rp(v:Int = 1):S // set repeat
-* rr(v:Int = 0):S // set repeat rest
-* l(v:Int = 64):S // set length
-* v(v:Float = 1):S // set volume
-* lp:S // loop
-* e:S // end
-* dm(seed:Int = -1,
+* new():S (i)
+* (static)fadeIn(second:Float = 1):S (fi)
+* (static)fadeOut(second:Float = 1):S (fo)
+* (static)stop:S (s)
+* major():S (mj)
+* minor():S (mn)
+* noise():S (n)
+* noiseScale():S (ns)
+* addTone(from:Float, time:Int = 1, to:Float = 0):S (t)
+* setWave(width:Float = 0, interval:Float = 0):S (w)
+* setMelody(maxLength:Int = 3, step:Int = 1, randomSeed:Int = -1):S (m)
+* setMinMax(min:Float = -1, max:Float = 1):S (mm)
+* addRest(v:Int = 0):S (r)
+* setRepeat(v:Int = 1):S (rp)
+* setRepeatRest(v:Int = 0):S (rr)
+* setLength(v:Int = 64):S (l)
+* setVolume(v:Float = 1):S (v)
+* setQuant(v:Int = 0):S (q)
+* setLoop():S (lp)
+* end():S (e)
+* setDrumMachine(seed:Int = -1,
 	bassPattern:Int = -1, snarePattern:Int = -1, hihatPattern:Int = -1,
-	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):S // set drum machine
-* p:S // play
+	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):S (dm)
+* play():S (p)
 
-####P // Particle
+####Particle (P)
 
 Particles splashed from a specified position.
 
 ##### Methods
-* (static)i:P // instance
-* (static)sc(className:String, vx:Float, vy:Float = 0,
+* new():P (i)
+* (static)scroll(className:String, vx:Float, vy:Float = 0,
 	minX:Float = 0, maxX:Float = 0,
-	minY:Float = 0, maxY:Float = 0):Void // scroll
-* p(pos:V):P // set position
-* xy(x:Float, y:Float):P // set xy
-* z(z:Float = 0):P // set z
-* c(color:C):P // set color
-* cn(count:Int):P // set count
-* sz(size:Float):P // set size
-* s(speed:Float):P // set speed
-* t(ticks:Float):P // set ticks
-* w(angle:Float, angleWidth:Float):P // set way
-* a:P // add
+	minY:Float = 0, maxY:Float = 0):Void (sc)
+* setPosition(pos:V):P (p)
+* setXy(x:Float, y:Float):P (xy)
+* setZ(z:Float = 0):P (z)
+* setColor(color:C):P (c)
+* setCount(count:Int):P (cn)
+* setSize(size:Float):P (sz)
+* setSpeed(speed:Float):P (s)
+* setTicks(ticks:Float):P (t)
+* setWay(angle:Float, angleWidth:Float = 0):P (w)
+* add():P (a)
 
-####T // Text
+####Text (T)
 
 Showing a text on a screen in a certain duration ticks.
 
 ##### Methods
-* (static)i:T // instance
-* tx(text:String):T // set text
-* p(pos:V):T // set position
-* xy(x:Float, y:Float):T // set xy
-* c(color:C):T // set color
-* ds(dotScale:Int = -1):T // set dot scale
-* al:T // align left
-* ar:T // align right
-* ac:T // align center
-* avc:T // align vertical center
-* v(vel:V):T // set velocity
-* vxy(x:Float, y:Float):T // set velocity xy
-* t(ticks:Int):T // set ticks
-* tf:T // tick forever
-* ao:T // add once
-* r:Bool // remove
-* d:T // draw
+* new():T (i)
+* setText(text:String):T (tx)
+* setPosition(pos:V):T (p)
+* setXy(x:Float, y:Float):T (xy)
+* setColor(color:C):T (c)
+* setDotScale(dotScale:Float = -1):T (ds)
+* alignLeft():T (al)
+* alignRight():T (ar)
+* alignCenter():T (ac)
+* alignVerticalCenter():T (avc)
+* setVelocity(vel:V):T (v)
+* setVelocityXy(x:Float, y:Float):T (vxy)
+* setTicks(ticks:Int):T (t)
+* tickForever():T (tf)
+* addOnce():T (ao)
+* remove():Bool (r)
+* draw():T (d)
 
-####R // Random
+####Random (R)
 
 Random number generator.
 
 ##### Methods
-* (static)i:R // instance
-* n(v:Float = 1, s:Float = 0):Float // number
-* ni(v:Int, s:Int = 0):Int // number int
-* f(from:Float to:Float):Float // from to
-* fi(from:Float to:Float):Int // from to int
-* pm:Int // plus minus
-* p(v:Float = 1):Float // plus minus number
-* pi(v:Int):Int // plus minus number int
-* s(v:Int = -0x7fffffff):R // set seed
-* bst(stage:Int):R // set difficulty basis stage
-* st(stage:Int, seedOffset:Int = 0):R // set stage seed
-* dc:Float // difficulty corrected random
+* new():R (i)
+* next(v:Float = 1, s:Float = 0):Float (n)
+* nextInt(v:Int, s:Int = 0):Int (ni)
+* nextFromTo(from:Float to:Float):Float (f)
+* nextFromToInt(from:Float to:Float):Int (fi)
+* nextPlusOrMinus:Int (pm)
+* nextPlusMinus(v:Float = 1):Float (p)
+* nextPlusMinusInt(v:Int):Int (pi)
+* setSeed(v:Int = -0x7fffffff):R (s)
+* setDifficultyBasisStage(stage:Int):R (bst)
+* setStage(stage:Int, seedOffset:Int = 0):R (st)
+* nextDifficultyCorrected:Float (dc)
 
-####F // Fiber
+####Fiber (F)
 
 Set the do block and the block runs constantly for a specified wait ticks.
 
 ##### Methods
-* (static)i():F // instance
-* (static)ip(parent:Dynamic):F // instance with parent
-* (static)cl:Bool // clear
-* d(block:Expr):F // do
-* w(count:Float):F // wait
-* aw(count:Float):F // add wait
-* dw(count:Float):F // decrement wait
-* dd:F // disable auto decrement
-* dl:F // disable loop
-* u:F // update
-* l:F // loop
-* r:F; // remove
-* cn:Float; // count
+* new(parent:Dynamic = null):F (i, ip)
+* (static)clear():Bool (cl)
+* doIt(block:Expr):F (d)
+* wait(count:Float):F (w)
+* addWait(count:Float):F (aw)
+* decrementWait(count:Float):F (dw)
+* disableAutoDecrement():F (dd)
+* disableLoop():F (dl)
+* update():F (u)
+* loop():F (l)
+* remove():F (r)
+* count:Float (cn)
 
-####C // Color
+####Color (C)
 
 RGB color.
 
 ##### Variables
-* r:Int // red
-* g:Int // green
-* b:Int // blue
+* r:Int
+* g:Int
+* b:Int
 
 ##### Methods
-* (static)ti:C // transparent instance
-* (static)di:C // dark (black) instance
-* (static)ri:C // red instance
-* (static)gi:C // green instance
-* (static)bi:C // blue instance
-* (static)yi:C // yellow instance
-* (static)mi:C // magenta instance
-* (static)ci:C // cyan instance
-* (static)wi:C // white instance
-* i:Int // integer value
-* v(v:C):C // set value
-* gd:C // go dark
-* gw:C // go white
-* gr:C // go red
-* gg:C // go green
-* gb:C // go blue
-* gbl:C // go blink
-* bl(color:C, ratio:Float):C // blend
+* (static)transparent:C (ti)
+* (static)black:C
+* (static)dark:C (di)
+* (static)red:C (ri)
+* (static)green:C (gi)
+* (static)blue:C (bi)
+* (static)yellow:C (yi)
+* (static)magenta:C (mi)
+* (static)cyan:C (ci)
+* (static)white:C (wi)
+* int:Int (i)
+* setValue(v:C):C (v)
+* goDark():C (gd)
+* goWhite():C (gw)
+* goRed():C (gr)
+* goGreen():C (gg)
+* goBlue():C (gb)
+* goBlink():C (gbl)
+* blend(color:C, ratio:Float):C (bl)
 
-####K // Key
+####Key (K)
 
 Key and joystick input status.
 
 ##### Variables
-* (static)s:Array<Bool> // pressed keys
+* (static)pressingKeys:Array<Bool> (s)
 
 ##### Methods
-* (static)iu:Bool // is up pressing
-* (static)id:Bool // is down pressing
-* (static)ir:Bool // is right pressing
-* (static)il:Bool // is left pressing
-* (static)ib:Bool // is button pressing
-* (static)ib1:Bool // is button1 pressing
-* (static)ib2:Bool // is button2 pressing
-* (static)ipb:Bool // is pressed button
-* (static)ipb1:Bool // is pressed button1
-* (static)ipb2:Bool // is pressed button2
-* (static)st:V // stick input vector
+* (static)isUpPressing:Bool (iu)
+* (static)isDownPressing:Bool (id)
+* (static)isRightPressing:Bool (ir)
+* (static)isLeftPressing:Bool (il)
+* (static)isButtonPressing:Bool (ib)
+* (static)isButton1Pressing:Bool (ib1)
+* (static)isButton2Pressing:Bool (ib2)
+* (static)isPressedUp:Bool (ipu)
+* (static)isPressedDown:Bool (ipd)
+* (static)isPressedRight:Bool (ipr)
+* (static)isPressedLeft:Bool (ipl)
+* (static)isPressedButton:Bool (ipb)
+* (static)isPressedButton1:Bool (ipb1)
+* (static)isPressedButton2:Bool (ipb2)
+* (static)stick:V (st)
 
-####M // Mouse
+####Mouse (M)
 
 Mouse input status.
 
 ##### Variables
-* (static)p:V // pos
-* (static)ip:Bool // is button pressing
-* (static)ipb:Bool // is pressed button
+* (static)position:V (p)
+* (static)isButtonPressing:Bool (ip)
+* (static)isPressedButton:Bool (ipb)
 
-####V // Vector
+####Vector (V)
 
 2D vector.
 
 ##### Variables
-* x:Float = 0 // x
-* y:Float = 0 // y
+* x:Float = 0
+* y:Float = 0
 
 ##### Methods
 * (static)i:V // instance
-* xy(x:Float = 0, y:Float = 0):V // set xy
-* n(n:Float = 0):V // set number
-* v(v:V):V // set value
-* l:Float // length
-* w:Float // way
-* xi:Int // x int
-* yi:Int // y int
-* dt(pos:V):Float // distance to
-* dtd(pos:V, pixelWHRatio:Float = -1):Float // distance to distorted
-* wt(pos:V):Float // way to
-* a(v:V):V // add
-* s(v:V):V // sub
-* m(v:Float):V // multiply
-* d(v:Float):V // divide
-* aw(angle:Float, speed:Float):V // add way
-* rt(angle:Float):V // rotate
-* ii(spacing:Float = 0,
-	minX:Float = 0, maxX:Float = 1, minY:Float = 0, maxY:Float = 1):Bool // is in
+* setXy(x:Float = 0, y:Float = 0):V (xy)
+* setNumber(n:Float = 0):V (n)
+* setValue(v:V):V (v)
+* length:Float (l)
+* way:Float (w)
+* xInt:Int (xi)
+* yInt:Int (yi)
+* distanceTo(pos:V):Float (dt)
+* distanceToDistorted(pos:V, pixelWHRatio:Float = -1):Float (dtd)
+* wayTo(pos:V):Float (wt)
+* add(v:V):V (a)
+* sub(v:V):V (s)
+* multiply(v:Float):V (m)
+* divide(v:Float):V (d)
+* addWay(angle:Float, speed:Float):V (aw)
+* rotate(angle:Float):V (rt)
+* isIn(spacing:Float = 0,
+	minX:Float = 0, maxX:Float = 1, minY:Float = 0, maxY:Float = 1):Bool (ii)
 
-####U // Utility
+####Util (U)
 
 Utility methods.
 
 ##### Methods
-* (static)c(v:Float, min:Float = 0.0, max:Float = 1.0):Float // clamp
-* (static)ci(v:Int, min:Int, max:Int):Int // clamp int
-* (static)nw(v:Float):Float // normalize way
-* (static)aw(v:Float, targetAngle:Float, angleVel:Float):Float // aim way
-* (static)lr(v:Float, min:Float, max:Float):Float // loop range
-* (static)lri(v:Int, min:Int, max:Int):Int // loop range int
-* (static)rn(v:Float = 1, s:Float = 0):Float // random number
-* (static)rni(v:Int, s:Int = 0):Int // random number int
-* (static)rf(from:Float, to:Float):Float // random from to
-* (static)rfi(from:Int, to:Int):Int // random from to int
-* (static)rp(v:Float = 1):Float // random plus minus number
-* (static)rpi(v:Int):Int // random plus minus number int
-* (static)ch(o:Dynamic):Int // class hash
+* (static)clamp(v:Float, min:Float = 0.0, max:Float = 1.0):Float (c)
+* (static)clampInt(v:Int, min:Int, max:Int):Int (ci)
+* (static)normalizeWay(v:Float):Float (nw)
+* (static)aimWay(v:Float, targetAngle:Float, angleVel:Float):Float (aw)
+* (static)loopRange(v:Float, min:Float, max:Float):Float (lr)
+* (static)loopRangeInt(v:Int, min:Int, max:Int):Int (lri)
+* (static)random(v:Float = 1, s:Float = 0):Float (rn)
+* (static)randomInt(v:Int, s:Int = 0):Int (rni)
+* (static)randomFromTo(from:Float, to:Float):Float (rf)
+* (static)randomFromToInt(from:Int, to:Int):Int (rfi)
+* (static)randomPlusMinus(v:Float = 1):Float (rp)
+* (static)randomPlusMinusInt(v:Int):Int (rpi)
+* (static)randomPlusOrMinus():Int (rpm)
+* (static)getClassHash(o:Dynamic):Int (ch)
 
 License
 ----------

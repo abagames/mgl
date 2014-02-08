@@ -5,43 +5,51 @@ import org.si.sion.SiONData;
 import org.si.sound.DrumMachine;
 #end
 using Math;
-using mgl.U;
-class S { // Sound
-	static public var i(get, null):S; // instance
+using mgl.Util;
+class Sound {
+	static public var i(get, null):Sound; // instance
 	static public function fi(second:Float = 1):Void { fadeIn(second); }
 	static public function fo(second:Float = 1):Void { fadeOut(second); }
+	static public function stop():Bool { return get_s(); }
 	static public var s(get, null):Bool; // stop
 	static public function dq(v:Int = 0):Void { setDefaultQuant(v); }
-	public var mj(get, null):S; // major
-	public var mn(get, null):S; // minor
-	public var n(get, null):S; // noise
-	public var ns(get, null):S; // noise scale
-	public function t(from:Float, time:Int = 1, to:Float = 0):S {
+	public function major():Sound { return get_mj(); }
+	public var mj(get, null):Sound; // major
+	public function minor():Sound { return get_mn(); }
+	public var mn(get, null):Sound; // minor
+	public function noise():Sound { return get_n(); }
+	public var n(get, null):Sound; // noise
+	public function noiseScale():Sound { return get_ns(); }
+	public var ns(get, null):Sound; // noise scale
+	public function t(from:Float, time:Int = 1, to:Float = 0):Sound {
 		return addTone(from, time, to);
 	}
-	public function w(width:Float = 0, interval:Float = 1):S { return setWave(width, interval); }
-	public function m(maxLength:Int = 3, step:Int = 1, seed:Int = -1):S {
+	public function w(width:Float = 0, interval:Float = 1):Sound { return setWave(width, interval); }
+	public function m(maxLength:Int = 3, step:Int = 1, seed:Int = -1):Sound {
 		return setMelody(maxLength, step, seed);
 	}
-	public function mm(min:Float = -1, max:Float = 1):S { return setMinMax(min, max); }
-	public function r(v:Int = 0):S { return addRest(v); }
-	public function rp(v:Int = 1):S { return setRepeat(v); }
-	public function rr(v:Int = 0):S { return setRepeatRest(v); }
-	public function l(v:Int = 64):S { return setLength(v); }
-	public function v(v:Float = 1):S { return setVolume(v); }
-	public function q(v:Int = 0):S { return setQuant(v); }
-	public var lp(get, null):S; // loop
-	public var e(get, null):S; // end
+	public function mm(min:Float = -1, max:Float = 1):Sound { return setMinMax(min, max); }
+	public function r(v:Int = 0):Sound { return addRest(v); }
+	public function rp(v:Int = 1):Sound { return setRepeat(v); }
+	public function rr(v:Int = 0):Sound { return setRepeatRest(v); }
+	public function l(v:Int = 64):Sound { return setLength(v); }
+	public function v(v:Float = 1):Sound { return setVolume(v); }
+	public function q(v:Int = 0):Sound { return setQuant(v); }
+	public function setLoop():Sound { return get_lp(); }
+	public var lp(get, null):Sound; // set loop
+	public function end():Sound { return get_e(); }
+	public var e(get, null):Sound; // end
 	public function dm(seed:Int = -1,
 	bassPattern:Int = -1, snarePattern:Int = -1, hihatPattern:Int = -1,
-	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):S {
+	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):Sound {
 		return setDrumMachine(seed, bassPattern, snarePattern, hihatPattern,
 			bassVoice, snareVoice, hihatVoice);
 	}
-	public var p(get, null):S; // play
+	public function play():Sound { return get_p(); }
+	public var p(get, null):Sound; // play
 
 	static inline var BASE_VOLUME:Int = 4;
-	static public var ss:Array<S>;
+	static public var ss:Array<Sound>;
 	static var baseRandomSeed = 0;
 	static var tones:Array<Array<String>>;
 	#if flash
@@ -50,8 +58,8 @@ class S { // Sound
 	static var isStarting = false;
 	static var defaultQuant = 0;
 	public static function initialize(main:Dynamic):Void {
-		baseRandomSeed = U.ch(main);
-		ss = new Array<S>();
+		baseRandomSeed = Util.ch(main);
+		ss = new Array<Sound>();
 		tones = [
 		["c", "c+", "d", "d+", "e", "f", "f+", "g", "g+", "a", "a+", "b"],
 		["c", "d", "e", "g", "a"],
@@ -84,15 +92,15 @@ class S { // Sound
 	public function new() {
 		quant = defaultQuant;
 	}
-	static function get_i():S {
-		return new S();
+	static function get_i():Sound {
+		return new Sound();
 	}
-	static function fadeIn(second:Float):Void {
+	static public function fadeIn(second:Float = 1):Void {
 		#if flash
 		driver.fadeIn(second);
 		#end
 	}
-	static function fadeOut(second:Float):Void {
+	static public function fadeOut(second:Float = 1):Void {
 		#if flash
 		driver.fadeOut(second);
 		#end
@@ -106,78 +114,78 @@ class S { // Sound
 		#end
 		return true;
 	}
-	static function setDefaultQuant(v:Int):Void {
+	static public function setDefaultQuant(v:Int = 0):Void {
 		defaultQuant = v;
 	}
-	function get_mj():S {
+	function get_mj():Sound {
 		begin(Major);
 		return this;
 	}
-	function get_mn():S {
+	function get_mn():Sound {
 		begin(Minor);
 		return this;
 	}
-	function get_n():S {
+	function get_n():Sound {
 		begin(Noise);
 		return this;
 	}
-	function get_ns():S {
+	function get_ns():Sound {
 		begin(NoiseScale);
 		return this;
 	}
-	function addTone(from:Float, time:Int = 1, to:Float = 0):S {
+	public function addTone(from:Float, time:Int = 1, to:Float = 0):Sound {
 		for (i in 0...repeat) addToneOnce(from, time, to);
 		return this;
 	}
-	function setWave(width:Float, interval:Float):S {
+	public function setWave(width:Float = 0, interval:Float = 1):Sound {
 		waveWidth = width;
 		waveInterval = (interval == 0 ? 0 : Math.PI / 2 / interval);
 		return this;
 	}
-	function setMelody(maxLength:Int, step:Int, seed:Int):S {
+	public function setMelody(maxLength:Int = 3, step:Int = 1, seed:Int = -1):Sound {
 		if (seed < 0) seed = baseRandomSeed++;
 		melodyRandomSeed = seed;
-		melodyMaxLength = maxLength.ci(1, 3);
+		melodyMaxLength = maxLength.clampInt(1, 3);
 		melodyStep = step;
 		return this;
 	}
-	function setMinMax(min:Float, max:Float):S {
+	public function setMinMax(min:Float = -1, max:Float = 1):Sound {
 		this.min = min;
 		this.max = max;
 		return this;
 	}
-	function addRest(v:Int):S {
+	public function addRest(v:Int = 0):Sound {
 		mml += "r";
 		if (v > 0) mml += v;
 		return this;
 	}
-	function setRepeat(v:Int):S {
+	public function setRepeat(v:Int = 1):Sound {
 		repeat = v;
 		return this;
 	}
-	function setRepeatRest(v:Int):S {
+	public function setRepeatRest(v:Int = 0):Sound {
 		repeatRest = v;
 		return this;
 	}
-	function setLength(v:Int):S {
+	public function setLength(v:Int = 64):Sound {
 		length = v;
 		mml += "l" + v;
 		return this;
 	}
-	function setVolume(v:Float):S {
+	public function setVolume(v:Float = 1):Sound {
 		volume = Std.int(v * BASE_VOLUME);
 		mml += "v" + volume;
 		return this;
 	}
-	function setQuant(v:Int):S {
+	public function setQuant(v:Int = 0):Sound {
 		quant = v;
 		return this;
 	}
-	function get_lp():S {
+	function get_lp():Sound {
 		mml += "$";
 		return this;
 	}
-	function get_e():S {
+	function get_e():Sound {
 		isStarting = false;
 		#if flash
 		data = driver.compile(mml);
@@ -187,17 +195,17 @@ class S { // Sound
 		ss.push(this);
 		return this;
 	}
-	function setDrumMachine(seed:Int,
-	bassPattern:Int, snarePattern:Int, hihatPattern:Int,
-	bassVoice:Int, snareVoice:Int, hihatVoice:Int):S {
+	public function setDrumMachine(seed:Int = -1,
+	bassPattern:Int = -1, snarePattern:Int = -1, hihatPattern:Int = -1,
+	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):Sound {
 		if (seed < 0) seed = baseRandomSeed++;
-		var r = R.i.s(seed);
-		if (bassPattern < 0) bassPattern = r.fi(1, 31);
-		if (snarePattern < 0) snarePattern = r.fi(1, 18);
-		if (hihatPattern < 0) hihatPattern = r.fi(1, 17);
-		if (bassVoice < 0) bassVoice = r.fi(1, 6);
-		if (snareVoice < 0) snareVoice = r.fi(1, 6);
-		if (hihatVoice < 0) hihatVoice = r.fi(1, 4);
+		var r = new Random().setSeed(seed);
+		if (bassPattern < 0) bassPattern = r.nextFromToInt(1, 31);
+		if (snarePattern < 0) snarePattern = r.nextFromToInt(1, 18);
+		if (hihatPattern < 0) hihatPattern = r.nextFromToInt(1, 17);
+		if (bassVoice < 0) bassVoice = r.nextFromToInt(1, 6);
+		if (snareVoice < 0) snareVoice = r.nextFromToInt(1, 6);
+		if (hihatVoice < 0) hihatVoice = r.nextFromToInt(1, 4);
 		isStarting = false;
 		#if flash
 		drumMachine = new DrumMachine(bassPattern, snarePattern, hihatPattern,
@@ -211,8 +219,8 @@ class S { // Sound
 		ss.push(this);
 		return this;
 	}
-	function get_p():S {
-		if (!G.ig || lastPlayTicks > 0) return this;
+	function get_p():Sound {
+		if (!Game.ig || lastPlayTicks > 0) return this;
 		isPlaying = true;
 		return this;
 	}
@@ -230,20 +238,20 @@ class S { // Sound
 		}
 		mml += "%1@" + voice + "l" + length + "v" + volume;
 	}
-	function addToneOnce(from:Float, time:Int = 1, to:Float = 0):S {
+	function addToneOnce(from:Float, time:Int = 1, to:Float = 0):Sound {
 		var tiMax = ((type == Noise || type == NoiseScale) ? 14 : 39);
-		var random:R = null;
-		if (melodyRandomSeed != 0) random = new R().s(melodyRandomSeed);
+		var random:Random = null;
+		if (melodyRandomSeed != 0) random = new Random().setSeed(melodyRandomSeed);
 		var tone = from * tiMax;
 		if (to == 0) to = from;
-		var tMin = (tone + min * tiMax).c(0, tiMax);
-		var tMax = (tone + max * tiMax).c(0, tiMax);
+		var tMin = (tone + min * tiMax).clamp(0, tiMax);
+		var tMax = (tone + max * tiMax).clamp(0, tiMax);
 		var step = (time > 1 ? (to - from) * tiMax / (time - 1) : 0.0);
 		var wa = 0.0;
 		var t = time;
 		while (t > 0) {
-			tone = tone.c(tMin, tMax);
-			var tv = (tone + wa.sin() * (waveWidth / 2) * tiMax).c(tMin, tMax);
+			tone = tone.clamp(tMin, tMax);
+			var tv = (tone + wa.sin() * (waveWidth / 2) * tiMax).clamp(tMin, tMax);
 			wa += waveInterval;
 			if (random == null) {
 				mml += getToneMml(Std.int(tv));
@@ -253,9 +261,9 @@ class S { // Sound
 					mml += "r";
 				} else {
 					mml += getToneMml(Std.int(tv));
-					tone += random.fi(-2, 2) * melodyStep;
+					tone += random.nextPlusMinusInt(2) * melodyStep;
 				}
-				var l = random.fi(1, melodyMaxLength.ci(1, t));
+				var l = random.fi(1, melodyMaxLength.clampInt(1, t));
 				if (l >= 2) mml += length / 2;
 				if (l == 3) mml += ".";
 				t -= l;

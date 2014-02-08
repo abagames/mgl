@@ -1,18 +1,18 @@
 import mgl.*;
-using mgl.F;
-using mgl.U;
-class Main extends G {
+using mgl.Fiber;
+using mgl.Util;
+class Main extends Game {
+	static public function main() {
+		new Main();
+	}
 	function new() {
 		super(this);
 	}
-	override function i() {
-		tt("MGL TEMPLATE").ie;
+	override function initialize() {
+		setTitle("MGL TEMPLATE");
 	}
-	override function b() {
+	override function begin() {
 	}
-	override function u() {
-	}
-	public static function main() {
-		new Main();
+	override function update() {
 	}
 }

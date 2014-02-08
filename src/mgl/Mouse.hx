@@ -3,20 +3,23 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.TouchEvent;
-import mgl.K.ButtonState;
-class M { // Mouse
-	static public var p:V; // position
+import mgl.Key.ButtonState;
+class Mouse {
+	static public var position(get, null):Vector;
+	static public var p:Vector; // position
+	static public var isButtonPressing(get, null):Bool;
 	static public var ib(get, null):Bool; // isButtonPressing
+	static public var isPressedButton(get, null):Bool;
 	static public var ipb(get, null):Bool; // isPressedButton
 
-	static var pixelSize:V;
+	static var pixelSize:Vector;
 	static var baseSprite:Sprite;
 	static var isPressing = false;
 	static var buttonState:ButtonState;
 	static public function initialize(s:Sprite) {
 		baseSprite = s;
-		pixelSize = G.pixelSize;
-		p = new V();
+		pixelSize = Game.pixelSize;
+		p = new Vector();
 		buttonState = new ButtonState(get_ib);
 		baseSprite.addEventListener(MouseEvent.MOUSE_MOVE, onMoved);
 		baseSprite.addEventListener(MouseEvent.MOUSE_DOWN, onPressed);
@@ -27,8 +30,17 @@ class M { // Mouse
 		baseSprite.addEventListener(TouchEvent.TOUCH_END, onReleased);
 		baseSprite.addEventListener(TouchEvent.TOUCH_OUT, onReleased);
 	}
+	static public function get_position():Vector {
+		return p;
+	}
+	static public function get_isButtonPressing():Bool {
+		return isPressing;
+	}
 	static public function get_ib():Bool {
 		return isPressing;
+	}
+	static public function get_isPressedButton():Bool {
+		return buttonState.isPressed;
 	}
 	static public function get_ipb():Bool {
 		return buttonState.isPressed;

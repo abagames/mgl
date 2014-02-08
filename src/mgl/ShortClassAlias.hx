@@ -1,0 +1,14 @@
+package mgl;
+typedef A = Actor;
+typedef C = Color;
+typedef D = DotPixelArt;
+typedef F = Fiber;
+typedef G = Game;
+typedef K = Key;
+typedef M = Mouse;
+typedef P = Particle;
+typedef R = Random;
+typedef S = Sound;
+typedef T = Text;
+typedef U = Util;
+typedef V = Vector;

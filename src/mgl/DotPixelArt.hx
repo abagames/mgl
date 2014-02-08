@@ -1,164 +1,170 @@
 package mgl;
-import mgl.G.Screen;
-import mgl.T.Letter;
+import mgl.Game.Screen;
+import mgl.Text.Letter;
 using Math;
-using mgl.U;
-class D { // DotPixelArt
-	static public var i(get, null):D; // instance
-	public function c(color:C):D { return setColor(color); }
-	public function cs(color:C):D { return setColorSpot(color); }
-	public function cb(color:C = null):D { return setColorBottom(color); }
-	public function cbs(color:C = null):D { return setColorBottomSpot(color); }
-	public function si(x:Float = 0, y:Float = 0, xy:Float = 0):D {
+using mgl.Util;
+class DotPixelArt {
+	static public var i(get, null):DotPixelArt; // instance
+	public function c(color:Color):DotPixelArt { return setColor(color); }
+	public function cs(color:Color):DotPixelArt { return setColorSpot(color); }
+	public function cb(color:Color = null):DotPixelArt { return setColorBottom(color); }
+	public function cbs(color:Color = null):DotPixelArt { return setColorBottomSpot(color); }
+	public function si(x:Float = 0, y:Float = 0, xy:Float = 0):DotPixelArt {
 		return setSpotInterval(x, y, xy);
 	}
-	public function st(threshold:Float):D { return setSpotThreshold(threshold); }
-	public function ds(dotScale:Float = -1):D { return setDotScale(dotScale); }
-	public function o(x:Float = 0, y:Float = 0):D { return setOffset(x, y); }
-	public function fr(width:Float, height:Float = -1, edgeWidth:Int = 0):D {
+	public function st(threshold:Float):DotPixelArt { return setSpotThreshold(threshold); }
+	public function ds(dotScale:Float = -1):DotPixelArt { return setDotScale(dotScale); }
+	public function o(x:Float = 0, y:Float = 0):DotPixelArt { return setOffset(x, y); }
+	public function fr(width:Float, height:Float = -1, edgeWidth:Int = 0):DotPixelArt {
 		return fillRect(width, height, edgeWidth);
 	}
-	public function lr(width:Float, height:Float = -1, edgeWidth:Int = 1):D {
+	public function lr(width:Float, height:Float = -1, edgeWidth:Int = 1):DotPixelArt {
 		return lineRect(width, height, edgeWidth);
 	}
-	public function gr(width:Float, height:Float = -1, seed:Int = -1):D {
+	public function gr(width:Float, height:Float = -1, seed:Int = -1):DotPixelArt {
 		return generateRect(width, height, seed);
 	}
-	public function fc(diameter:Float, edgeWidth:Int = 0):D {
+	public function fc(diameter:Float, edgeWidth:Int = 0):DotPixelArt {
 		return fillCircle(diameter, edgeWidth);
 	}
-	public function lc(diameter:Float, edgeWidth:Int = 1):D {
+	public function lc(diameter:Float, edgeWidth:Int = 1):DotPixelArt {
 		return lineCircle(diameter, edgeWidth);
 	}
-	public function gc(diameter:Float, seed:Int = -1):D {
+	public function gc(diameter:Float, seed:Int = -1):DotPixelArt {
 		return generateCircle(diameter, seed);
 	}
-	public function gs(width:Float, height:Float = -1, seed:Int = -1):D {
+	public function gs(width:Float, height:Float = -1, seed:Int = -1):DotPixelArt {
 		return generateShape(width, height, seed);
 	}
-	public function tx(text:String):D {
+	public function tx(text:String):DotPixelArt {
 		return drawText(text);
 	}
-	public function p(pos:V):D { return setPos(pos); }
-	public function xy(x:Float, y:Float):D { return setXy(x, y); }
-	public function z(z:Float = 0):D { return setZ(z); }
-	public function rt(angle:Float = 0):D { return rotate(angle); }
-	public function sc(x:Float = 1, y:Float = -1):D { return setScale(x, y); }
-	public var ed(get, null):D; // enable dot scale
-	public var dd(get, null):D; // disable dot scale
-	public var er(get, null):D; // enable rolling shape
-	public function dc(color:C = null):D { return setDrawColor(color); }
-	public var d(get, null):D; // draw
+	public function p(pos:Vector):DotPixelArt { return setPosition(pos); }
+	public function xy(x:Float, y:Float):DotPixelArt { return setXy(x, y); }
+	public function z(z:Float = 0):DotPixelArt { return setZ(z); }
+	public function rt(angle:Float = 0):DotPixelArt { return rotate(angle); }
+	public function sc(x:Float = 1, y:Float = -1):DotPixelArt { return setScale(x, y); }
+	public function enableDotScale():DotPixelArt { return get_ed(); }
+	public var ed(get, null):DotPixelArt; // enable dot scale
+	public function disableDotScale():DotPixelArt { return get_dd(); }
+	public var dd(get, null):DotPixelArt; // disable dot scale
+	public function enableRollingShape():DotPixelArt { return get_er(); }
+	public var er(get, null):DotPixelArt; // enable rolling shape
+	public function dc(color:Color = null):DotPixelArt { return setDrawColor(color); }
+	public function draw():DotPixelArt { return get_d(); }
+	public var d(get, null):DotPixelArt; // draw
 
 	static var baseRandomSeed = 0;
-	static var pixelSize:V;
+	static var pixelSize:Vector;
 	static var pixelWHRatio:Float;
 	static var baseDotSize = 1;
-	static var rPos:V;
-	static var aVec:V;
+	static var rPos:Vector;
+	static var aVec:Vector;
 	public static function initialize(main:Dynamic) {
-		baseRandomSeed = U.ch(main);
-		pixelSize = G.pixelSize;
-		pixelWHRatio = G.pixelWHRatio;
-		baseDotSize = G.baseDotSize;
-		rPos = new V();
-		aVec = new V();
+		baseRandomSeed = Util.getClassHash(main);
+		pixelSize = Game.pixelSize;
+		pixelWHRatio = Game.pixelWHRatio;
+		baseDotSize = Game.baseDotSize;
+		rPos = new Vector();
+		aVec = new Vector();
 	}
 	var dots:Array<OffsetColor>;
 	var dotSize = 1;
-	var color:C;
-	var colorSpot:C;
-	var colorBottom:C;
-	var colorBottomSpot:C;
+	var color:Color;
+	var colorSpot:Color;
+	var colorBottom:Color;
+	var colorBottomSpot:Color;
 	var spotThreshold = 0.3;
 	var xSpotInterval = 0.0;
 	var ySpotInterval = 0.0;
 	var xySpotInterval = 0.0;
-	var offset:V;
-	var pos:V;
+	var offset:Vector;
+	var pos:Vector;
 	var pz = 0.0;
 	var angle = 0.0;
 	var scaleX = 1.0;
 	var scaleY = 1.0;
 	var isDotScale = true;
 	var isRollingShape = false;
-	var drawColor:C;
+	var drawColor:Color;
 	public function new() {
 		dots = new Array<OffsetColor>();
 		dotSize = baseDotSize;
-		color = C.wi;
-		colorSpot = C.di;
-		offset = new V();
-		pos = new V();
+		color = Color.white;
+		colorSpot = Color.black;
+		offset = new Vector();
+		pos = new Vector();
 	}
-	static function get_i():D  {
-		return new D();
+	static function get_i():DotPixelArt  {
+		return new DotPixelArt();
 	}
-	function setColor(color:C):D {
+	public function setColor(color:Color):DotPixelArt {
 		this.color = color;
 		return this;
 	}
-	function setColorSpot(color:C):D {
+	public function setColorSpot(color:Color):DotPixelArt {
 		colorSpot = color;
 		return this;
 	}
-	function setColorBottom(color:C):D {
+	public function setColorBottom(color:Color = null):DotPixelArt {
 		colorBottom = color;
 		return this;
 	}
-	function setColorBottomSpot(color:C):D {
+	public function setColorBottomSpot(color:Color = null):DotPixelArt {
 		colorBottomSpot = color;
 		return this;
 	}
-	function setSpotInterval(x:Float = 0, y:Float = 0, xy:Float = 0):D {
+	public function setSpotInterval(x:Float = 0, y:Float = 0, xy:Float = 0):DotPixelArt {
 		xSpotInterval = (x == 0 ? 0 : Math.PI / 2 / x);
 		ySpotInterval = (y == 0 ? 0 : Math.PI / 2 / y);
 		xySpotInterval = (xy == 0 ? 0 : Math.PI / 2 / xy);
 		return this;
 	}
-	function setSpotThreshold(threshold:Float):D {
+	public function setSpotThreshold(threshold:Float):DotPixelArt {
 		spotThreshold =  threshold;
 		return this;
 	}
-	function setDotScale(dotScale:Float):D {
+	public function setDotScale(dotScale:Float = -1):DotPixelArt {
 		if (dotScale < 0) dotSize = baseDotSize;
 		else dotSize = Std.int(dotScale * baseDotSize);
 		return this;
 	}
-	function setOffset(x:Float, y:Float):D {
+	public function setOffset(x:Float = 0, y:Float = 0):DotPixelArt {
 		offset.x = Std.int(x * pixelSize.x / dotSize);
 		offset.y = Std.int(y * pixelSize.y / dotSize);
 		return this;
 	}
-	function fillRect(width:Float, height:Float, edgeWidth:Int):D {
+	public function fillRect(width:Float, height:Float = -1, edgeWidth:Int = 0):DotPixelArt {
 		if (height < 0) height = width;
 		return setRect(width, height, edgeWidth, false);
 	}
-	function lineRect(width:Float, height:Float, edgeWidth:Int):D {
+	public function lineRect(width:Float, height:Float = -1, edgeWidth:Int = 1):DotPixelArt {
 		if (height < 0) height = width;
 		return setRect(width, height, edgeWidth, true);
 	}
-	function generateRect(width:Float, height:Float, seed:Int):D {
+	public function generateRect(width:Float, height:Float = -1, seed:Int = -1):DotPixelArt {
 		if (height < 0) height = width;
-		var oc = C.di.v(color);
+		var oc = new Color().setValue(color);
 		setGeneratedColors(color, seed);
-		fr(width, height, 1).c(oc).cb(oc.gd).si().lr(width, height);
+		fillRect(width, height, 1);
+		setColor(oc).setColorBottom(oc.goDark()).setSpotInterval().lineRect(width, height);
 		return this;
 	}
-	function fillCircle(diameter:Float, edgeWidth:Int):D {
+	public function fillCircle(diameter:Float, edgeWidth:Int = 0):DotPixelArt {
 		return setCircle(diameter, edgeWidth, false);
 	}
-	function lineCircle(diameter:Float, edgeWidth:Int):D {
+	public function lineCircle(diameter:Float, edgeWidth:Int = 1):DotPixelArt {
 		return setCircle(diameter, edgeWidth, true);
 	}
-	function generateCircle(diameter:Float, seed:Int):D {
-		var oc = C.di.v(color);
+	public function generateCircle(diameter:Float, seed:Int = -1):DotPixelArt {
+		var oc = new Color().setValue(color);
 		setGeneratedColors(color, seed);
-		fc(diameter).c(oc).cb(oc.gd).si().lc(diameter);
+		fillCircle(diameter);
+		setColor(oc).setColorBottom(oc.goDark()).setSpotInterval().lineCircle(diameter);
 		return this;
 	}
-	function generateShape(width:Float, height:Float, seed:Int,
-		fillRatio:Float = 0.4, sideRatio:Float = 0.2, crossRatio:Float = 0.2):D {
+	public function generateShape(width:Float, height:Float = -1, seed:Int = -1,
+	fillRatio:Float = 0.4, sideRatio:Float = 0.2, crossRatio:Float = 0.2):DotPixelArt {
 		if (height < 0) height = width;
 		if (seed < 0) seed = baseRandomSeed++;
 		var w = Std.int(width * pixelSize.x / dotSize / 2);
@@ -172,13 +178,13 @@ class D { // DotPixelArt
 			for (y in 0...h) lp.push(0);
 			pixels.push(lp);
 		}
-		var nextPixels = new Array<V>();
-		var oc = C.di.v(color);
+		var nextPixels = new Array<Vector>();
+		var oc = new Color().setValue(color);
 		setGeneratedColors(color, seed);
-		var r = R.i.s(seed);
+		var r = new Random().setSeed(seed);
 		for (i in 0...Std.int(w * h * fillRatio)) {
 			for (j in 0...100) {
-				if (nextPixels.length <= 0) nextPixels.push(V.i.xy(r.fi(1, w - 2), r.fi(1, h - 2)));
+				if (nextPixels.length <= 0) nextPixels.push(Vector.i.xy(r.fi(1, w - 2), r.fi(1, h - 2)));
 				var np = nextPixels[r.ni(nextPixels.length - 1)];
 				var nx = np.xi, ny = np.yi;
 				nextPixels.remove(np);
@@ -200,7 +206,7 @@ class D { // DotPixelArt
 						for (iy in (ny - 1).ci(1, h - 2)...(ny + 2).ci(2, h - 1)) {
 							if (pixels[ix][iy] == 0) {
 								for (np in nextPixels) if (np.xi == ix && np.yi == iy) continue;
-								nextPixels.push(V.i.xy(ix, iy));
+								nextPixels.push(new Vector().setXy(ix, iy));
 							}
 						}
 					}
@@ -208,7 +214,7 @@ class D { // DotPixelArt
 				}
 			}
 		}
-		c(oc).cb(oc.gd).si();
+		setColor(oc).setColorBottom(oc.goDark()).setSpotInterval();
 		for (x in 1...w - 1) {
 			for (y in 1...h - 1) {
 				if (pixels[x][y] != 1) continue;
@@ -226,7 +232,7 @@ class D { // DotPixelArt
 		}
 		return this;
 	}
-	function drawText(text:String):D {
+	public function drawText(text:String):DotPixelArt {
 		var l = new Letter();
 		l.setDotSize();
 		l.setText(text);
@@ -235,50 +241,50 @@ class D { // DotPixelArt
 		l.draw(pixelFillRect);
 		return this;
 	}
-	function setPos(pos:V):D {
+	public function setPosition(pos:Vector):DotPixelArt {
 		this.pos.v(pos);
 		return this;
 	}
-	function setXy(x:Float, y:Float):D {
+	public function setXy(x:Float, y:Float):DotPixelArt {
 		this.pos.xy(x, y);
 		return this;
 	}
-	function setZ(z:Float):D {
+	public function setZ(z:Float = 0):DotPixelArt {
 		pz = z;
 		return this;
 	}
-	function rotate(angle:Float):D {
+	public function rotate(angle:Float = 0):DotPixelArt {
 		if (pixelWHRatio == 1.0) {
 			this.angle = angle;
 		} else {
 			var a = angle * Math.PI / 180;
-			aVec.xy(a.sin() * pixelWHRatio, -a.cos());
-			this.angle = aVec.w;
+			aVec.setXy(a.sin() * pixelWHRatio, -a.cos());
+			this.angle = aVec.way;
 		}
 		return this;
 	}
-	function setScale(x:Float, y:Float):D {
+	public function setScale(x:Float = 1, y:Float = 1):DotPixelArt {
 		scaleX = x;
 		scaleY = (y >= 0 ? y : x);
 		return this;
 	}
-	function get_ed():D {
+	function get_ed():DotPixelArt {
 		isDotScale = true;
 		return this;
 	}
-	function get_dd():D {
+	function get_dd():DotPixelArt {
 		isDotScale = false;
 		return this;
 	}
-	function get_er():D {
+	function get_er():DotPixelArt {
 		isRollingShape = true;
 		return this;
 	}
-	function setDrawColor(color:C):D {
+	public function setDrawColor(color:Color = null):DotPixelArt {
 		drawColor = color;
 		return this;
 	}
-	function get_d():D {
+	function get_d():DotPixelArt {
 		var zs = 1.0 / (pz + 1);
 		var dox:Float;
 		var doy:Float;
@@ -319,7 +325,7 @@ class D { // DotPixelArt
 		for (d in dots) {
 			rPos.x = d.offset.x * dox;
 			rPos.y = d.offset.y * doy;
-			if (angle != 0) rPos.rt(angle);
+			if (angle != 0) rPos.rotate(angle);
 			var px = Std.int(x + rPos.x) - rox;
 			var py = Std.int(y + rPos.y) - roy;
 			if (drawColor != null) Screen.pixelFillRect(px, py, pw, ph, drawColor);
@@ -328,7 +334,7 @@ class D { // DotPixelArt
 		return this;
 	}
 
-	function setRect(width:Float, height:Float, edgeWidth:Int, isDrawingEdge:Bool = false):D {
+	function setRect(width:Float, height:Float, edgeWidth:Int, isDrawingEdge:Bool = false):DotPixelArt {
 		var w = Std.int(pixelSize.x * width / dotSize);
 		var h = Std.int(pixelSize.y * height / dotSize);
 		var ox = -Std.int(w / 2), oy = -Std.int(h / 2);
@@ -344,7 +350,7 @@ class D { // DotPixelArt
 		}
 		return this;
 	}
-	function setCircle(diameter:Float, edgeWidth:Int, isDrawingEdge:Bool):D {
+	function setCircle(diameter:Float, edgeWidth:Int, isDrawingEdge:Bool):DotPixelArt {
 		var ps = pixelWHRatio < 1 ? pixelSize.x : pixelSize.y;
 		var r = Std.int(ps * diameter / 2 / dotSize);
 		if (isDrawingEdge) {
@@ -389,13 +395,13 @@ class D { // DotPixelArt
 		setDot(-x, -y, ry);
 		setDot(x, -y, ry);
 	}
-	public function pixelFillRect(x:Int, y:Int, width:Int, height:Int, c:C):Void {
+	public function pixelFillRect(x:Int, y:Int, width:Int, height:Int, c:Color):Void {
 		setDot(x, y, 0);
 	}
 	function setDot(x:Int, y:Int, ry:Float):OffsetColor {
 		var ca = (x * xSpotInterval).cos() * (y * ySpotInterval).cos() *
 			((x + y) * xySpotInterval).cos();
-		var c:C;
+		var c:Color;
 		if (ca.abs() < spotThreshold) {
 			if (colorBottomSpot != null) c = colorSpot.bl(colorBottomSpot, ry);
 			else c = colorSpot;
@@ -411,26 +417,27 @@ class D { // DotPixelArt
 		dots.push(d);
 		return d;
 	}
-	function setGeneratedColors(color:C, seed:Int):Void {
+	function setGeneratedColors(color:Color, seed:Int):Void {
 		if (seed < 0) seed = baseRandomSeed++;
-		var r = R.i.s(seed);
-		var cbl = C.di.v(color);
+		var r = new Random().setSeed(seed);
+		var cbl = new Color().setValue(color);
 		blinkColor(cbl, r);
-		c(cbl).cb(cbl.gd);
+		setColor(cbl).setColorBottom(cbl.goDark());
 		blinkColor(cbl, r);
-		cs(cbl).cbs(cbl.gd).si(r.ni(3), r.ni(3), r.ni(3));
+		setColorSpot(cbl).setColorBottomSpot(cbl.goDark());
+		setSpotInterval(r.nextInt(3), r.nextInt(3), r.nextInt(3));
 	}
-	function blinkColor(c:C, r:R):Void {
-		c.r += r.pi(64);
-		c.g += r.pi(64);
-		c.b += r.pi(64);
+	function blinkColor(c:Color, r:Random):Void {
+		c.r += r.nextPlusMinusInt(64);
+		c.g += r.nextPlusMinusInt(64);
+		c.b += r.nextPlusMinusInt(64);
 		c.normalize();
 	}
 }
 class OffsetColor {
-	public var offset:V;
-	public var color:C;
+	public var offset:Vector;
+	public var color:Color;
 	public function new() {
-		offset = new V();
+		offset = new Vector();
 	}
 }

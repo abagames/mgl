@@ -2,7 +2,7 @@ package mgl;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import mgl.K.ButtonState;
+import mgl.Key.ButtonState;
 #if flash
 import flash.events.GameInputEvent;
 import flash.ui.GameInput;
@@ -10,24 +10,41 @@ import flash.ui.GameInputControl;
 import flash.ui.GameInputDevice;
 #end
 using Math;
-class K { // Key
-	static public var s:Array<Bool>;
+class Key {
+	static public var pressingKeys(get, null):Array<Bool>;
+	static public var s:Array<Bool>; // pressing keys
+	static public var isUpPressing(get, null):Bool;
 	static public var iu(get, null):Bool; // isUpPressing
+	static public var isDownPressing(get, null):Bool;
 	static public var id(get, null):Bool; // isDownPressing
+	static public var isRightPressing(get, null):Bool;
 	static public var ir(get, null):Bool; // isRightPressing
+	static public var isLeftPressing(get, null):Bool;
 	static public var il(get, null):Bool; // isLeftPressing
+	static public var isButtonPressing(get, null):Bool;
 	static public var ib(get, null):Bool; // isButtonPressing
+	static public var isButton1Pressing(get, null):Bool;
 	static public var ib1(get, null):Bool; // isButton1Pressing
+	static public var isButton2Pressing(get, null):Bool;
 	static public var ib2(get, null):Bool; // isButton2Pressing
+	static public var isPressedUp(get, null):Bool;
 	static public var ipu(get, null):Bool; // isPressedUp
+	static public var isPressedDown(get, null):Bool;
 	static public var ipd(get, null):Bool; // isPressedDown
+	static public var isPressedRight(get, null):Bool;
 	static public var ipr(get, null):Bool; // isPressedRight
+	static public var isPressedLeft(get, null):Bool;
 	static public var ipl(get, null):Bool; // isPressedLeft
+	static public var isPressedButton(get, null):Bool;
 	static public var ipb(get, null):Bool; // isPressedButton
+	static public var isPressedButton1(get, null):Bool;
 	static public var ipb1(get, null):Bool; // iPressedsButton1
+	static public var isPressedButton2(get, null):Bool;
 	static public var ipb2(get, null):Bool; // isPressedButton2
-	static public var st(get, null):V; // stick
+	static public var stick(get, null):Vector;
+	static public var st(get, null):Vector; // stick
 
+	static public function reset():Bool { return get_rs(); }
 	static public var rs(get, null):Bool; // reset
 
 	static var uState:ButtonState;
@@ -38,8 +55,8 @@ class K { // Key
 	static var button1State:ButtonState;
 	static var button2State:ButtonState;
 	static inline var GI_STICK_THRESHOLD = 0.5;
-	static var stick:V;
-	static var giStick:V;
+	static var kStick:Vector;
+	static var giStick:Vector;
 	static var giButton1 = false;
 	static var giButton2 = false;
 	#if flash
@@ -51,8 +68,8 @@ class K { // Key
 	static public function initialize() {
 		s = new Array<Bool>();
 		for (i in 0...256) s.push(false);
-		stick = new V();
-		giStick = new V();
+		kStick = new Vector();
+		giStick = new Vector();
 		uState = new ButtonState(get_iu);
 		dState = new ButtonState(get_id);
 		rState = new ButtonState(get_ir);
@@ -75,57 +92,105 @@ class K { // Key
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onPressed);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onReleased);	
 	}
+	static function get_pressingKeys():Array<Bool> {
+		return s;
+	}
+	static function get_isUpPressing():Bool {
+		return get_iu();
+	}
 	static function get_iu():Bool {
 		return s[0x26] || s[0x57] || giStick.y < 0;
+	}
+	static function get_isDownPressing():Bool {
+		return get_id();
 	}
 	static function get_id():Bool {
 		return s[0x28] || s[0x53] || giStick.y > 0;
 	}
+	static function get_isRightPressing():Bool {
+		return get_ir();
+	}
 	static function get_ir():Bool {
 		return s[0x27] || s[0x44] || giStick.x > 0;
+	}
+	static function get_isLeftPressing():Bool {
+		return get_il();
 	}
 	static function get_il():Bool {
 		return s[0x25] || s[0x41] || giStick.x < 0;
 	}
+	static function get_isButtonPressing():Bool {
+		return get_ib();
+	}
 	static function get_ib():Bool {
 		return get_ib1() || get_ib2();
+	}
+	static function get_isButton1Pressing():Bool {
+		return get_ib1();
 	}
 	static function get_ib1():Bool {
 		return s[0x5a] || s[0xbe] || s[0x20] || s[0x0d] || giButton1;
 	}
+	static function get_isButton2Pressing():Bool {
+		return get_ib2();
+	}
 	static function get_ib2():Bool {
 		return s[0x58] || s[0xbf] || giButton2;
 	}	
+	static function get_isPressedUp():Bool {
+		return uState.isPressed;
+	}
 	static function get_ipu():Bool {
 		return uState.isPressed;
+	}
+	static function get_isPressedDown():Bool {
+		return dState.isPressed;
 	}
 	static function get_ipd():Bool {
 		return dState.isPressed;
 	}
+	static function get_isPressedRight():Bool {
+		return rState.isPressed;
+	}
 	static function get_ipr():Bool {
 		return rState.isPressed;
+	}
+	static function get_isPressedLeft():Bool {
+		return lState.isPressed;
 	}
 	static function get_ipl():Bool {
 		return lState.isPressed;
 	}
+	static function get_isPressedButton():Bool {
+		return buttonState.isPressed;
+	}
 	static function get_ipb():Bool {
 		return buttonState.isPressed;
+	}
+	static function get_isPressedButton1():Bool {
+		return button1State.isPressed;
 	}
 	static function get_ipb1():Bool {
 		return button1State.isPressed;
 	}
+	static function get_isPressedButton2():Bool {
+		return button2State.isPressed;
+	}
 	static function get_ipb2():Bool {
 		return button2State.isPressed;
 	}
-	static function get_st():V {
-		stick.n(0);
-		stick.a(giStick);
-		if (get_iu()) stick.y -= 1;
-		if (get_id()) stick.y += 1;
-		if (get_ir()) stick.x += 1;
-		if (get_il()) stick.x -= 1;
-		if (stick.l > 0) stick.d(stick.l);
-		return stick;
+	static function get_stick():Vector {
+		return get_st();
+	}
+	static function get_st():Vector {
+		kStick.setNumber(0);
+		kStick.add(giStick);
+		if (get_iu()) kStick.y -= 1;
+		if (get_id()) kStick.y += 1;
+		if (get_ir()) kStick.x += 1;
+		if (get_il()) kStick.x -= 1;
+		if (kStick.l > 0) kStick.divide(kStick.length);
+		return kStick;
 	}
 	static function get_rs():Bool {
 		for (i in 0...256) s[i] = false;
@@ -134,7 +199,7 @@ class K { // Key
 	
 	static public function update():Void {
 		#if flash
-		giStick.n(0);
+		giStick.setNumber(0);
 		giButton1 = giButton2 = false;
 		if (device != null) {
 			try {
@@ -164,12 +229,12 @@ class K { // Key
 		button1State.update();
 		button2State.update();
 	}
-	static public function ls(d) {
+	static public function loadState(d) {
 		#if flash
 		isUdReverse = d.isUdReverse;
 		#end
 	}
-	static public function ss(d) {
+	static public function saveState(d) {
 		#if flash
 		d.isUdReverse = isUdReverse;
 		#end
@@ -179,7 +244,7 @@ class K { // Key
 		#if flash
 		if (e.keyCode == 82 && !s[82]) {
 			isUdReverse = !isUdReverse;
-			T.i.tx("REVERSE Y AXIS").xy(0.2, 0.95).t();
+			new Text().setText("REVERSE Y AXIS").setXy(0.2, 0.95).setTicks();
 			isRPressed = true;
 		}
 		#end
