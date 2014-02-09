@@ -102,8 +102,8 @@ class Actor {
 		for (a in actors) {
 			a.p.x += vx;
 			a.p.y += vy;
-			if (minX < maxX) a.p.x = a.p.x.loopRange(minX, maxX);
-			if (minY < maxY) a.p.y = a.p.y.loopRange(minY, maxY);
+			if (minX < maxX) a.p.x = Util.loopRange(a.p.x, minX, maxX);
+			if (minY < maxY) a.p.y = Util.loopRange(a.p.y, minY, maxY);
 		}
 	}
 	static public function scrollActors(classNames:Array<String>, vx:Float, vy:Float = 0,
