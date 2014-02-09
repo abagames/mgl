@@ -3,14 +3,20 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.display.MovieClip;
+import flash.display.Stage;
 import flash.events.Event;
 import flash.filters.BlurFilter;
 import flash.filters.ColorMatrixFilter;
+import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.net.SharedObject;
 import flash.utils.ByteArray;
 import flash.Lib;
+#if flash
+import flash.net.FileReference;
+import org.bytearray.gif.encoder.GIFEncoder;
+#end
 class Game {
 	static public var isInGame(get, null):Bool;
 	static public var ig(get, null):Bool; // is in game
@@ -39,6 +45,10 @@ class Game {
 	public function vr(version:Int = 1):Game { return setVersion(version); }
 	public function enableDebuggingMode():Game { return get_dm(); }
 	public var dm(get, null):Game; // enable debugging mode
+	public function cm
+	(scale:Float = 1, fromSec:Float = 5, toSec:Float = 8, intervalSec:Float = .1):Game {
+		return enableCaptureMode(scale, fromSec, toSec, intervalSec);
+	}
 	public function yr(ratio:Float):Game { return setYRatio(ratio); }
 	public function initializeEnd():Game { return get_ie(); }
 	public var ie(get, null):Game; // initialize end
@@ -73,10 +83,15 @@ class Game {
 	var titleTicks = 0;
 	var wasClicked = false;
 	var wasReleased = false;
-	var isDebugging = false;
+	var isDebuggingMode = false;
 	var isPaused = false;
 	var fpsCount = 0;
 	var lastTimer = 0;
+	var isCaptureMode = false;
+	var captureScale = 1.0;
+	var captureFrom = 0;
+	var captureTo = 0;
+	var captureInterval = 0;
 	function initializeFirst(mi:Dynamic):Void {
 		baseSprite = new Sprite();
 		mainInstance = mi;
@@ -121,7 +136,16 @@ class Game {
 		return this;
 	}
 	function get_dm():Game {
-		isDebugging = true;
+		isDebuggingMode = true;
+		return this;
+	}
+	public function enableCaptureMode
+	(scale:Float = 1, fromSec:Float = 5, toSec:Float = 8, intervalSec:Float = .1):Game {
+		isCaptureMode = true;
+		captureScale = scale;
+		captureFrom = Std.int(fromSec * 60);
+		captureTo = Std.int(toSec * 60);
+		captureInterval = Std.int(intervalSec * 60);
 		return this;
 	}
 	public function setYRatio(ratio:Float):Game {
@@ -134,7 +158,7 @@ class Game {
 		if (isGameLoopStarted) return this;
 		isGameLoopStarted = true;
 		Game.load();
-		if (isDebugging) {
+		if (isDebuggingMode) {
 			beginGame();
 		} else {
 			initializeGame();
@@ -233,6 +257,7 @@ class Game {
 		Sound.stop();
 		isInGameState = true;
 		initializeGame();
+		if (isCaptureMode) Screen.beginCapture(captureScale);
 	}
 	function initializeGame():Void {
 		Actor.clear();
@@ -260,17 +285,23 @@ class Game {
 			Fiber.updateAll();
 			mainInstance.update();
 			mainInstance.u();
-			if (isDebugging) {
+			if (isDebuggingMode) {
 				new Text().setText('FPS: ${Std.int(fps)}').setXy(0.01, 0.97);
 			}
 			for (s in Sound.ss) s.u();
 			currentTicks++;
+			if (!isInGameState) handleTitleScreen();
+			Screen.postUpdate();
+			if (isInGameState && isCaptureMode) {
+				if (currentTicks >= captureFrom && currentTicks <= captureTo) {
+					if (currentTicks % captureInterval == 0) Screen.capture();
+					if (currentTicks == captureTo) Screen.endCapture(captureInterval);
+				}
+			}
 		} else {
 			new Text().setText("PAUSED").setXy(0.5, 0.45).alignCenter().draw();
 			new Text().setText("CLICK/TOUCH TO RESUME").setXy(0.5, 0.55).alignCenter().draw();
 		}
-		if (!isInGameState) handleTitleScreen();
-		Screen.postUpdate();
 		calcFps();
 	}
 	function onActivated(e:Event):Void {
@@ -390,5 +421,38 @@ class Screen {
 		baseSprite.removeChild(blurBitmap);
 		baseSprite.addChild(new Bitmap(bd));
 		hasBlur = false;
+	}
+	static var capturedBds:Array<BitmapData>;
+	static var captureWidth = 0;
+	static var captureHeight = 0;
+	static var captureMatrix:Matrix;
+	static var isCapturing = false;
+	static public function beginCapture(scale:Float):Void {
+		capturedBds = new Array<BitmapData>();
+		captureWidth = Std.int(pixelSize.xi * scale);
+		captureHeight = Std.int(pixelSize.yi * scale);
+		captureMatrix = new Matrix();
+		captureMatrix.scale(scale, scale);
+		isCapturing = true;
+	}
+	static public function capture():Void {
+		if (!isCapturing) return;
+		var capturedBd = new BitmapData(captureWidth, captureHeight, false, 0);
+		capturedBd.draw(Lib.current.stage, captureMatrix);
+		capturedBds.push(capturedBd);
+	}
+	static public function endCapture(interval:Int):Void {
+		if (!isCapturing) return;
+		isCapturing = false;
+		#if flash
+		var encoder = new GIFEncoder();
+		encoder.setRepeat(0);
+		encoder.setDelay(Std.int(interval * 1000 / 60));
+		encoder.start();
+		for (cbd in capturedBds) encoder.addFrame(cbd);
+		encoder.finish();
+		var fileReference = new FileReference();
+		fileReference.save(encoder.stream, "capture.gif");
+		#end
 	}
 }

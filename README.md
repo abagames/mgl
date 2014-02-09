@@ -4,6 +4,8 @@ Mgl is a mini game programming library written in Haxe + OpenFL. Mgl is useful f
 
 Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
+Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif encoder.
+
 ####Sample game
 
 [LEFT RIGHT HAND RULE](http://abagames.sakura.ne.jp/flash/lrh/)
@@ -161,7 +163,7 @@ class Player extends Actor {
 		way = v.way;
 		// Add the reddish green particle from the position.
 		new Particle().setPosition(position).setColor(Color.green.goRed())
-			.setWay(way + 180, 45).setSpeed(v.l).add();
+			.setWay(way + 180, 45).setSpeed(velocity.length).add();
 		// Check the hit to the Ball actors.
 		isHit("Ball", function(ball) {
 			// If the player hit the ball, erase the ball.
@@ -220,6 +222,7 @@ A basic game loop handler. You have to override the initialize(), begin() and up
 * setTitle(title:String, title2:String = ""):Game (tt)
 * setVersion(version:Int = 1):Game (vr)
 * enableDebuggingMode():Game (dm)
+* enableCaptureMode(scale:Float = 1, fromSec:Float = 5, toSec:Float = 8, intervalSec:Float = .1):Game (cm)
 * setYRatio(ratio:Float):Game (yr)
 * initializeEnd():Game (ie)
 
