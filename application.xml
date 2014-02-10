@@ -24,5 +24,6 @@
 	<!-- optimize output
 	<haxeflag name="-dce full" /> -->
 	<haxeflag name="-swf-lib lib/sion/library.swf" if="flash" />
+	<haxeflag name="-swf-lib lib/GIFPlayer/library.swf" if="flash" />
 	
 </project>
