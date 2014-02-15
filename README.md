@@ -8,6 +8,8 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 ####Sample game
 
+[TYPHOON AVENUE](http://abagames.sakura.ne.jp/flash/ta/)
+
 [LEFT RIGHT HAND RULE](http://abagames.sakura.ne.jp/flash/lrh/)
 
 [REFLECTOR SATELLITES](http://abagames.sakura.ne.jp/flash/rs/)
@@ -82,12 +84,12 @@ class Main extends Game {
 	// First initializer.
 	override function initialize() {
 		Ball.main = this;
+		// Apply quarter-note quantization.
+		Sound.setDefaultQuant(4);
 		// Generate sounds.
 		bgmDrumSound = new Sound().setDrumMachine();
 		endGameSound = new Sound().major().setMelody()
 			.addTone(.3, 10, .7).addTone(.6, 10, .4).end();
-		// Apply quarter-note quantization.
-		Sound.setDefaultQuant(4);
 		// Set the title.
 		setTitle("BALL 28 IN SPACE");
 	}
@@ -188,7 +190,7 @@ class Ball extends Actor {
 			// Set the random position from .1 to .9.
 			position.setXy(.1.randomFromTo(.9), .1.randomFromTo(.9));
 			// If the distance to the player is far enough then break.
-			if (position.distanceTo(player.p) > .3) break;
+			if (position.distanceTo(player.position) > .3) break;
 		}
 	}
 	public function erase() {
@@ -230,6 +232,7 @@ A basic game loop handler. You have to override the initialize(), begin() and up
 * initialize():Void (i)
 * begin():Void (b)
 * update():Void (u)
+* updateBackground():Void (ub)
 * initializeState():Void (is)
 * loadState(d:Dynamic):Void (ls)
 * saveState(d:Dynamic):Void (ss)
@@ -264,6 +267,7 @@ An actor moves on a screen. An actor has a position, a velocity and a dot pixel 
 * setDisplayPriority(priority:Int):Actor (dp)
 * drawToForeground():Actor (df)
 * drawToBackground():Actor (bf)
+* sortByZ():Actor (sz)
 
 ##### Overriden methods
 * initialize():Void (i)
