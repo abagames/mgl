@@ -42,6 +42,8 @@ class Actor {
 	public var db(get, null):Actor; // draw to background
 	public function drawToForeground():Actor { return get_df(); }
 	public var df(get, null):Actor; // draw to foreground
+	public function sortByZ():Actor { return get_sz(); }
+	public var sz(get, null):Actor; // sort by Z
 
 	public function initialize():Void { }
 	public function i():Void { }
@@ -66,6 +68,7 @@ class Actor {
 			if (g.isDrawingToBack) Game.drawToBackground();
 			else Game.drawToForeground();
 			var actors = g.s;
+			if (g.isSortingByZ) actors.sort(compareByZ);
 			var i = 0;
 			while (i < actors.length) {
 				if (actors[i].isRemoving) {
@@ -75,7 +78,7 @@ class Actor {
 					i++;
 				}
 			}
-			Game.df;
+			Game.drawToForeground();
 		}
 	}
 	static public function getActors(className:String):Array<Dynamic> {
@@ -109,6 +112,11 @@ class Actor {
 	static public function scrollActors(classNames:Array<String>, vx:Float, vy:Float = 0,
 	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		for (cn in classNames) scroll(cn, vx, vy, minX, maxX, minY, maxY);
+	}
+	static public function compareByZ(x:Actor, y:Actor):Int {
+		if (x.z > y.z) return -1;
+		if (x.z < y.z) return 1;
+		return 0;
 	}
 	public var isRemoving = false;
 	public var currentTicks = 0;
@@ -254,6 +262,11 @@ class Actor {
 		group.isDrawingToBack = false;
 		return this;
 	}
+	function get_sz():Actor {
+		var group = groups.get(Type.getClassName(Type.getClass(this)));
+		group.isSortingByZ = true;
+		return this;
+	}
 	function get_m():Actor {
 		p.add(v);
 		p.addWay(w, s);
@@ -277,6 +290,7 @@ class ActorGroup {
 	public var s:Array<Actor>;
 	public var displayPriority = 10;
 	public var isDrawingToBack = false;
+	public var isSortingByZ = false;
 	public var hitRect:Vector;
 	public var d:DotPixelArt;
 	public function new(className:String) {
