@@ -57,6 +57,8 @@ class Game {
 	public function i():Void { } // initialize
 	public function begin():Void { }
 	public function b():Void { } // begin
+	public function updateBackground():Void { }
+	public function ub():Void { } // updateBackground
 	public function update():Void { }
 	public function u():Void { } // update
 	public function end():Void { }
@@ -264,8 +266,8 @@ class Game {
 		Fiber.clear();
 		currentTicks = 0;
 		random.setSeed(0);
-		mainInstance.b();
 		mainInstance.begin();
+		mainInstance.b();
 	}
 	function handleTitleScreen():Void {
 		if (Mouse.isButtonPressing || Key.isButtonPressing ||
@@ -278,6 +280,8 @@ class Game {
 	}
 	function updateFrame(e:Event):Void {
 		Screen.preUpdate(isPaused);
+		mainInstance.updateBackground();
+		mainInstance.ub();
 		Mouse.update();
 		Key.update();
 		if (!isPaused) {
@@ -291,18 +295,23 @@ class Game {
 			for (s in Sound.ss) s.u();
 			currentTicks++;
 			if (!isInGameState) handleTitleScreen();
-			Screen.postUpdate();
-			if (isInGameState && isCaptureMode) {
-				if (currentTicks >= captureFrom && currentTicks <= captureTo) {
-					if (currentTicks % captureInterval == 0) Screen.capture();
-					if (currentTicks == captureTo) Screen.endCapture(captureInterval);
-				}
-			}
 		} else {
 			new Text().setText("PAUSED").setXy(0.5, 0.45).alignCenter().draw();
 			new Text().setText("CLICK/TOUCH TO RESUME").setXy(0.5, 0.55).alignCenter().draw();
 		}
+		Screen.postUpdate();
 		calcFps();
+		if (isInGameState && isCaptureMode) {
+			if (currentTicks >= captureFrom && currentTicks <= captureTo) {
+				if (currentTicks == captureTo) {
+					Screen.endCapture(captureInterval);
+				} else if (currentTicks == captureTo - 2) {
+					new Text().setXy(.5, .5).alignCenter().setText("CAPTURING...");
+				} else if (currentTicks < captureTo - 2 && currentTicks % captureInterval == 0) {
+					Screen.capture();
+				}
+			}
+		}
 	}
 	function onActivated(e:Event):Void {
 		isPaused = false;
