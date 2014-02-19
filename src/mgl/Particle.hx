@@ -23,7 +23,7 @@ class Particle {
 	public var a(get, null):Particle; // add
 
 	static var random:Random;
-	public static function initialize():Void {
+	static public function initialize():Void {
 		random = new Random();
 	}
 	var aPos:Vector;
@@ -95,7 +95,7 @@ class Particle {
 class PActor extends Actor {
 	static var pixelSize:Vector;
 	static var pixelSizeL:Float;
-	override function initialize() {
+	override public function initialize() {
 		pixelSize = Game.pixelSize;
 		pixelSizeL = Game.pixelWHRatio < 1 ? pixelSize.x : pixelSize.y;
 		dp(0);
@@ -105,7 +105,7 @@ class PActor extends Actor {
 	public var targetSize:Float;
 	var size = 0.01;
 	var isExpand = true;
-	override function update() {
+	override public function update() {
 		p.a(v);
 		v.m(0.98);
 		if (isExpand) {

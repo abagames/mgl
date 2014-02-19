@@ -57,7 +57,7 @@ class Sound {
 	#end
 	static var isStarting = false;
 	static var defaultQuant = 0;
-	public static function initialize(main:Dynamic):Void {
+	static public function initialize(main:Dynamic):Void {
 		baseRandomSeed = Util.ch(main);
 		ss = new Array<Sound>();
 		tones = [
@@ -281,7 +281,7 @@ class Sound {
 			return (ti < 4 ? "o5" + tones[0][3 - ti] : "o4" + tones[0][15 - ti]);
 		}
 	}
-	public function u():Void {
+	public function update():Void {
 		lastPlayTicks--;
 		if (!isPlaying) return;
 		if (!isStarting) {

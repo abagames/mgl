@@ -60,7 +60,7 @@ class DotPixelArt {
 	static var baseDotSize = 1;
 	static var rPos:Vector;
 	static var aVec:Vector;
-	public static function initialize(main:Dynamic) {
+	static public function initialize(main:Dynamic) {
 		baseRandomSeed = Util.getClassHash(main);
 		pixelSize = Game.pixelSize;
 		pixelWHRatio = Game.pixelWHRatio;

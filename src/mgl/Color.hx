@@ -45,7 +45,7 @@ class Color {
 	static inline var WHITENESS = 0;
 	static var random:Random;
 	static var blinkColor:Color;
-	public static function initialize():Void {
+	static public function initialize():Void {
 		random = new Random();
 		blinkColor = new Color();
 	}

@@ -54,21 +54,13 @@ class Game {
 	public var ie(get, null):Game; // initialize end
 
 	public function initialize():Void { }
-	public function i():Void { } // initialize
 	public function begin():Void { }
-	public function b():Void { } // begin
 	public function updateBackground():Void { }
-	public function ub():Void { } // updateBackground
 	public function update():Void { }
-	public function u():Void { } // update
 	public function end():Void { }
-	public function e():Void { } // end
 	public function initializeState():Void { }
-	public function is():Void { } // initialize state
 	public function loadState(d:Dynamic):Void { }
-	public function ls(d:Dynamic):Void { } // load state
 	public function saveState(d:Dynamic):Void { }
-	public function ss(d:Dynamic):Void { } // save state
 
 	static public var isInGameState = false;
 	static public var currentTicks = 0;
@@ -125,7 +117,6 @@ class Game {
 		Text.initialize();
 		rn = Random.i;
 		mainInstance.initialize();
-		mainInstance.i();
 		get_ie();
 	}
 	public function setTitle(t:String, t2:String = ""):Game {
@@ -189,7 +180,6 @@ class Game {
 		Sound.fadeOut();
 		Game.save();
 		gInstance.end();
-		gInstance.e();
 		gInstance.beginTitle();
 		return true;
 	}
@@ -200,16 +190,13 @@ class Game {
 			var sharedObject:SharedObject = SharedObject.getLocal(storeKey);
 			if (sharedObject.size < 10) {
 				mainInstance.initializeState();
-				mainInstance.is();
 			} else {
 				mainInstance.loadState(sharedObject.data);
-				mainInstance.ls(sharedObject.data);
 				Key.loadState(sharedObject.data);
 			}
 			return true;
 		} catch (e:Dynamic) {
 			mainInstance.initializeState();
-			mainInstance.is();
 		}
 		#end
 		return false;
@@ -220,7 +207,6 @@ class Game {
 			var storeKey = StringTools.replace(title + "_" + title2 + "_" + version, " ", "");
 			var sharedObject:SharedObject = SharedObject.getLocal(storeKey);
 			mainInstance.saveState(sharedObject.data);
-			mainInstance.ss(sharedObject.data);
 			Key.saveState(sharedObject.data);
 			sharedObject.flush();
 			return true;
@@ -265,9 +251,8 @@ class Game {
 		Actor.clear();
 		Fiber.clear();
 		currentTicks = 0;
-		random.setSeed(0);
+		rn.setSeed();
 		mainInstance.begin();
-		mainInstance.b();
 	}
 	function handleTitleScreen():Void {
 		if (Mouse.isButtonPressing || Key.isButtonPressing ||
@@ -281,18 +266,16 @@ class Game {
 	function updateFrame(e:Event):Void {
 		Screen.preUpdate(isPaused);
 		mainInstance.updateBackground();
-		mainInstance.ub();
 		Mouse.update();
 		Key.update();
 		if (!isPaused) {
 			Actor.updateAll();
 			Fiber.updateAll();
 			mainInstance.update();
-			mainInstance.u();
 			if (isDebuggingMode) {
 				new Text().setText('FPS: ${Std.int(fps)}').setXy(0.01, 0.97);
 			}
-			for (s in Sound.ss) s.u();
+			for (s in Sound.ss) s.update();
 			currentTicks++;
 			if (!isInGameState) handleTitleScreen();
 		} else {

@@ -124,16 +124,16 @@ class Text {
 	}
 }
 class TActor extends Actor {
-	override public function i() {
+	override public function initialize() {
 		dp(100);
 	}
 	public var removeTicks = 1;
 	public var letter:Letter;
 	var isFirstTicks = true;
-	override function begin() {
+	override public function begin() {
 		letter = new Letter();
 	}
-	override function update() {
+	override public function update() {
 		if (isFirstTicks) {
 			v.d(removeTicks);
 			isFirstTicks = false;

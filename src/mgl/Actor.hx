@@ -36,7 +36,7 @@ class Actor {
 	public function ih(actorClassName:String, onHit:Dynamic -> Void = null):Bool {
 		return isHit(actorClassName, onHit);
 	}
-	// Functions should be used in an i (initialize) function
+	// Functions should be used in an initialize function
 	public function dp(priority:Int):Actor { return setDisplayPriority(priority); }
 	public function drawToBackground():Actor { return get_db(); }
 	public var db(get, null):Actor; // draw to background
@@ -46,11 +46,8 @@ class Actor {
 	public var sz(get, null):Actor; // sort by Z
 
 	public function initialize():Void { }
-	public function i():Void { }
 	public function begin():Void { }
-	public function b():Void { }
 	public function update():Void { }
-	public function u():Void { }
 	
 	public function move():Actor { return get_m(); }
 	public var m(get, null):Actor;
@@ -137,7 +134,6 @@ class Actor {
 			group = new ActorGroup(className);
 			groups.set(className, group);
 			initialize();
-			i();
 			group.hitRect.setValue(hitRect);
 			group.d = d;
 		} else {
@@ -145,7 +141,6 @@ class Actor {
 			d = group.d;
 		}
 		begin();
-		b();
 		group.s.push(this);
 	}
 	function get_position():Vector {
@@ -277,7 +272,6 @@ class Actor {
 		move();
 		Fiber.updateAll(fs);
 		update();
-		u();
 		if (d != null) d.setPosition(p).setZ(z).rotate(w).draw();
 		currentTicks++;
 	}
