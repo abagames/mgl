@@ -8,6 +8,8 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 ####Sample game
 
+[CALC +-*/](http://abagames.sakura.ne.jp/flash/cp/)
+
 [TYPHOON AVENUE](http://abagames.sakura.ne.jp/flash/ta/)
 
 [LEFT RIGHT HAND RULE](http://abagames.sakura.ne.jp/flash/lrh/)
@@ -229,13 +231,13 @@ A basic game loop handler. You have to override the initialize(), begin() and up
 * initializeEnd():Game (ie)
 
 ##### Overriden methods
-* initialize():Void (i)
-* begin():Void (b)
-* update():Void (u)
-* updateBackground():Void (ub)
-* initializeState():Void (is)
-* loadState(d:Dynamic):Void (ls)
-* saveState(d:Dynamic):Void (ss)
+* initialize():Void
+* begin():Void
+* update():Void
+* updateBackground():Void
+* initializeState():Void
+* loadState(d:Dynamic):Void
+* saveState(d:Dynamic):Void
 
 ####Actor (A)
 
@@ -270,9 +272,9 @@ An actor moves on a screen. An actor has a position, a velocity and a dot pixel 
 * sortByZ():Actor (sz)
 
 ##### Overriden methods
-* initialize():Void (i)
-* begin():Void (b)
-* update():Void (u)
+* initialize():Void
+* begin():Void
+* update():Void
 
 ###DotPixelArt (D)
 
