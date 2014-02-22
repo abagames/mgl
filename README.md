@@ -8,6 +8,8 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 ####Sample game
 
+[SUM10](http://abagames.sakura.ne.jp/flash/st/)
+
 [CALC +-*/](http://abagames.sakura.ne.jp/flash/cp/)
 
 [TYPHOON AVENUE](http://abagames.sakura.ne.jp/flash/ta/)
