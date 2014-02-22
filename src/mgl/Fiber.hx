@@ -88,12 +88,12 @@ class Fiber {
 		if (isRemoving) return this;
 		if (isAutoDecrement) currentCount--;
 		if (currentCount > 0) return this;
-		if (isLooping) l;
+		if (isLooping) get_l();
 		block();
 		return this;
 	}
 	function get_l():Fiber {
-		currentCount = defaultCount;
+		currentCount += defaultCount;
 		return this;
 	}
 	function get_r():Fiber {
