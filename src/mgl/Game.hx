@@ -43,6 +43,7 @@ class Game {
 	public function new(main:Dynamic) { initializeFirst(main); }
 	public function tt(title:String, title2:String = ""):Game { return setTitle(title, title2); }
 	public function vr(version:Int = 1):Game { return setVersion(version); }
+	public function dt(color:Color, seed:Int = -1):Game { return decorateTitle(color, seed); }
 	public function enableDebuggingMode():Game { return get_dm(); }
 	public var dm(get, null):Game; // enable debugging mode
 	public function cm
@@ -74,13 +75,17 @@ class Game {
 	static var version = 1;
 	static var gInstance:Game;
 	var baseSprite:Sprite;
+	var baseRandomSeed = 0;	
 	var titleTicks = 0;
 	var wasClicked = false;
 	var wasReleased = false;
-	var isDebuggingMode = false;
 	var isPaused = false;
 	var fpsCount = 0;
 	var lastTimer = 0;
+	var isTitleDecorated = false;
+	var titleDecoratingColor:Color;
+	var titleDecoratingSeed = 0;
+	var isDebuggingMode = false;
 	var isCaptureMode = false;
 	var captureScale = 1.0;
 	var captureFrom = 0;
@@ -89,6 +94,7 @@ class Game {
 	function initializeFirst(mi:Dynamic):Void {
 		baseSprite = new Sprite();
 		mainInstance = mi;
+		baseRandomSeed = Util.getClassHash(mi);
 		gInstance = this;
 		pixelSize = new Vector().setXy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		pixelWHRatio = pixelSize.x / pixelSize.y;
@@ -126,6 +132,13 @@ class Game {
 	}
 	public function setVersion(v:Int = 1):Game {
 		version = v;
+		return this;
+	}
+	function decorateTitle(color:Color, seed:Int = -1):Game {
+		isTitleDecorated = true;
+		titleDecoratingColor = color;
+		if (seed < 0) seed = baseRandomSeed++;		
+		titleDecoratingSeed = seed;
 		return this;
 	}
 	function get_dm():Game {
@@ -228,15 +241,28 @@ class Game {
 	
 	function beginTitle():Void {
 		var tx = 0.5;
-		if (title2.length <= 0) {
-			new Text().setText(title).setXy(tx, 0.4).alignCenter().setTickForever();
+		if (isTitleDecorated) {
+			if (title2.length <= 0) {
+				new Text().decorate(titleDecoratingColor, titleDecoratingSeed)
+				.setText(title).setXy(tx, 0.37).alignCenter().setTickForever();
+			} else {
+				new Text().decorate(titleDecoratingColor, titleDecoratingSeed)
+				.setText(title).setXy(tx, 0.3).alignCenter().setTickForever();
+				new Text().decorate(titleDecoratingColor, titleDecoratingSeed)
+				.setText(title2).setXy(tx, 0.42).alignCenter().setTickForever();
+			}
 		} else {
-			new Text().setText(title).setXy(tx, 0.38).alignCenter().setTickForever();
-			new Text().setText(title2).setXy(tx, 0.41).alignCenter().setTickForever();
+			if (title2.length <= 0) {
+				new Text().setText(title).setXy(tx, 0.4).alignCenter().setTickForever();
+			} else {
+				new Text().setText(title).setXy(tx, 0.38).alignCenter().setTickForever();
+				new Text().setText(title2).setXy(tx, 0.41).alignCenter().setTickForever();
+			}
 		}
-		new Text().setText("CLICK/TOUCH/PUSH").setXy(tx, 0.54).alignCenter().setTickForever();
-		new Text().setText("TO").setXy(tx, 0.58).alignCenter().setTickForever();
-		new Text().setText("START").setXy(tx, 0.615).alignCenter().setTickForever();
+		var msgY = if (isTitleDecorated) 0.6 else 0.54;
+		new Text().setText("CLICK/TOUCH/PUSH").setXy(tx, msgY).alignCenter().setTickForever();
+		new Text().setText("TO").setXy(tx, msgY + 0.04).alignCenter().setTickForever();
+		new Text().setText("START").setXy(tx, msgY + 0.075).alignCenter().setTickForever();
 		isInGameState = false;
 		wasClicked = wasReleased = false;
 		titleTicks = 10;

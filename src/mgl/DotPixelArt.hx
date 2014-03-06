@@ -398,7 +398,7 @@ class DotPixelArt {
 	public function pixelFillRect(x:Int, y:Int, width:Int, height:Int, c:Color):Void {
 		setDot(x, y, 0);
 	}
-	function setDot(x:Int, y:Int, ry:Float):OffsetColor {
+	public function setDot(x:Int, y:Int, ry:Float):OffsetColor {
 		var ca = (x * xSpotInterval).cos() * (y * ySpotInterval).cos() *
 			((x + y) * xySpotInterval).cos();
 		var c:Color;
@@ -417,7 +417,7 @@ class DotPixelArt {
 		dots.push(d);
 		return d;
 	}
-	function setGeneratedColors(color:Color, seed:Int):Void {
+	public function setGeneratedColors(color:Color, seed:Int):Void {
 		if (seed < 0) seed = baseRandomSeed++;
 		var r = new Random().setSeed(seed);
 		var cbl = new Color().setValue(color);

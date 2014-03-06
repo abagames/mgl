@@ -8,6 +8,7 @@ class Text {
 	public function xy(x:Float, y:Float):Text { return setXy(x, y); }
 	public function c(color:Color):Text { return setColor(color); }
 	public function ds(dotScale:Float = -1):Text { return setDotScale(dotScale); }
+	public function dc(color:Color, seed:Int = -1):Text { return decorate(color, seed); }
 	public function alignLeft():Text { return get_al(); }
 	public var al(get, null):Text; // align left
 	public function alignCenter():Text { return get_ac(); }
@@ -64,6 +65,10 @@ class Text {
 	}
 	public function setDotScale(dotScale:Float = -1):Text {
 		actor.letter.setDotScale(dotScale);
+		return this;
+	}
+	public function decorate(color:Color, seed:Int = -1):Text {
+		actor.letter.decorate(color, seed);
 		return this;
 	}
 	function get_al():Text {
@@ -153,6 +158,9 @@ class Letter {
 	static var baseDotSize = 1;
 	static var dotPatterns:Array<Array<Vector>>;
 	static var charToIndex:Array<Int>;
+	static var decoratedLetterWidth = 3 * 4;
+	static var decoratedLetterHeight = 2 * 5 + 4;
+	static var decoratingDotPattern:Array<Array<Int>>;
 	static public function initialize():Void {
 		pixelSize = Game.pixelSize;
 		baseDotSize = Std.int(Game.baseDotSize / 2).clampInt(1, 10);
@@ -200,6 +208,7 @@ class Letter {
 			}
 			charToIndex.push(li);
 		}
+		decoratingDotPattern = [[0, 1, 1], [1, 1, 1], [1, 1, 1]];
 	}
 	var text:String;
 	var pos:Vector;
@@ -207,6 +216,10 @@ class Letter {
 	var isAlignVerticalCenter = false;
 	var dotSize = 1;
 	var color:Color;
+	var isDecorated = false;
+	var decoratingColor:Color;
+	var decoratingSeed = 0;
+	var decoratiedShape:DotPixelArt;
 	public function new() {
 		pos = new Vector();
 		align = Left;
@@ -218,6 +231,11 @@ class Letter {
 	}
 	public function setPos(pos:Vector):Void {
 		this.pos.v(pos);
+	}
+	public function decorate(color:Color, seed:Int):Void {
+		isDecorated = true;
+		decoratingColor = color;
+		decoratingSeed = seed;
 	}
 	public function alignLeft():Void {
 		align = Left;
@@ -245,6 +263,10 @@ class Letter {
 		draw(Screen.pixelFillRect);
 	}
 	public function draw(df:Int -> Int -> Int -> Int -> Color -> Void):Void {
+		if (isDecorated) {
+			drawDecorated();
+			return;
+		}
 		var tx = Std.int(pos.x * pixelSize.x);
 		var ty = Std.int(pos.y * pixelSize.y);
 		var lw = dotSize * 5;
@@ -270,6 +292,66 @@ class Letter {
 			var py = y + p.yi * dotSize;
 			df(px, py, dotSize, dotSize, color);
 		}
+	}
+	function drawDecorated():Void {
+		if (decoratiedShape == null) setDecoratedShape();
+		var x = pos.x;
+		var y = pos.y;
+		if (align == Center) {
+			x -= decoratedLetterWidth * text.length * dotSize / pixelSize.xi;
+		} else if (align == Right) {
+			x -= decoratedLetterWidth * text.length * dotSize / pixelSize.xi * 2;
+		}
+		if (isAlignVerticalCenter) {
+			y -= decoratedLetterHeight * dotSize / pixelSize.yi;
+		}
+		decoratiedShape.xy(x, y).draw();
+	}
+	function setDecoratedShape():Void {
+		var dw = text.length * decoratedLetterWidth;
+		var dh = decoratedLetterHeight;
+		var dots = [for (x in 0...dw) [for (y in 0...dh) 0]];
+		for (i in 0...text.length) {
+			var c = text.charCodeAt(i);
+			var li = charToIndex[c];
+			if (li < 0) continue;
+			var dx = i * 3 * 4 + 2;
+			var dy = 2;
+			for (p in dotPatterns[li]) {
+				setDots(dots, dx + p.xi * 2, dy + p.yi * 2);
+			}
+		}
+		decoratiedShape = new DotPixelArt();
+		decoratiedShape.setGeneratedColors(decoratingColor, decoratingSeed);
+		for (x in 0...dw) {
+			for (y in 0...dh) {
+				if (dots[x][y] > 0) continue;
+				for (ox in x - 1...x + 2) {
+					for (oy in y - 1...y + 2) {
+						if (checkDot(dots, ox, oy, dw, dh) == 1) dots[x][y] = 2;
+					}
+				}
+			}
+		}
+		for (x in 0...dw) {
+			for (y in 0...dh) {
+				if (dots[x][y] <= 0) continue;
+				var ry = if (dots[x][y] == 1) y / dh; else 0;
+				decoratiedShape.setDot(x, y, ry);
+			}
+		}
+	}
+	function setDots(dots:Array<Array<Int>>, x:Int, y:Int):Void {
+		for (ox in 0...3) {
+			for (oy in 0...3) {
+				if (decoratingDotPattern[oy][ox] == 0) continue;
+				dots[x + ox][y + oy] = 1;
+			}
+		}
+	}
+	function checkDot(dots:Array<Array<Int>>, x:Int, y:Int, w:Int, h:Int):Int {
+		if (x < 0 || x >= w || y < 0 || y >= h) return -1;
+		return dots[x][y];
 	}
 }
 enum LetterAlign {
