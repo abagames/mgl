@@ -8,6 +8,8 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 ####Sample game
 
+[POLE SLIP DOWN](http://abagames.sakura.ne.jp/flash/psd/)
+
 [SUM10](http://abagames.sakura.ne.jp/flash/st/)
 
 [CALC +-*/](http://abagames.sakura.ne.jp/flash/cp/)
@@ -227,6 +229,7 @@ A basic game loop handler. You have to override the initialize(), begin() and up
 * (static)drawToBackground():Bool (db)
 * setTitle(title:String, title2:String = ""):Game (tt)
 * setVersion(version:Int = 1):Game (vr)
+* decorateTitle(color:Color, seed:Int = -1):Game (dt)
 * enableDebuggingMode():Game (dm)
 * enableCaptureMode(scale:Float = 1, fromSec:Float = 5, toSec:Float = 8, intervalSec:Float = .1):Game (cm)
 * setYRatio(ratio:Float):Game (yr)
@@ -371,6 +374,7 @@ Showing a text on a screen in a certain duration ticks.
 * setXy(x:Float, y:Float):Text (xy)
 * setColor(color:C):Text (c)
 * setDotScale(dotScale:Float = -1):Text (ds)
+* decorate(color:Color, seed:Int = -1):Text (dc)
 * alignLeft():Text (al)
 * alignRight():Text (ar)
 * alignCenter():Text (ac)
