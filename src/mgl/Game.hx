@@ -41,7 +41,9 @@ class Game {
 	static public function drawToBackground():Bool { return get_db(); }
 	static public var db(get, null):Bool; // draw to background
 	public function new(main:Dynamic) { initializeFirst(main); }
-	public function tt(title:String, title2:String = ""):Game { return setTitle(title, title2); }
+	public function tt(title:String, title2:String = "", title3:String = ""):Game {
+		return setTitle(title, title2, title3);
+	}
 	public function vr(version:Int = 1):Game { return setVersion(version); }
 	public function dt(color:Color, seed:Int = -1):Game { return decorateTitle(color, seed); }
 	public function enableDebuggingMode():Game { return get_dm(); }
@@ -72,6 +74,7 @@ class Game {
 	static var mainInstance:Dynamic;
 	static var title = "";
 	static var title2 = "";
+	static var title3 = "";
 	static var version = 1;
 	static var gInstance:Game;
 	var baseSprite:Sprite;
@@ -125,9 +128,10 @@ class Game {
 		mainInstance.initialize();
 		get_ie();
 	}
-	public function setTitle(t:String, t2:String = ""):Game {
+	public function setTitle(t:String, t2:String = "", t3:String = ""):Game {
 		title = t;
 		title2 = t2;
+		title3 = t3;
 		return this;
 	}
 	public function setVersion(v:Int = 1):Game {
@@ -241,23 +245,20 @@ class Game {
 	
 	function beginTitle():Void {
 		var tx = 0.5;
-		if (isTitleDecorated) {
-			if (title2.length <= 0) {
-				new Text().decorate(titleDecoratingColor, titleDecoratingSeed)
-				.setText(title).setXy(tx, 0.37).alignCenter().setTickForever();
-			} else {
-				new Text().decorate(titleDecoratingColor, titleDecoratingSeed)
-				.setText(title).setXy(tx, 0.3).alignCenter().setTickForever();
-				new Text().decorate(titleDecoratingColor, titleDecoratingSeed)
-				.setText(title2).setXy(tx, 0.42).alignCenter().setTickForever();
-			}
+		var tts:Array<Text> = new Array<Text>();
+		tts.push(new Text().setText(title));
+		if (title2.length > 0) tts.insert(0, new Text().setText(title2));
+		if (title3.length > 0) tts.insert(0, new Text().setText(title3));
+		var ty = if (isTitleDecorated) {
+			if (tts.length == 1) 0.37 else 0.42;
 		} else {
-			if (title2.length <= 0) {
-				new Text().setText(title).setXy(tx, 0.4).alignCenter().setTickForever();
-			} else {
-				new Text().setText(title).setXy(tx, 0.38).alignCenter().setTickForever();
-				new Text().setText(title2).setXy(tx, 0.41).alignCenter().setTickForever();
-			}
+			if (tts.length == 1) 0.4 else 0.41;
+		}
+		for (tt in tts) {
+			tt.alignCenter().setTickForever();
+			if (isTitleDecorated) tt.decorate(titleDecoratingColor, titleDecoratingSeed);
+			tt.setXy(tx, ty);
+			ty -= if (isTitleDecorated) 0.12 else 0.03;
 		}
 		var msgY = if (isTitleDecorated) 0.6 else 0.54;
 		new Text().setText("CLICK/TOUCH/PUSH").setXy(tx, msgY).alignCenter().setTickForever();
