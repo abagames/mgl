@@ -8,6 +8,10 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 ####Sample game
 
+[EARTH DEFENSE STICKS](http://abagames.sakura.ne.jp/flash/eds/)
+
+[SIDE WALLS MULTI KICKS](http://abagames.sakura.ne.jp/flash/swmk/)
+
 [POLE SLIP DOWN](http://abagames.sakura.ne.jp/flash/psd/)
 
 [SUM10](http://abagames.sakura.ne.jp/flash/st/)
