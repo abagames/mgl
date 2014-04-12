@@ -205,8 +205,11 @@ class DotPixelArt {
 					for (ix in (nx - 1).ci(0, w - 2)...(nx + 2).ci(1, w - 1)) {
 						for (iy in (ny - 1).ci(1, h - 2)...(ny + 2).ci(2, h - 1)) {
 							if (pixels[ix][iy] == 0) {
-								for (np in nextPixels) if (np.xi == ix && np.yi == iy) continue;
-								nextPixels.push(new Vector().setXy(ix, iy));
+								if (!Lambda.exists(nextPixels, function(np) {
+									return (np.xi == ix && np.yi == iy);
+								})) {
+									nextPixels.push(new Vector().setXy(ix, iy));
+								}
 							}
 						}
 					}
