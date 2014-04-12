@@ -8,53 +8,31 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 ####Sample game
 
-[EARTH DEFENSE STICKS](http://abagames.sakura.ne.jp/flash/eds/)
-
-[SIDE WALLS MULTI KICKS](http://abagames.sakura.ne.jp/flash/swmk/)
-
-[POLE SLIP DOWN](http://abagames.sakura.ne.jp/flash/psd/)
-
+[SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/) 
+[DON'T SEE ME](http://abagames.sakura.ne.jp/flash/dsm/)
 [SUM10](http://abagames.sakura.ne.jp/flash/st/)
-
-[CALC +-*/](http://abagames.sakura.ne.jp/flash/cp/)
-
-[TYPHOON AVENUE](http://abagames.sakura.ne.jp/flash/ta/)
-
-[LEFT RIGHT HAND RULE](http://abagames.sakura.ne.jp/flash/lrh/)
-
-[REFLECTOR SATELLITES](http://abagames.sakura.ne.jp/flash/rs/)
-
-[SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/)
-
-[BALLOON BURROWER](http://abagames.sakura.ne.jp/flash/bb/)
-
-[SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/)
-
-[POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
-
 [WASD THRUST](http://abagames.sakura.ne.jp/flash/wt/)
+[DETERMINISTIC PANELS](http://abagames.sakura.ne.jp/flash/dm/)
+[CUT OFF LINE AMEBA](http://abagames.sakura.ne.jp/flash/cola/)
+[EARTH DEFENSE STICKS](http://abagames.sakura.ne.jp/flash/eds/)
+[SIDE WALLS MULTI KICKS](http://abagames.sakura.ne.jp/flash/swmk/)
+[POLE SLIP DOWN](http://abagames.sakura.ne.jp/flash/psd/)
+[CALC +-*/](http://abagames.sakura.ne.jp/flash/cp/)
+[TYPHOON AVENUE](http://abagames.sakura.ne.jp/flash/ta/)
+[LEFT RIGHT HAND RULE](http://abagames.sakura.ne.jp/flash/lrh/)
+[REFLECTOR SATELLITES](http://abagames.sakura.ne.jp/flash/rs/)
+[BALLOON BURROWER](http://abagames.sakura.ne.jp/flash/bb/)
+[SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/)
+[POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
 
 ####Sample game (using the older version mgl)
 
 [LONG EDGE WINS](http://abagames.sakura.ne.jp/flash/lew/)
-
 [REVGRAV](http://abagames.sakura.ne.jp/flash/rg/)
-
 [SPACE SHIPS CONTACT ACCIDENTAL](http://abagames.sakura.ne.jp/flash/ssca/)
-
 [YOU HAVE ONE SHOT](http://abagames.sakura.ne.jp/flash/yhos/)
-
 [SIDE SHOT BOOSTER](http://abagames.sakura.ne.jp/flash/ssb/)
-
 [MAGNETIC ACTION](http://abagames.sakura.ne.jp/flash/ma/)
-
-[LASER WINDER](http://wonderfl.net/c/pYeI)
-
-[LOCK ON TO ALL OF THEM](http://wonderfl.net/c/rqvL)
-
-[DUAL PISTOLS RG](http://wonderfl.net/c/ilHX)
-
-[TOSSED HUMANS SPLIT OVER](http://wonderfl.net/c/d8Rm)
 
 ###Advantages
 
