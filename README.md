@@ -12,7 +12,7 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 [DON'T SEE ME](http://abagames.sakura.ne.jp/flash/dsm/) /
 [SUM10](http://abagames.sakura.ne.jp/flash/st/) /
 [WASD THRUST](http://abagames.sakura.ne.jp/flash/wt/) /
-[DETERMINISTIC PANELS](http://abagames.sakura.ne.jp/flash/dm/) /
+[DETERMINISTIC PANELS](http://abagames.sakura.ne.jp/flash/dp/) /
 [CUT OFF LINE AMEBA](http://abagames.sakura.ne.jp/flash/cola/) /
 [EARTH DEFENSE STICKS](http://abagames.sakura.ne.jp/flash/eds/) /
 [SIDE WALLS MULTI KICKS](http://abagames.sakura.ne.jp/flash/swmk/) /
