@@ -6,12 +6,14 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif encoder.
 
-####Sample game
+####Sample games
 
 [SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/) /
 [DON'T SEE ME](http://abagames.sakura.ne.jp/flash/dsm/) /
+[BADDALION](http://abagames.sakura.ne.jp/flash/bd/) /
 [SUM10](http://abagames.sakura.ne.jp/flash/st/) /
 [WASD THRUST](http://abagames.sakura.ne.jp/flash/wt/) /
+[OVEREXPLODE](http://abagames.sakura.ne.jp/flash/oe/) /
 [DETERMINISTIC PANELS](http://abagames.sakura.ne.jp/flash/dp/) /
 [CUT OFF LINE AMEBA](http://abagames.sakura.ne.jp/flash/cola/) /
 [EARTH DEFENSE STICKS](http://abagames.sakura.ne.jp/flash/eds/) /
@@ -25,14 +27,14 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 [SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/) /
 [POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
 
-####Sample game (using the older version mgl)
+####Sample games (using the older version mgl)
 
 [LONG EDGE WINS](http://abagames.sakura.ne.jp/flash/lew/) /
 [REVGRAV](http://abagames.sakura.ne.jp/flash/rg/) /
 [SPACE SHIPS CONTACT ACCIDENTAL](http://abagames.sakura.ne.jp/flash/ssca/) /
 [YOU HAVE ONE SHOT](http://abagames.sakura.ne.jp/flash/yhos/) /
 [SIDE SHOT BOOSTER](http://abagames.sakura.ne.jp/flash/ssb/) /
-[MAGNETIC ACTION](http://abagames.sakura.ne.jp/flash/ma/) /
+[MAGNETIC ACTION](http://abagames.sakura.ne.jp/flash/ma/)
 
 ###Advantages
 
