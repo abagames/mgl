@@ -37,6 +37,9 @@ class Text {
 		shownMessages = new Array<String>();
 		Letter.initialize();
 	}
+	static public function setBaseDotSize():Void {
+		Letter.setBaseDotSize();
+	}
 	var actor:TActor;
 	var text:String;
 	var isFirstTicks = true;
@@ -163,7 +166,6 @@ class Letter {
 	static var decoratingDotPattern:Array<Array<Int>>;
 	static public function initialize():Void {
 		pixelSize = Game.pixelSize;
-		baseDotSize = Std.int(Game.baseDotSize / 2).clampInt(1, 10);
 		dotPatterns = new Array<Array<Vector>>();
 		charToIndex = new Array<Int>();
 		var patterns = [
@@ -209,6 +211,9 @@ class Letter {
 			charToIndex.push(li);
 		}
 		decoratingDotPattern = [[0, 1, 1], [1, 1, 1], [1, 1, 1]];
+	}
+	static public function setBaseDotSize():Void {
+		baseDotSize = Std.int(Game.baseDotSize / 2).clampInt(1, 10);
 	}
 	var text:String;
 	var pos:Vector;
