@@ -49,10 +49,13 @@ class Game {
 	public function enableDebuggingMode():Game { return get_dm(); }
 	public var dm(get, null):Game; // enable debugging mode
 	public function cm
-	(scale:Float = 1, fromSec:Float = 5, toSec:Float = 8, intervalSec:Float = .1):Game {
-		return enableCaptureMode(scale, fromSec, toSec, intervalSec);
+	(scale:Float = 1, durationSec:Float = 3, intervalSec:Float = .1):Game {
+		return enableCaptureMode(scale, durationSec, intervalSec);
 	}
 	public function yr(ratio:Float):Game { return setYRatio(ratio); }
+	public function ds(baseDotSizeRatio:Float = 1):Game {
+		return setBaseDotSizeRatio(baseDotSizeRatio);
+	}
 	public function initializeEnd():Game { return get_ie(); }
 	public var ie(get, null):Game; // initialize end
 
@@ -90,9 +93,6 @@ class Game {
 	var titleDecoratingSeed = 0;
 	var isDebuggingMode = false;
 	var isCaptureMode = false;
-	var captureScale = 1.0;
-	var captureFrom = 0;
-	var captureTo = 0;
 	var captureInterval = 0;
 	function initializeFirst(mi:Dynamic):Void {
 		baseSprite = new Sprite();
@@ -101,9 +101,16 @@ class Game {
 		gInstance = this;
 		pixelSize = new Vector().setXy(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		pixelWHRatio = pixelSize.x / pixelSize.y;
-		baseDotSize = Util.ci(Std.int(Math.min(pixelSize.x, pixelSize.y) / 160) + 1, 1, 20);
+		setBaseDotSizeRatio();
 		baseSprite.addEventListener(Event.ADDED_TO_STAGE, onAdded);
 		Lib.current.addChild(baseSprite);
+	}
+	public function setBaseDotSizeRatio(baseDotSizeRatio:Float = 1):Game {
+		baseDotSize = Util.ci(Std.int(
+			(Math.min(pixelSize.x, pixelSize.y) / 160 + 1) * baseDotSizeRatio), 1, 20);
+		DotPixelArt.setBaseDotSize();
+		Text.setBaseDotSize();
+		return this;
 	}
 	function onAdded(_):Void {
 		baseSprite.removeEventListener(Event.ADDED_TO_STAGE, onAdded);
@@ -150,11 +157,9 @@ class Game {
 		return this;
 	}
 	public function enableCaptureMode
-	(scale:Float = 1, fromSec:Float = 5, toSec:Float = 8, intervalSec:Float = .1):Game {
+	(scale:Float = 1, durationSec:Float = 3, intervalSec:Float = .1):Game {
 		isCaptureMode = true;
-		captureScale = scale;
-		captureFrom = Std.int(fromSec * 60);
-		captureTo = Std.int(toSec * 60);
+		Screen.beginCapture(scale, durationSec, intervalSec);
 		captureInterval = Std.int(intervalSec * 60);
 		return this;
 	}
@@ -272,7 +277,6 @@ class Game {
 		Sound.stop();
 		isInGameState = true;
 		initializeGame();
-		if (isCaptureMode) Screen.beginCapture(captureScale);
 	}
 	function initializeGame():Void {
 		Actor.clear();
@@ -290,7 +294,16 @@ class Game {
 			if (--titleTicks <= 0) wasReleased = true;
 		}
 	}
+	var isCapturing = false;
 	function updateFrame(e:Event):Void {
+		if (isCaptureMode) {
+			if (isCapturing) {
+				Screen.endCapture();
+				isCapturing = Key.s[67] = false;
+			} else if (currentTicks % captureInterval == 0) {
+				Screen.capture();
+			}
+		}
 		Screen.preUpdate(isPaused);
 		mainInstance.updateBackground();
 		Mouse.update();
@@ -300,7 +313,7 @@ class Game {
 			Fiber.updateAll();
 			mainInstance.update();
 			if (isDebuggingMode) {
-				new Text().setText('FPS: ${Std.int(fps)}').setXy(0.01, 0.97);
+				new Text().setText('FPS: ${Std.int(fps)}').setXy(0.01, 0.97).draw();
 			}
 			for (s in Sound.ss) s.update();
 			currentTicks++;
@@ -309,19 +322,12 @@ class Game {
 			new Text().setText("PAUSED").setXy(0.5, 0.45).alignCenter().draw();
 			new Text().setText("CLICK/TOUCH TO RESUME").setXy(0.5, 0.55).alignCenter().draw();
 		}
+		if (isCaptureMode && isInGameState && Key.s[67]) {
+			new Text().setText("CAPTURING...").setXy(.5, .5).alignCenter().draw();
+			isCapturing = true;
+		}
 		Screen.postUpdate();
 		calcFps();
-		if (isInGameState && isCaptureMode) {
-			if (currentTicks >= captureFrom && currentTicks <= captureTo) {
-				if (currentTicks == captureTo) {
-					Screen.endCapture(captureInterval);
-				} else if (currentTicks == captureTo - 2) {
-					new Text().setXy(.5, .5).alignCenter().setText("CAPTURING...");
-				} else if (currentTicks < captureTo - 2 && currentTicks % captureInterval == 0) {
-					Screen.capture();
-				}
-			}
-		}
 	}
 	function onActivated(e:Event):Void {
 		isPaused = false;
@@ -344,8 +350,6 @@ class Game {
 class Screen {
 	static var baseSprite:Sprite;
 	static var pixelSize:Vector;
-	static var pixelWHRatio = 1.0;
-	static var baseDotSize = 1;
 	static var pixelRect:Rectangle;
 	static var pixelCount = 0;
 	static var bd:BitmapData;
@@ -362,8 +366,6 @@ class Screen {
 	static public function initialize(bs:Sprite):Void {
 		baseSprite = bs;
 		pixelSize = Game.pixelSize;
-		pixelWHRatio = Game.pixelWHRatio;
-		baseDotSize = Game.baseDotSize;
 		pixelRect = new Rectangle(0, 0, pixelSize.x, pixelSize.y);
 		pixelCount = pixelSize.xi * pixelSize.yi;
 		baseBd = new BitmapData(pixelSize.xi, pixelSize.yi, false, 0);
@@ -442,33 +444,40 @@ class Screen {
 		hasBlur = false;
 	}
 	static var capturedBds:Array<BitmapData>;
+	static var capturedBdsIndex = 0;
+	static var captureDuration = 0;
+	static var captureInterval = 0;
 	static var captureWidth = 0;
 	static var captureHeight = 0;
 	static var captureMatrix:Matrix;
-	static var isCapturing = false;
-	static public function beginCapture(scale:Float):Void {
+	static public function beginCapture(scale:Float, durationSec:Float, intervalSec:Float):Void {
 		capturedBds = new Array<BitmapData>();
+		captureDuration = Std.int(durationSec / intervalSec);
+		captureInterval = Std.int(intervalSec * 1000);
+		for (i in 0...captureDuration) capturedBds.push(null);
 		captureWidth = Std.int(pixelSize.xi * scale);
 		captureHeight = Std.int(pixelSize.yi * scale);
 		captureMatrix = new Matrix();
 		captureMatrix.scale(scale, scale);
-		isCapturing = true;
 	}
 	static public function capture():Void {
-		if (!isCapturing) return;
 		var capturedBd = new BitmapData(captureWidth, captureHeight, false, 0);
 		capturedBd.draw(Lib.current.stage, captureMatrix);
-		capturedBds.push(capturedBd);
+		capturedBds[capturedBdsIndex] = capturedBd;
+		capturedBdsIndex = Util.loopRangeInt(capturedBdsIndex + 1, 0, captureDuration);
 	}
-	static public function endCapture(interval:Int):Void {
-		if (!isCapturing) return;
-		isCapturing = false;
+	static public function endCapture():Void {
 		#if flash
 		var encoder = new GIFEncoder();
 		encoder.setRepeat(0);
-		encoder.setDelay(Std.int(interval * 1000 / 60));
+		encoder.setDelay(captureInterval);
 		encoder.start();
-		for (cbd in capturedBds) encoder.addFrame(cbd);
+		var idx = capturedBdsIndex;
+		for (i in 0...captureDuration) {
+			var cbd = capturedBds[idx];
+			if (cbd != null) encoder.addFrame(cbd);
+			idx = Util.loopRangeInt(idx + 1, 0, captureDuration);
+		}
 		encoder.finish();
 		var fileReference = new FileReference();
 		fileReference.save(encoder.stream, "capture.gif");
