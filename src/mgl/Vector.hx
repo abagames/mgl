@@ -20,6 +20,9 @@ class Vector {
 		return distanceToDistorted(pos, pixelWHRatio);
 	}
 	public inline function wt(pos:Vector):Float { return wayTo(pos); }
+	public inline function wtd(pos:Vector, pixelWHRatio:Float = -1):Float {
+		return wayToDistorted(pos, pixelWHRatio);
+	}
 	public inline function a(v:Vector):Vector { return add(v); }
 	public inline function s(v:Vector):Vector { return sub(v); }
 	public inline function m(v:Float):Vector { return multiply(v); }
@@ -88,6 +91,14 @@ class Vector {
 	}
 	public inline function wayTo(pos:Vector):Float {
 		return (pos.x - x).atan2(y - pos.y) * 180 / Math.PI;
+	}
+	public inline function wayToDistorted(pos:Vector, pixelWHRatio:Float = -1):Float {
+		if (pixelWHRatio < 0) pixelWHRatio = Game.pixelWHRatio;
+		var ox = pos.x - x;
+		var oy = y - pos.y;
+		if (pixelWHRatio < 1) oy /= pixelWHRatio;
+		else if (pixelWHRatio > 1) ox *= pixelWHRatio;
+		return ox.atan2(oy) * 180 / Math.PI;
 	}
 	public inline function add(v:Vector):Vector {
 		x += v.x;
