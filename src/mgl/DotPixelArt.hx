@@ -24,6 +24,21 @@ class DotPixelArt {
 	public function gr(width:Float, height:Float = -1, seed:Int = -1):DotPixelArt {
 		return generateRect(width, height, seed);
 	}
+	public function ft(width:Float, height:Float = -1,
+	topFrom:Float = .5, topTo:Float = .5, bottomFrom:Float = 0, bottomTo:Float = 1,
+	edgeWidth:Int = 0):DotPixelArt {
+		return fillTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, edgeWidth);
+	}
+	public function lt(width:Float, height:Float = -1,
+	topFrom:Float = .5, topTo:Float = .5, bottomFrom:Float = 0, bottomTo:Float = 1,
+	edgeWidth:Int = 1):DotPixelArt {
+		return lineTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, edgeWidth);
+	}
+	public function gt(width:Float, height:Float = -1,
+	topFrom:Float = .5, topTo:Float = .5, bottomFrom:Float = 0, bottomTo:Float = 1,
+	seed:Int = -1):DotPixelArt {
+		return generateTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, seed);
+	}
 	public function fc(diameter:Float, edgeWidth:Int = 0):DotPixelArt {
 		return fillCircle(diameter, edgeWidth);
 	}
@@ -64,9 +79,11 @@ class DotPixelArt {
 		baseRandomSeed = Util.getClassHash(main);
 		pixelSize = Game.pixelSize;
 		pixelWHRatio = Game.pixelWHRatio;
-		baseDotSize = Game.baseDotSize;
 		rPos = new Vector();
 		aVec = new Vector();
+	}
+	static public function setBaseDotSize():Void {
+		baseDotSize = Game.baseDotSize;
 	}
 	var dots:Array<OffsetColor>;
 	var dotSize = 1;
@@ -148,6 +165,29 @@ class DotPixelArt {
 		setGeneratedColors(color, seed);
 		fillRect(width, height, 1);
 		setColor(oc).setColorBottom(oc.goDark()).setSpotInterval().lineRect(width, height);
+		return this;
+	}
+	public function fillTrapezoid(width:Float, height:Float = -1,
+	topFrom:Float = .5, topTo:Float = .5, bottomFrom:Float = 0, bottomTo:Float = 1,
+	edgeWidth:Int = 0):DotPixelArt {
+		if (height < 0) height = width;
+		return setTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, edgeWidth, false);
+	}
+	public function lineTrapezoid(width:Float, height:Float = -1,
+	topFrom:Float = .5, topTo:Float = .5, bottomFrom:Float = 0, bottomTo:Float = 1,
+	edgeWidth:Int = 1):DotPixelArt {
+		if (height < 0) height = width;
+		return setTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, edgeWidth, true);
+	}
+	public function generateTrapezoid(width:Float, height:Float = -1,
+	topFrom:Float = .5, topTo:Float = .5, bottomFrom:Float = 0, bottomTo:Float = 1,
+	seed:Int = -1):DotPixelArt {
+		if (height < 0) height = width;
+		var oc = new Color().setValue(color);
+		setGeneratedColors(color, seed);
+		fillTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, 1);
+		setColor(oc).setColorBottom(oc.goDark()).setSpotInterval()
+			.lineTrapezoid(width, height, topFrom, topTo, bottomFrom, bottomTo, 1);
 		return this;
 	}
 	public function fillCircle(diameter:Float, edgeWidth:Int = 0):DotPixelArt {
@@ -350,6 +390,32 @@ class DotPixelArt {
 					if (!isDrawingEdge) setDot(x + ox, y + oy, y / h);
 				}
 			}
+		}
+		return this;
+	}
+	function setTrapezoid(width:Float, height:Float,
+	topFrom:Float, topTo:Float, bottomFrom:Float, bottomTo:Float,
+	edgeWidth:Int, isDrawingEdge:Bool = false):DotPixelArt {
+		var w = Std.int(pixelSize.x * width / dotSize);
+		var h = Std.int(pixelSize.y * height / dotSize);
+		var ox = -Std.int(w / 2), oy = -Std.int(h / 2);
+		var fx = topFrom * w;
+		var tx = topTo * w;
+		var vfx = (bottomFrom * w - fx) / (h - 1);
+		var vtx = (bottomTo * w - tx) / (h - 1);
+		for (y in 0...h) {
+			var fxi = Std.int(fx);
+			var txi = Std.int(tx);
+			for (x in fxi...txi) {
+				if (x < fxi + edgeWidth || x >= txi - edgeWidth ||
+					y < edgeWidth || y >= h - edgeWidth) {
+					if (isDrawingEdge) setDot(x + ox, y + oy, y / h);
+				} else {
+					if (!isDrawingEdge) setDot(x + ox, y + oy, y / h);
+				}
+			}
+			fx += vfx;
+			tx += vtx;
 		}
 		return this;
 	}
