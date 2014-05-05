@@ -16,6 +16,9 @@ class Actor {
 	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		scrollActors(classNames, vx, vy, minX, maxX, minY, maxY);
 	}
+	static public function ap(isAffected:Bool = true):Void {
+		return setAffectedByPixelWHRatio(isAffected);
+	}
 	public var position(get, set):Vector;
 	public var p:Vector; // position
 	public var z = 0.0;
@@ -54,9 +57,11 @@ class Actor {
 
 	static var groups:Map<String, ActorGroup>;
 	static var emptyGroup:Array<Actor>;
+	static var isAffectedByPixelWHRatio = false;
 	static public function initializeAll() {
 		groups = new Map<String, ActorGroup>();
 		emptyGroup = new Array<Actor>();
+		isAffectedByPixelWHRatio = (Game.pixelWHRatio != 1);
 	}
 	static public function updateAll():Void {
 		var groupsArray = Lambda.array(groups);
@@ -110,6 +115,9 @@ class Actor {
 	minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0):Void {
 		for (cn in classNames) scroll(cn, vx, vy, minX, maxX, minY, maxY);
 	}
+	static public function setAffectedByPixelWHRatio(isAffected:Bool = false):Void {
+		isAffectedByPixelWHRatio = isAffected;
+	}
 	static public function compareByZ(x:Actor, y:Actor):Int {
 		if (x.z > y.z) return -1;
 		if (x.z < y.z) return 1;
@@ -121,12 +129,14 @@ class Actor {
 	public var hitDiameter = -999.0;
 	var group:ActorGroup;
 	var ho:Vector;
+	var av:Vector;
 	var fs:Array<Fiber>;
 	public function new() {
 		p = new Vector();
 		v = new Vector();
 		hitRect = new Vector().setXy(-999, -999);
 		ho = new Vector();
+		av = new Vector();
 		fs = new Array<Fiber>();
 		var className = Type.getClassName(Type.getClass(this));
 		group = groups.get(className);
@@ -135,9 +145,11 @@ class Actor {
 			groups.set(className, group);
 			initialize();
 			group.hitRect.setValue(hitRect);
+			group.hitDiameter = hitDiameter;
 			group.d = d;
 		} else {
 			hitRect.setValue(group.hitRect);
+			hitDiameter = group.hitDiameter;
 			d = group.d;
 		}
 		begin();
@@ -263,8 +275,14 @@ class Actor {
 		return this;
 	}
 	function get_m():Actor {
-		p.add(v);
-		p.addWay(w, s);
+		if (isAffectedByPixelWHRatio) {
+			av.n().add(v).addWay(w, s);
+			av.y *= Game.pixelWHRatio;
+			p.add(av);
+		} else {
+			p.add(v);
+			p.addWay(w, s);
+		}
 		return this;
 	}
 
@@ -286,6 +304,7 @@ class ActorGroup {
 	public var isDrawingToBack = false;
 	public var isSortingByZ = false;
 	public var hitRect:Vector;
+	public var hitDiameter = -999.0;
 	public var d:DotPixelArt;
 	public function new(className:String) {
 		this.className = className;
