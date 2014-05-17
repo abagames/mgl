@@ -143,10 +143,10 @@ class TActor extends Actor {
 	}
 	override public function update() {
 		if (isFirstTicks) {
+			p.s(v);
 			v.d(removeTicks);
 			isFirstTicks = false;
 		}
-		p.a(v);
 		draw();
 		if (ticks >= removeTicks) get_r();
 	}
