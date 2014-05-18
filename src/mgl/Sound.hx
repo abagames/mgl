@@ -13,6 +13,7 @@ class Sound {
 	static public function stop():Bool { return get_s(); }
 	static public var s(get, null):Bool; // stop
 	static public function dq(v:Int = 0):Void { setDefaultQuant(v); }
+	static public function b(v:Float = 120):Void { setBpm(v); }
 	public function major():Sound { return get_mj(); }
 	public var mj(get, null):Sound; // major
 	public function minor():Sound { return get_mn(); }
@@ -116,6 +117,11 @@ class Sound {
 	}
 	static public function setDefaultQuant(v:Int = 0):Void {
 		defaultQuant = v;
+	}
+	static public function setBpm(v:Float = 120):Void {
+		#if flash
+		driver.bpm = v;
+		#end
 	}
 	function get_mj():Sound {
 		begin(Major);

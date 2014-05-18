@@ -303,9 +303,11 @@ A 8-bit era style sound effect.
 
 ##### Methods
 * new():Sound (i)
-* (static)fadeIn(second:Float = 1):Sound (fi)
-* (static)fadeOut(second:Float = 1):Sound (fo)
-* (static)stop:Sound (s)
+* (static)fadeIn(second:Float = 1):Void (fi)
+* (static)fadeOut(second:Float = 1):Void (fo)
+* (static)stop:Bool (s)
+* (static)setDefaultQuant(v:Int = 0):Void (dq)
+* (static)setBpm(v:Float = 120):Void (b)
 * major():Sound (mj)
 * minor():Sound (mn)
 * noise():Sound (n)
@@ -490,6 +492,7 @@ Mouse input status.
 * distanceTo(pos:V):Float (dt)
 * distanceToDistorted(pos:V, pixelWHRatio:Float = -1):Float (dtd)
 * wayTo(pos:V):Float (wt)
+* wayToDistorted(pos:V, pixelWHRatio:Float = -1):Float (wtd)
 * add(v:V):Vector (a)
 * sub(v:V):Vector (s)
 * multiply(v:Float):Vector (m)
