@@ -10,9 +10,15 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 
 [SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/) /
 [DON'T SEE ME](http://abagames.sakura.ne.jp/flash/dsm/) /
+[MISSILE COMES BACK TO ME](http://abagames.sakura.ne.jp/flash/mcbtm/) /
+[PROMINENT MOUNTAIN](http://abagames.sakura.ne.jp/flash/pm/) /
 [BADDALION](http://abagames.sakura.ne.jp/flash/bd/) /
 [SUM10](http://abagames.sakura.ne.jp/flash/st/) /
 [WASD THRUST](http://abagames.sakura.ne.jp/flash/wt/) /
+[LURE AWAY](http://abagames.sakura.ne.jp/flash/la/) /
+[FROM FOUR SIDES](http://abagames.sakura.ne.jp/flash/ffs/) /
+[PINCER ATTACK](http://abagames.sakura.ne.jp/flash/pa/) / 
+[STRONG BUY STRONG SELL](http://abagames.sakura.ne.jp/flash/sbss/) /
 [OVEREXPLODE](http://abagames.sakura.ne.jp/flash/oe/) /
 [DETERMINISTIC PANELS](http://abagames.sakura.ne.jp/flash/dp/) /
 [CUT OFF LINE AMEBA](http://abagames.sakura.ne.jp/flash/cola/) /
