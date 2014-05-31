@@ -24,6 +24,9 @@ class Game {
 	static public var eg(get, null):Bool; // end game
 	static public var ticks(get, null):Int;
 	static public var t(get, null):Int; // ticks
+	static public function dc(factor:Float = 1):Float {
+		return getDifficulty(factor);
+	}
 	static public function load():Bool { return get_ld(); }
 	static public var ld(get, null):Bool; // load
 	static public function save():Bool { return get_sv(); }
@@ -196,6 +199,9 @@ class Game {
 	}
 	static function get_t():Int {
 		return currentTicks;
+	}
+	static function getDifficulty(factor:Float = 1):Float {
+		return Math.sqrt(currentTicks * 0.0001 * factor) + 1;
 	}
 	static function get_eg():Bool {
 		if (!isInGameState) return false;
