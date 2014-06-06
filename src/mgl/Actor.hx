@@ -28,6 +28,10 @@ class Actor {
 	public var w = 0.0; // way
 	public var speed(get, set):Float;
 	public var s = 0.0; // speed
+	public var scaleX(get, set):Float;
+	public var sx = 1.0; // scaleX
+	public var scaleY(get, set):Float;
+	public var sy = 1.0; // scaleY
 	public var dotPixelArt(get, set):DotPixelArt;
 	public var d:DotPixelArt; // dot pixel art
 	public var ticks(get, null):Int;
@@ -183,6 +187,20 @@ class Actor {
 		s = v;
 		return s;
 	}
+	function get_scaleX():Float {
+		return sx;
+	}
+	function set_scaleX(v:Float):Float {
+		sx = v;
+		return sx;
+	}
+	function get_scaleY():Float {
+		return sy;
+	}
+	function set_scaleY(v:Float):Float {
+		sy = v;
+		return sy;
+	}
 	function get_dotPixelArt():DotPixelArt {
 		return d;
 	}
@@ -290,7 +308,7 @@ class Actor {
 		move();
 		Fiber.updateAll(fs);
 		update();
-		if (d != null) d.setPosition(p).setZ(z).rotate(w).draw();
+		if (d != null) d.setPosition(p).setZ(z).setScale(sx, sy).rotate(w).draw();
 		currentTicks++;
 	}
 }
