@@ -128,7 +128,7 @@ class Main extends Game {
 			new Text().setXy(.1, .1).setText("[urdl]: MOVE").setTicks(180).addOnce();
 		}
 		if (Game.ticks == 60) {
-			new Text().setXy(.1, .15).setText("[Z]: BREAK").setTicks(180).addOnce();
+			new Text().setXy(.1, .15).setText("[Z]: BRAKE").setTicks(180).addOnce();
 		}
 	}
 }
