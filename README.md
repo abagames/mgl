@@ -6,7 +6,7 @@ Using the [SiON](https://github.com/keim/SiON "SiON") synthesizer library.
 
 Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif encoder.
 
-####Sample games
+#### Sample games
 
 [SCAFFOLD NOW](http://abagames.sakura.ne.jp/flash/sn/) /
 [DON'T SEE ME](http://abagames.sakura.ne.jp/flash/dsm/) /
@@ -33,7 +33,7 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 [SATELLITE CATCH](http://abagames.sakura.ne.jp/flash/sc/) /
 [POLAR NS](http://abagames.sakura.ne.jp/flash/pns/)
 
-####Sample games (using the older version mgl)
+#### Sample games (using the older version mgl)
 
 [LONG EDGE WINS](http://abagames.sakura.ne.jp/flash/lew/) /
 [REVGRAV](http://abagames.sakura.ne.jp/flash/rg/) /
@@ -42,7 +42,7 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 [SIDE SHOT BOOSTER](http://abagames.sakura.ne.jp/flash/ssb/) /
 [MAGNETIC ACTION](http://abagames.sakura.ne.jp/flash/ma/)
 
-###Advantages
+### Advantages
 
 * A basic game loop is automatically managed.
 * You can do spawning, moving and removing the actor in an easy-to-write manner.
@@ -55,7 +55,7 @@ Using the [as3gif](https://code.google.com/p/as3gif/ "as3gif") animated gif enco
 * Not suitable for a large scale game because of lacking flexibility in handling a game loop.
 * No 3d, neither external bitmaps nor sounds loading support.
 
-###Sample code
+### Sample code
 
 [BALL 28 IN SPACE](http://abagames.sakura.ne.jp/flash/b2is/)
 
@@ -202,11 +202,11 @@ class Ball extends Actor {
 }
 ```
 
-###Classes
+### Classes
 
 A shortened form of a class/method name is described in ( ).
 
-###Game (G)
+### Game (G)
 
 A basic game loop handler. You have to override the initialize(), begin() and update() method.
 
@@ -234,7 +234,7 @@ A basic game loop handler. You have to override the initialize(), begin() and up
 * loadState(d:Dynamic):Void
 * saveState(d:Dynamic):Void
 
-####Actor (A)
+#### Actor (A)
 
 An actor moves on a screen. An actor has a position, a velocity and a dot pixel art.
 
@@ -271,7 +271,7 @@ An actor moves on a screen. An actor has a position, a velocity and a dot pixel 
 * begin():Void
 * update():Void
 
-###DotPixelArt (D)
+### DotPixelArt (D)
 
 A pixel art for an actor. You can write a rectangle, a circle and an auto generated shape.
 
@@ -303,7 +303,7 @@ A pixel art for an actor. You can write a rectangle, a circle and an auto genera
 * setDrawColor(color:C = null):DotPixelArt (dc)
 * draw():DotPixelArt (d)
 
-###Sound (S)
+### Sound (S)
 
 A 8-bit era style sound effect.
 
@@ -335,7 +335,7 @@ A 8-bit era style sound effect.
 	bassVoice:Int = -1, snareVoice:Int = -1, hihatVoice:Int = -1):Sound (dm)
 * play():Sound (p)
 
-####Particle (P)
+#### Particle (P)
 
 Particles splashed from a specified position.
 
@@ -355,7 +355,7 @@ Particles splashed from a specified position.
 * setWay(angle:Float, angleWidth:Float = 0):Particle (w)
 * add():Particle (a)
 
-####Text (T)
+#### Text (T)
 
 Showing a text on a screen in a certain duration ticks.
 
@@ -379,7 +379,7 @@ Showing a text on a screen in a certain duration ticks.
 * remove():Bool (r)
 * draw():Text (d)
 
-####Random (R)
+#### Random (R)
 
 Random number generator.
 
@@ -397,7 +397,7 @@ Random number generator.
 * setStage(stage:Int, seedOffset:Int = 0):Random (st)
 * nextDifficultyCorrected:Float (dc)
 
-####Fiber (F)
+#### Fiber (F)
 
 Set the do block and the block runs constantly for a specified wait ticks.
 
@@ -415,7 +415,7 @@ Set the do block and the block runs constantly for a specified wait ticks.
 * remove():Fiber (r)
 * count:Float (cn)
 
-####Color (C)
+#### Color (C)
 
 RGB color.
 
@@ -445,7 +445,7 @@ RGB color.
 * goBlink():Color (gbl)
 * blend(color:C, ratio:Float):Color (bl)
 
-####Key (K)
+#### Key (K)
 
 Key and joystick input status.
 
@@ -469,7 +469,7 @@ Key and joystick input status.
 * (static)isPressedButton2:Bool (ipb2)
 * (static)stick:Vector (st)
 
-####Mouse (M)
+#### Mouse (M)
 
 Mouse input status.
 
@@ -478,7 +478,7 @@ Mouse input status.
 * (static)isButtonPressing:Bool (ip)
 * (static)isPressedButton:Bool (ipb)
 
-####Vector (V)
+#### Vector (V)
 
 2D vector.
 
@@ -508,7 +508,7 @@ Mouse input status.
 * isIn(spacing:Float = 0,
 	minX:Float = 0, maxX:Float = 1, minY:Float = 0, maxY:Float = 1):Bool (ii)
 
-####Util (U)
+#### Util (U)
 
 Utility methods.
 
